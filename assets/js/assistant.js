@@ -11,7 +11,7 @@
   const log = $("#chat-log");
   const actions = $("#chat-actions");
   const status = $("#chat-status");
-  const PHONE = "+44 (0)20 8158 8434", PHONE_HREF = "tel:+442081588434", EMAIL = "admin@propertysauce.co";
+  const PHONE = "+44 (0)20 8988 8434", PHONE_HREF = "tel:+442089888434", EMAIL = "contact@propertysauce.co";
   const API = { chat: "/api/chat/", verify: "/api/verify/" };
 
   const state = load() || { mode: null, session: null, tenant: null, history: [], transcript: [] };

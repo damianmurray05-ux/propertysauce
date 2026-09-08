@@ -32,7 +32,7 @@ Optional:
 |---|---|---|
 | `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, `TWILIO_FROM` | From <https://twilio.com> | One-time codes by text message |
 | `MAINTENANCE_WEBHOOK_URL` | A Zapier or Make webhook | Pushing every job into Trello, a sheet, or anywhere else |
-| `TEAM_EMAIL` | Defaults to `admin@propertysauce.co` | Where jobs and enquiries are sent |
+| `TEAM_EMAIL` | Defaults to `contact@propertysauce.co` | Where jobs and enquiries are sent |
 | `CHAT_MODEL` | Defaults to `claude-opus-5` | Which model answers |
 
 After adding variables, go to **Deployments** and click **Redeploy** on the
@@ -84,7 +84,7 @@ across; Vercel issues the SSL certificate itself.
   a repair**, enter `PS-0001`, and choose email. The code arrives from
   `assistant@propertysauce.co`.
 - Describe a fault and attach a photo. You should receive the job email at
-  `admin@propertysauce.co` and a confirmation at your own address.
+  `contact@propertysauce.co` and a confirmation at your own address.
 
 ## Running it locally
 

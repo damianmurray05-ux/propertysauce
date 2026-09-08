@@ -5,12 +5,12 @@
 
 export const knowledge = `
 ## Property Sauce
-Property Sauce is a trading name of Sure Lets and Manage Limited (company number 16613860). It lets and manages residential property across England for private, corporate and institutional landlords, manages blocks and portfolios, and buys blocks of flats for its own account. Sister brands: Sure Lets & Manage (lettings for individual landlords) and Luxe Stay (serviced and short-stay homes). Office: Top Floor, 55 Coopers Lane, Leyton, London E10 5DG. Phone +44 (0)20 8158 8434, Monday to Friday 9am to 6pm. Email admin@propertysauce.co. Property Redress Scheme member PRS058008. ICO registration ZC027659.
+Property Sauce is a trading name of Sure Lets and Manage Limited (company number 16613860). It lets and manages residential property across England for private, corporate and institutional landlords, manages blocks and portfolios, and buys blocks of flats for its own account. Sister brands: Sure Lets & Manage (lettings for individual landlords) and Luxe Stay (serviced and short-stay homes). Office: Top Floor, 55 Coopers Lane, Leyton, London E10 5DG. Phone +44 (0)20 8988 8434, Monday to Friday 9am to 6pm. Email contact@propertysauce.co. Property Redress Scheme member PRS058008. ICO registration ZC027659.
 
 ## Emergencies (tell the tenant to phone, do not just log it)
 - Smell of gas: leave the property, do not use switches, call the National Gas Emergency Service on 0800 111 999, then ring us.
 - No heating or hot water in cold weather, a leak that cannot be stopped, no electricity, no water, sewage backing up, a broken external door or window that cannot be secured, a fire (call 999 first), carbon monoxide alarm sounding (leave, call 0800 111 999).
-- For all of these: ring +44 (0)20 8158 8434. Out of hours [out-of-hours arrangement to be confirmed by the team]. Log the report as well so there is a record.
+- For all of these: ring +44 (0)20 8988 8434. Out of hours [out-of-hours arrangement to be confirmed by the team]. Log the report as well so there is a record.
 
 ## Reporting a repair
 - Existing tenants verify with their tenancy reference (format PS-1234, on the tenancy agreement and on our emails) and a one-time code by email or text.
@@ -35,7 +35,7 @@ Property Sauce is a trading name of Sure Lets and Manage Limited (company number
 - Documents given at the start: tenancy agreement, How to Rent guide, EPC, gas safety certificate, electrical safety report, deposit protection certificate and prescribed information, and any licence details.
 - Bills: unless the agreement says otherwise the tenant pays council tax, gas, electricity, water, broadband and TV licence, and is responsible for contents insurance for their own belongings.
 - Ending the tenancy: two months' notice in writing from the tenant; check-out inspection against the inventory; deposit returned within 10 days of agreeing deductions, disputes go to the scheme's free adjudication.
-- Complaints: in writing to admin@propertysauce.co; acknowledged within three working days, full reply within fifteen; then review by a director; then the Property Redress Scheme, free to the tenant.
+- Complaints: in writing to contact@propertysauce.co; acknowledged within three working days, full reply within fifteen; then review by a director; then the Property Redress Scheme, free to the tenant.
 
 ## Prospective tenants agreeing a new tenancy
 - The assistant can explain the standard terms above and note requested changes (for example start date, pets, decorating, additional occupier, guarantor) for a member of staff to confirm. It cannot agree changes itself.

@@ -82,7 +82,7 @@ export async function runTool(name, input, ctx) {
       await sendEmail({
         to: who.email,
         subject: `Your repair report ${ref}`,
-        text: `Thank you for reporting this. Your reference is ${ref}.\n\nWhat you told us: ${input.summary}\nLocation: ${input.location_in_property}\nAccess: ${input.access}\n\nThe team reviews reports the same working day and a contractor will contact you to arrange access. If the problem is dangerous or getting worse, ring +44 (0)20 8158 8434.\n\nProperty Sauce`,
+        text: `Thank you for reporting this. Your reference is ${ref}.\n\nWhat you told us: ${input.summary}\nLocation: ${input.location_in_property}\nAccess: ${input.access}\n\nThe team reviews reports the same working day and a contractor will contact you to arrange access. If the problem is dangerous or getting worse, ring +44 (0)20 8988 8434.\n\nProperty Sauce`,
       });
     }
     await postWebhook({ type: "repair", reference: ref, raised: new Date().toISOString(), verified, reporter: who, ...input, photos: ctx.photos.length });
@@ -96,11 +96,11 @@ export async function runTool(name, input, ctx) {
     const text = `${kind} ${ref}\nReceived ${when} via the website assistant\n\n${lines(input)}`;
     const team = await sendEmail({ to: TEAM_EMAIL, subject, text, replyTo: /@/.test(input.contact) ? input.contact : undefined });
     if (/@/.test(input.contact)) {
-      await sendEmail({ to: input.contact.trim(), subject: `We have your ${kind.toLowerCase()} (${ref})`, text: `Thank you. Reference ${ref}.\n\nWhat we noted: ${input.summary}\n\nA member of the team will reply, usually the same working day. Ring +44 (0)20 8158 8434 if it is urgent.\n\nProperty Sauce` });
+      await sendEmail({ to: input.contact.trim(), subject: `We have your ${kind.toLowerCase()} (${ref})`, text: `Thank you. Reference ${ref}.\n\nWhat we noted: ${input.summary}\n\nA member of the team will reply, usually the same working day. Ring +44 (0)20 8988 8434 if it is urgent.\n\nProperty Sauce` });
     }
     await postWebhook({ type: name, reference: ref, received: new Date().toISOString(), ...input });
     ctx.raised.push({ reference: ref, note: "A person will follow up." });
-    return `Logged. Reference ${ref}. ${team.ok ? "The team has been emailed." : "Email delivery is not configured; tell the person to also email admin@propertysauce.co."}`;
+    return `Logged. Reference ${ref}. ${team.ok ? "The team has been emailed." : "Email delivery is not configured; tell the person to also email contact@propertysauce.co."}`;
   }
   return `Unknown tool ${name}`;
 }

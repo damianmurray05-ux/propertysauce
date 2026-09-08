@@ -86,7 +86,7 @@ export async function POST(request) {
     for (let turn = 0; turn < 4; turn++) {
       const res = await create({ ...base, messages });
       if (res.stop_reason === "refusal") {
-        reply = "I cannot help with that here. Ring +44 (0)20 8158 8434 or email admin@propertysauce.co and a person will help.";
+        reply = "I cannot help with that here. Ring +44 (0)20 8988 8434 or email contact@propertysauce.co and a person will help.";
         break;
       }
       const text = res.content.filter((b) => b.type === "text").map((b) => b.text).join("\n").trim();

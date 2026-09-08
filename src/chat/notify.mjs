@@ -4,7 +4,7 @@
 // otherwise, so the site keeps working before they are configured.
 
 const FROM = process.env.MAIL_FROM || "Property Sauce <assistant@propertysauce.co>";
-export const TEAM_EMAIL = process.env.TEAM_EMAIL || "admin@propertysauce.co";
+export const TEAM_EMAIL = process.env.TEAM_EMAIL || "contact@propertysauce.co";
 
 export const emailConfigured = () => Boolean(process.env.RESEND_API_KEY);
 export const smsConfigured = () => Boolean(process.env.TWILIO_ACCOUNT_SID && process.env.TWILIO_AUTH_TOKEN && process.env.TWILIO_FROM);
