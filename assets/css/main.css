@@ -485,7 +485,7 @@ body.menu-open .header-cta { visibility: hidden; }
 .score-part-head span { font-family: var(--font-display); font-size: var(--fs-2); font-weight: 600; color: var(--ink); }
 .score-part-head strong { font-family: var(--font-display); font-size: var(--fs-2); font-weight: 500; color: var(--gold); }
 .score-bar { height: 4px; background: var(--paper-2); overflow: hidden; }
-.score-bar i { display: block; height: 100%; background: var(--gold); transition: width 1s var(--ease-out); }
+.score-bar i { display: block; height: 100%; width: 100%; background: var(--gold); transform-origin: left; transform: scaleX(var(--p, 0)); transition: transform 1s var(--ease-out); }
 .score-part small { display: block; margin-top: 0.4rem; color: var(--muted); font-size: var(--fs-0); }
 .score-history h3, .score-cols h3 { font-size: var(--fs-2); margin-bottom: 0.75rem; }
 .score-months { display: grid; grid-template-columns: repeat(12, 1fr); gap: 0.4rem; max-width: 34rem; }
