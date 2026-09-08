@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+      <circle cx="50" cy="50" r="46" fill="none" stroke="#f4f5f1" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"/>
+      <path d="M20 74V44L26 38L32 44V74M32 74V40L50 24L68 40V74M68 74V44L74 38L80 44V74M16 74H84" fill="none" stroke="#f4f5f1" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"/>
+      <path d="M26 30V38M74 30V38M44 30V29M56 30V29" stroke="#f4f5f1" stroke-width="2.5" stroke-linecap="round"/>
+      <path d="M42 33H58" stroke="#f4f5f1" stroke-width="2.5" stroke-linecap="round"/>
+      <rect x="23" y="50" width="6" height="8" fill="#f4f5f1"/><rect x="71" y="50" width="6" height="8" fill="#f4f5f1"/>
+      <rect x="38" y="44" width="6" height="8" fill="#f4f5f1"/><rect x="47" y="44" width="6" height="8" fill="#f4f5f1"/><rect x="56" y="44" width="6" height="8" fill="#f4f5f1"/>
+      <rect x="38" y="57" width="6" height="8" fill="#f4f5f1"/><rect x="56" y="57" width="6" height="8" fill="#f4f5f1"/>
+      <path d="M45 74V62A5 5 0 0 1 55 62V74Z" fill="#c8502a"/></svg>
