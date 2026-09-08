@@ -1,0 +1,2 @@
+landlord_ref,name,email,phone,notes
+PSL-1001,Example Landlord,landlord@example.com,+447700900001,Example row: one per landlord. The reference is what they sign in with.

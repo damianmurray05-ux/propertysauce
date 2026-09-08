@@ -78,3 +78,33 @@ test("scorecard scoring is fair and bounded", async () => {
   assert.equal(rough.streak, 1);
   assert.ok(rough.tips.length >= 3);
 });
+
+test("landlord portfolio scoring, certificates and sign-in", async () => {
+  process.env.LANDLORD_DIRECTORY_JSON = JSON.stringify([{ landlord_ref: "PSL-1001", name: "Bea Owner", email: "bea@example.com", phone: "" }]);
+  const soon = new Date(Date.now() + 30 * 86400000).toISOString().slice(0, 10);
+  const later = new Date(Date.now() + 400 * 86400000).toISOString().slice(0, 10);
+  process.env.PROPERTY_DIRECTORY_JSON = JSON.stringify([
+    { property_ref: "PSP-1", landlord_ref: "PSL-1001", address: "Flat 1, Example St", rent_pcm: "1000", rent_history_12m: "OOOOOOOOOOOO", rent_due_12m: "12000", rent_collected_12m: "12000", arrears: "0", landlord_payments_12m: "12", landlord_paid_on_time_12m: "12", gas_expiry: later, eicr_expiry: later, epc_expiry: later, epc_rating: "C", deposit_protected: "yes" },
+    { property_ref: "PSP-2", landlord_ref: "PSL-1001", address: "Flat 2, Example St", rent_pcm: "1000", rent_history_12m: "OOMMLLPOOOOO", rent_due_12m: "12000", rent_collected_12m: "9500", arrears: "2500", landlord_payments_12m: "10", landlord_paid_on_time_12m: "9", gas_expiry: "2024-01-01", eicr_expiry: soon, epc_expiry: "", deposit_protected: "no" },
+    { property_ref: "PSP-9", landlord_ref: "PSL-9999", address: "Someone else's", rent_pcm: "1", rent_history_12m: "", rent_due_12m: "", rent_collected_12m: "" },
+  ]);
+  process.env.DOCUMENT_DIRECTORY_JSON = JSON.stringify([{ property_ref: "PSP-1", type: "gas", title: "Gas cert", date: "2026-01-01", url: "https://example.com/a" }]);
+  const { scorePortfolio, propertiesFor } = await import("../src/chat/landlords.mjs");
+  const props = await propertiesFor("psl 1001");
+  assert.equal(props.length, 2);
+  const pf = scorePortfolio(props);
+  assert.equal(pf.properties[0].score, 100); assert.equal(pf.properties[0].rag, "green"); assert.equal(pf.properties[0].documents.length, 1);
+  const bad = pf.properties[1];
+  assert.ok(bad.score < 65, String(bad.score)); assert.equal(bad.rag, "red");
+  assert.ok(bad.certificates.some((c) => c.label === "Gas safety" && c.status === "expired"));
+  assert.ok(bad.certificates.some((c) => c.label === "Electrical (EICR)" && c.status === "due"));
+  assert.ok(bad.alerts.length >= 3);
+  const api = await import("../api/landlord.js");
+  const post = (b) => api.POST(new Request("http://x/api/landlord/", { method: "POST", body: JSON.stringify(b) }));
+  let r = await post({ action: "start", reference: "PSL-1001", channel: "email" });
+  const { token, devCode } = await r.json();
+  r = await post({ action: "check", token, code: devCode }); assert.equal(r.status, 200);
+  const { session } = await r.json();
+  r = await post({ action: "portfolio", session }); assert.equal(r.status, 200);
+  const d = await r.json(); assert.equal(d.firstName, "Bea"); assert.equal(d.totals.properties, 2);
+});

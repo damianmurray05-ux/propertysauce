@@ -1,0 +1,5 @@
+property_ref,type,title,date,url,amount,notes
+PSP-2001,tenancy,Tenancy agreement 2024,2024-03-01,https://drive.google.com/file/d/EXAMPLE/view,,type is one of: tenancy gas eicr epc licence inventory invoice statement other
+PSP-2001,gas,Gas safety certificate,2026-03-14,https://drive.google.com/file/d/EXAMPLE/view,,
+PSP-2001,invoice,Rent invoice August 2026,2026-08-01,https://drive.google.com/file/d/EXAMPLE/view,1450,
+PSP-2001,statement,Statement and payment August 2026,2026-08-06,https://drive.google.com/file/d/EXAMPLE/view,1232,

@@ -1,0 +1,67 @@
+---
+title: Landlord portal
+description: Landlords sign in with a one-time code to see each property scored on rent, payments and certificates, with every tenancy agreement, certificate, invoice and statement to hand.
+noindex: true
+---
+<section class="intro">
+  <div class="wrap">
+    <h1 data-reveal>Your portfolio, at a glance.</h1>
+    <p class="lede" data-reveal style="--d:80ms">Every property scored on rent collected, rent paid to you, and certificates in date. Every document in one place: tenancy agreements, gas and electrical certificates, EPCs, rent invoices and your statements.</p>
+  </div>
+</section>
+
+<section class="section-tight">
+  <div class="wrap">
+    <div class="score-gate" id="portal-gate" data-reveal>
+      <div class="score-gate-inner">
+        <h2>Sign in to your portal.</h2>
+        <p class="muted">Your landlord reference is on your management agreement and on our statements. We send a one-time code to the email or mobile we hold for you.</p>
+        <form class="score-form" id="portal-ref-form" novalidate>
+          <div class="field"><label for="pl-ref">Landlord reference</label><input id="pl-ref" type="text" autocomplete="off" placeholder="PSL-1234" required></div>
+          <button class="btn btn-primary" type="submit">Continue <svg class="ic btn-ic" aria-hidden="true"><use href="/assets/icons.svg#arrow-up-right"/></svg></button>
+        </form>
+        <div id="portal-channels" class="score-channels" hidden></div>
+        <form class="score-form" id="portal-code-form" novalidate hidden>
+          <div class="field"><label for="pl-code">Six-digit code</label><input id="pl-code" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="7" required></div>
+          <button class="btn btn-primary" type="submit">Open my portal <svg class="ic btn-ic" aria-hidden="true"><use href="/assets/icons.svg#arrow-up-right"/></svg></button>
+        </form>
+        <p class="notice" id="portal-msg" hidden></p>
+      </div>
+    </div>
+
+    <div class="portal" id="portal" hidden>
+      <div class="portal-head">
+        <div>
+          <span class="eyebrow">Landlord portal</span>
+          <h2 id="pl-title">Hello.</h2>
+          <p class="muted" id="pl-sub"></p>
+        </div>
+        <div class="score-ring" id="pl-ring" role="img" aria-label="Portfolio score"></div>
+      </div>
+      <div class="portal-totals" id="pl-totals"></div>
+      <div class="portal-alerts" id="pl-alerts"></div>
+      <div class="portal-props" id="pl-props"></div>
+      <p class="calc-note">Figures are updated when we update your file, usually with the monthly statement. Documents open in Google Drive. If anything looks wrong, use the assistant or ring the office.</p>
+      <div class="calc-actions">
+        <a class="btn btn-primary btn-sm" href="/contact/">Talk to us <svg class="ic btn-ic" aria-hidden="true"><use href="/assets/icons.svg#arrow-up-right"/></svg></a>
+        <button type="button" class="btn btn-ghost btn-sm" id="pl-signout">Sign out</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="wrap split">
+    <div class="sh" data-reveal>
+      <h2>How each property is scored.</h2>
+      <p>One hundred points, four parts. Green is 85 and above, amber 65 to 84, red below 65.</p>
+    </div>
+    <div class="steps">
+      <div class="step" data-reveal><span class="step-n">35</span><div><h3>Rent collected</h3><p>Rent received in the last twelve months as a share of rent due. Part payments count for what they are.</p></div></div>
+      <div class="step" data-reveal><span class="step-n">20</span><div><h3>Paid on time by the tenant</h3><p>Payments received on or before the due date score in full; late or part payments score half; missed payments score nothing.</p></div></div>
+      <div class="step" data-reveal><span class="step-n">15</span><div><h3>Paid to you on time</h3><p>Statements paid to you within five working days of the rent clearing. Our promise, scored against ourselves.</p></div></div>
+      <div class="step" data-reveal><span class="step-n">30</span><div><h3>Certificates and compliance</h3><p>Gas safety, electrical report, EPC and deposit protection, each in date. A certificate due within sixty days scores most of its points because the renewal is already booked; an expired or missing one scores none until it is fixed.</p></div></div>
+    </div>
+  </div>
+</section>
+<script src="/assets/js/portal.js" defer></script>

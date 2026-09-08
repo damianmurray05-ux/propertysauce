@@ -1,0 +1,2 @@
+property_ref,landlord_ref,address,tenant_ref,rent_pcm,rent_history_12m,rent_due_12m,rent_collected_12m,arrears,landlord_payments_12m,landlord_paid_on_time_12m,gas_expiry,eicr_expiry,epc_expiry,epc_rating,licence_expiry,deposit_protected,notes
+PSP-2001,PSL-1001,"Flat 1, 1 Example Street, London E10 0AA",PS-1001,1450,OOOOLOOOOPOO,17400,17250,150,12,12,2027-03-14,2029-06-01,2031-01-20,C,,yes,"rent_history_12m: O on time, L late, P part, M missed, - not due. Dates YYYY-MM-DD. gas_expiry can be 'none' for all-electric. licence_expiry blank if not required."

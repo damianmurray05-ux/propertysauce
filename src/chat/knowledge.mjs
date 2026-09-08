@@ -41,6 +41,9 @@ Property Sauce is a trading name of Sure Lets and Manage Limited (company number
 - Every tenant has a score out of 100 at propertysauce.co/my-tenancy/ after signing in with their reference and a one-time code. Four parts: rent paid on time (50), account up to date (15), good neighbour with no upheld noise reports (20), home looked after at inspections (15). Tiers: Platinum 95+, Gold 85+, Silver 70+, Bronze 50+.
 - Rewards: Silver and above can have a landlord reference on request; Gold and Platinum get priority booking for non-urgent repairs. [Other rewards to be confirmed by the team.] Scores update when the file is updated, usually monthly. If a tenant thinks a figure is wrong, log it for the team.
 
+## Landlord portal
+- Landlords sign in at propertysauce.co/landlord-portal/ with their landlord reference (format PSL-1234, on the management agreement and statements) and a one-time code. They see each property scored out of 100 (rent collected 35, paid on time by the tenant 20, paid to the landlord on time 15, certificates and compliance 30), with green, amber and red, plus every document: tenancy agreements, gas safety, EICR, EPC, licences, inventories, rent invoices and statements. If a landlord cannot find their reference, take their details and pass to the team.
+
 ## Calculators on the website
 - Lease extension calculator at /leasehold-calculator/ (statutory method, marriage value under 80 years, option for the 2024 Act method). Capital gains tax calculator at /capital-gains-tax-calculator/ (residential property, 2025 to 2026 figures). Both are estimates, not advice.
 

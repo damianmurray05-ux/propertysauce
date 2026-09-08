@@ -56,6 +56,26 @@ code, in a Google Sheet you control:
 Give every tenant their reference (it is what they will be asked for). The
 format `PS-1234` is a suggestion; anything unique works.
 
+## 3b. The landlord portal
+
+Landlords sign in the same way tenants do, and see their properties scored,
+with certificates and documents. It reads three more sheets, or three tabs of
+one Google Sheet, each published to the web as CSV like the tenant directory:
+
+| Variable | Template | What it holds |
+|---|---|---|
+| `LANDLORD_DIRECTORY_URL` | `docs/landlord-directory-template.csv` | One row per landlord: reference, name, email, phone |
+| `PROPERTY_DIRECTORY_URL` | `docs/property-directory-template.csv` | One row per property: landlord reference, rent figures, certificate expiry dates |
+| `DOCUMENT_DIRECTORY_URL` | `docs/document-directory-template.csv` | One row per document: property reference, type, title, date, a Google Drive link |
+
+Put the documents themselves in Google Drive, one folder per property, and
+paste each file's share link into the documents sheet. Set the link to
+"anyone with the link can view": the portal only shows a landlord links for
+their own properties, but the Drive link itself is the thing that opens the
+file, so keep it unguessable and do not post it anywhere else. Update the
+property sheet when you send the monthly statement; the portal reflects it
+within five minutes.
+
 ## 4. Email sending
 
 Codes and job notifications go out through Resend. In Resend, add the domain

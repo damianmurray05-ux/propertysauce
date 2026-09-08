@@ -9,7 +9,7 @@
 let cache = { at: 0, rows: [] };
 const TTL = 5 * 60 * 1000;
 
-function parseCsv(text) {
+export function parseCsv(text) {
   const rows = [];
   let row = [], field = "", q = false;
   for (let i = 0; i < text.length; i++) {

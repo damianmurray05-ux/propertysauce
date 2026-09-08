@@ -185,6 +185,7 @@ ${body}
     <div class="footer-col">
       <h2>Services</h2>
       <a href="/landlords/">Landlords</a>
+      <a href="/landlord-portal/">Landlord portal</a>
       <a href="/investors/">Corporate and institutional</a>
       <a href="/block-management/">Block management</a>
       <a href="/investors/#portfolio">Portfolio management</a>
