@@ -162,9 +162,9 @@ body.menu-open .header-cta { visibility: hidden; }
 .ledger-side { position: sticky; top: 6rem; align-self: start; }
 .ledger-side .frame { aspect-ratio: 4 / 5; }
 .rows { display: grid; }
-.row { display: grid; grid-template-columns: 3.5rem 1fr; gap: 1rem; padding: clamp(1.5rem, 3vw, 2.25rem) 0; border-top: 1px solid var(--line); text-decoration: none; color: inherit; transition: padding-left var(--dur-fast) var(--ease-out); }
+.row { display: grid; grid-template-columns: 3.5rem 1fr; gap: 1rem; padding: clamp(1.5rem, 3vw, 2.25rem) 0; border-top: 1px solid var(--line); text-decoration: none; color: inherit; transition: transform var(--dur-fast) var(--ease-out); }
 .row:last-child { border-bottom: 1px solid var(--line); }
-.row:hover { padding-left: 0.5rem; }
+.row:hover { transform: translateX(0.5rem); }
 .row-n { font-family: var(--font-display); font-size: var(--fs-2); font-weight: 700; letter-spacing: -0.02em; color: var(--accent); line-height: 1.3; }
 .row h3 { margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.6rem; }
 .row h3 .ic { color: var(--accent); opacity: 0; transition: opacity var(--dur-fast); }
