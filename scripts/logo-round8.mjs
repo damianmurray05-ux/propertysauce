@@ -58,7 +58,7 @@ const lockups = {
     title: "Horizontal lockup for the website header",
     why: "The monogram small on the left, the name beside it in serif capitals with the trades beneath. This is how it sits in a navigation bar and an email signature.",
     bg: PAPER,
-    svg: mono(INK, INK, 78, 150, 0.52) + serif("PROPERTY SAUCE", 190, 148, 21, INK, { weight: 500, track: 0.12 }) + caps("LETTINGS  ·  BLOCK MANAGEMENT  ·  ACQUISITION", 190, 168, 6.2, INK, 0.22),
+    svg: mono(INK, INK, 62, 150, 0.42) + `<path d="M108 128V176" stroke="${INK}" stroke-width="0.8"/>` + serif("PROPERTY SAUCE", 194, 148, 19, INK, { weight: 500, track: 0.1 }) + caps("LETTINGS  ·  BLOCK MANAGEMENT  ·  ACQUISITION", 194, 166, 5.6, INK, 0.2),
   },
 };
 
