@@ -1,0 +1,39 @@
+---
+title: Contact Property Sauce
+description: Talk to Property Sauce about letting or managing a property, block or portfolio management, or selling a block of flats. Phone, email and enquiry form.
+priority: 0.8
+---
+<section class="intro">
+  <div class="wrap">
+    <h1 data-reveal>Talk to us.</h1>
+    <p class="lede" data-reveal style="--d:80ms">Landlords, institutions, freeholders, sellers, agents and receivers: tell us what you have and what you need. Tenants reporting a repair should use the assistant, which verifies you and raises the job straight away.</p>
+  </div>
+</section>
+
+<section class="section-tight">
+  <div class="wrap contact-grid">
+    <div class="contact-details" data-reveal>
+      <div><h3>Phone</h3><p><a href="tel:+442081588434">+44 (0)20 8158 8434</a></p><p class="muted">Monday to Friday, 9am to 6pm</p></div>
+      <div><h3>Email</h3><p><a href="mailto:admin@propertysauce.co">admin@propertysauce.co</a></p></div>
+      <div><h3>Office</h3><p>Top Floor, 55 Coopers Lane<br>Leyton, London E10 5DG</p></div>
+      <div><h3>Tenants</h3><p>Report a repair or ask about a tenancy with the assistant.</p><p><button type="button" class="btn btn-ghost btn-sm" data-open-chat="repair">Report a repair</button></p></div>
+    </div>
+    <form class="form" id="enquiry-form" data-to="admin@propertysauce.co" novalidate data-reveal style="--d:80ms">
+      <div class="form-row">
+        <div class="field"><label for="f-name">Your name</label><input id="f-name" name="name" type="text" autocomplete="name" required><span class="err" data-error-for="name" hidden>Please enter your name</span></div>
+        <div class="field"><label for="f-email">Email</label><input id="f-email" name="email" type="email" autocomplete="email" required><span class="err" data-error-for="email" hidden>Please enter a valid email address</span></div>
+      </div>
+      <div class="form-row">
+        <div class="field"><label for="f-phone">Phone <span class="muted">(optional)</span></label><input id="f-phone" name="phone" type="tel" autocomplete="tel"></div>
+        <div class="field"><label for="f-role">I am</label><select id="f-role" name="role"><option>A private landlord</option><option>A corporate or institutional landlord</option><option>A freeholder or RTM director</option><option>Selling a property or block</option><option>An agent, receiver or solicitor</option><option>Something else</option></select></div>
+      </div>
+      <div class="field"><label for="f-property">Property, block or portfolio <span class="muted">(optional)</span></label><input id="f-property" name="property" type="text" placeholder="Address or area, number of units, how it is let"></div>
+      <div class="field"><label for="f-message">What do you need?</label><textarea id="f-message" name="message" rows="5" required></textarea><span class="err" data-error-for="message" hidden>Please tell us a little about it</span></div>
+      <div class="form-foot">
+        <button class="btn btn-primary" type="submit">Send <svg class="ic btn-ic" aria-hidden="true"><use href="/assets/icons.svg#arrow-up-right"/></svg></button>
+        <small>Opens in your email app with everything filled in. We reply the same working day. <a href="/privacy/">Privacy</a>.</small>
+      </div>
+      <p class="notice" id="form-sent" hidden>Your email app should have opened with the message ready to send. If it did not, email <a href="mailto:admin@propertysauce.co">admin@propertysauce.co</a>.</p>
+    </form>
+  </div>
+</section>

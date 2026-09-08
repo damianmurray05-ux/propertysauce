@@ -1,0 +1,6 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    { "name": "propertysauce-preview", "runtimeExecutable": "/Users/damian/.local/node/bin/node", "runtimeArgs": ["server.mjs"], "port": 4323, "autoPort": true }
+  ]
+}

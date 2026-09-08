@@ -1,0 +1,68 @@
+import { test } from "node:test";
+import assert from "node:assert/strict";
+
+process.env.CHAT_SECRET = "test-secret";
+process.env.TENANT_DIRECTORY_JSON = JSON.stringify([
+  { reference: "PS-1001", name: "Ada Example", email: "ada@example.com", phone: "+44 7700 900000", address: "Flat 1, 1 Example Street" },
+]);
+process.env.CHAT_DEV_ECHO_CODE = "1";
+
+const { sign, verify, hashCode, otp, reference } = await import("../src/chat/crypto.mjs");
+const { findTenant, maskEmail, maskPhone, normaliseRef } = await import("../src/chat/directory.mjs");
+const { systemPrompt } = await import("../src/chat/prompt.mjs");
+const verifyApi = await import("../api/verify.js");
+
+test("tokens round-trip and reject tampering", () => {
+  const t = sign({ a: 1, exp: Date.now() + 1000 });
+  assert.equal(verify(t).a, 1);
+  assert.equal(verify(t.slice(0, -2) + "zz"), null);
+  assert.equal(verify(sign({ exp: Date.now() - 1 })).expired, true);
+});
+
+test("codes are six digits and hash deterministically", () => {
+  assert.match(otp(), /^\d{6}$/);
+  assert.equal(hashCode("PS-1", "123456"), hashCode("PS-1", "123456"));
+  assert.notEqual(hashCode("PS-1", "123456"), hashCode("PS-1", "654321"));
+  assert.match(reference(), /^PS-\d{6}-\d{3}$/);
+});
+
+test("directory lookup is forgiving about formatting", async () => {
+  assert.equal(normaliseRef(" ps 1001 "), "PS1001");
+  const t = await findTenant("ps-1001");
+  assert.equal(t.firstName, "Ada");
+  assert.equal(t.phone, "+447700900000");
+  assert.equal(await findTenant("PS-9999"), null);
+  assert.equal(maskEmail("ada@example.com"), "ad*@example.com");
+  assert.equal(maskPhone("+447700900000"), "**********000");
+});
+
+test("verification flow: lookup, start, check", async () => {
+  const post = (body) => verifyApi.POST(new Request("http://x/api/verify", { method: "POST", body: JSON.stringify(body) }));
+  let r = await post({ action: "lookup", reference: "PS-1001" });
+  assert.equal(r.status, 200);
+  const ch = await r.json();
+  assert.equal(ch.email, "ad*@example.com");
+  r = await post({ action: "start", reference: "PS-1001", channel: "email" });
+  assert.equal(r.status, 200);
+  const { token, devCode } = await r.json();
+  assert.match(devCode, /^\d{6}$/);
+  r = await post({ action: "check", token, code: "000000" });
+  assert.equal(r.status, devCode === "000000" ? 200 : 400);
+  r = await post({ action: "check", token, code: devCode });
+  assert.equal(r.status, 200);
+  const { session, tenant } = await r.json();
+  assert.equal(tenant.firstName, "Ada");
+  const s = verify(session);
+  assert.equal(s.t, "session");
+  assert.equal(s.address, "Flat 1, 1 Example Street");
+  r = await post({ action: "lookup", reference: "PS-0000" });
+  assert.equal(r.status, 404);
+});
+
+test("system prompt carries verified tenant details and the knowledge", () => {
+  const p = systemPrompt({ mode: "repair", tenant: { name: "Ada Example", address: "Flat 1", reference: "PS-1001" } });
+  assert.match(p, /verified tenant/);
+  assert.match(p, /Flat 1/);
+  assert.match(p, /0800 111 999/);
+  assert.doesNotMatch(p, /[–—]/);
+});
