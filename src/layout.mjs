@@ -36,10 +36,11 @@ export const nav = [
 export const icon = (name, cls = "") =>
   `<svg class="ic ${cls}" width="20" height="20" aria-hidden="true"><use href="/assets/icons.svg#${name}"/></svg>`;
 
-// The mark, inline so it needs no request. A drop that reads as a roofline,
-// with a paprika door. Class hooks let dark contexts invert it in CSS.
-export const mark = (size = 36) =>
-  `<svg class="brand-mark" viewBox="0 0 64 64" width="${size}" height="${size}" aria-hidden="true"><rect class="mark-tile" width="64" height="64" rx="16" fill="#0f2a22"/><path class="mark-drop" d="M32 9.5C38.5 20 49.5 28.5 49.5 41A17.5 17.5 0 0 1 14.5 41C14.5 28.5 25.5 20 32 9.5Z" fill="#f4f5f1"/><rect class="mark-door" x="27.25" y="36" width="9.5" height="13" rx="2.2" fill="#c8502a"/></svg>`;
+// The brand lockup, in HTML so it inherits colour: the PS monogram with its
+// gold hairline (CSS text-stroke), a gold rule, the name and the descriptor.
+export const brand = () =>
+  `<span class="mono" aria-hidden="true">P<span>S</span></span><span class="brand-text"><span class="brand-word">Property Sauce</span><span class="brand-tag">Portfolios · Block management · Acquisitions</span></span>`;
+export const mark = brand;
 
 export function layout(meta, body) {
   const title = meta.title ? `${meta.title} | ${site.name}` : `${site.name} | Lettings, block management and property acquisition across England`;
@@ -58,7 +59,7 @@ export function layout(meta, body) {
         legalName: site.legalName,
         alternateName: "Property Sauce (a trading name of Sure Lets and Manage Limited)",
         url: site.url,
-        logo: `${site.url}/brand/logo-primary.png`,
+        logo: `${site.url}/brand/logo-primary-on-paper.png`,
         image: ogImage,
         telephone: site.phoneE164,
         email: site.email,
@@ -132,7 +133,7 @@ ${meta.noindex === "true" ? '<meta name="robots" content="noindex">' : '<meta na
 <link rel="icon" href="/favicon.ico" sizes="32x32">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <link rel="manifest" href="/site.webmanifest">
-<link rel="preload" href="/assets/fonts/schibsted-grotesk-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/assets/fonts/cormorant-normal-latin.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/assets/fonts/geist-latin.woff2" as="font" type="font/woff2" crossorigin>
 ${meta.preload ? `<link rel="preload" href="${meta.preload}" as="image" fetchpriority="high">` : ""}
 <link rel="stylesheet" href="/assets/css/tokens.css">
@@ -145,8 +146,7 @@ ${meta.preload ? `<link rel="preload" href="${meta.preload}" as="image" fetchpri
 <header class="site-header" id="top">
   <div class="header-inner">
     <a class="brand" href="/" aria-label="${site.name} home">
-      ${mark()}
-      <span class="brand-word">Property Sauce</span>
+      ${brand()}
     </a>
     <nav class="nav" aria-label="Primary">
       ${nav
@@ -174,7 +174,7 @@ ${body}
 <footer class="site-footer">
   <div class="footer-inner">
     <div class="footer-brand">
-      <a class="brand" href="/">${mark()}<span class="brand-word">Property Sauce</span></a>
+      <a class="brand" href="/">${brand()}</a>
       <p class="footer-tag">Lettings, block and portfolio management, and direct acquisition of residential blocks across England.</p>
       <p class="footer-contact">
         <a href="${site.phoneHref}">${site.phone}</a><br>

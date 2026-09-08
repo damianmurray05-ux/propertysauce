@@ -1,15 +1,24 @@
 /* Property Sauce design tokens
-   Theme: light page, deep green anchoring sections, one paprika accent.
-   Type: Schibsted Grotesk (display) + Geist (body), self-hosted. */
+   Theme: light page, deep green anchoring sections, gold hairlines, paprika
+   used sparingly. Type: Cormorant Garamond (display) + Geist (body). */
 
 @font-face {
-  font-family: "Schibsted Grotesk";
+  font-family: "Cormorant";
   font-style: normal;
-  font-weight: 400 900;
+  font-weight: 400 700;
   font-display: swap;
-  src: url("../fonts/schibsted-grotesk-latin.woff2") format("woff2");
+  src: url("../fonts/cormorant-normal-latin.woff2") format("woff2");
   unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
+@font-face {
+  font-family: "Cormorant";
+  font-style: italic;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url("../fonts/cormorant-italic-latin.woff2") format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
 @font-face {
   font-family: "Geist";
   font-style: normal;
@@ -32,7 +41,9 @@
   --muted-2: #85938c;
   --line: rgba(15, 42, 34, 0.12);
   --line-strong: rgba(15, 42, 34, 0.24);
-  --accent: #c8502a;       /* Paprika. Marks, icons, emphasis */
+  --gold: #b4924a;         /* Gold. Hairlines, rules, the monogram edge */
+  --gold-soft: rgba(180, 146, 74, 0.35);
+  --accent: #c8502a;       /* Paprika. Used sparingly: the door, one accent per page */
   --accent-ink: #a13f20;   /* Paprika for small text on paper (AA) */
   --accent-soft: #f7e3da;
   --accent-on-dark: #f2a385;
@@ -45,15 +56,15 @@
   --on-dark-line: rgba(255, 255, 255, 0.14);
 
   /* type */
-  --font-display: "Schibsted Grotesk", "Helvetica Neue", Arial, sans-serif;
+  --font-display: "Cormorant", "Cormorant Garamond", Georgia, "Times New Roman", serif;
   --font-body: "Geist", "Helvetica Neue", Arial, sans-serif;
   --fs-0: clamp(0.8125rem, 0.78rem + 0.15vw, 0.875rem);
   --fs-1: clamp(0.9375rem, 0.9rem + 0.2vw, 1.0625rem);
   --fs-2: clamp(1.125rem, 1.05rem + 0.35vw, 1.3125rem);
   --fs-3: clamp(1.375rem, 1.2rem + 0.8vw, 1.875rem);
   --fs-4: clamp(1.75rem, 1.35rem + 1.6vw, 2.75rem);
-  --fs-5: clamp(2.25rem, 1.5rem + 3vw, 4.25rem);
-  --fs-6: clamp(2.6rem, 1.5rem + 4.4vw, 5.5rem);
+  --fs-5: clamp(2.5rem, 1.7rem + 3.2vw, 4.6rem);
+  --fs-6: clamp(3rem, 1.8rem + 4.8vw, 6rem);
 
   /* rhythm */
   --space-1: 0.25rem;
@@ -69,9 +80,9 @@
   --gutter: clamp(1.25rem, 1rem + 2.5vw, 3.5rem);
   --max: 84rem;
 
-  /* shape: one soft system. Cards 18px, controls and inputs 10px */
-  --r-card: 18px;
-  --r-ctl: 10px;
+  /* shape: near-square. Cards 4px, controls 2px */
+  --r-card: 4px;
+  --r-ctl: 2px;
 
   /* motion */
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
