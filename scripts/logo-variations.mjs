@@ -16,50 +16,47 @@ const fontFace = `@font-face{font-family:"Schibsted Grotesk";font-weight:400 900
 const tile = `<rect width="64" height="64" rx="16" fill="${INK}"/>`;
 const drop = (fill, extra = "") => `<path d="M32 9.5C38.5 20 49.5 28.5 49.5 41A17.5 17.5 0 0 1 14.5 41C14.5 28.5 25.5 20 32 9.5Z" fill="${fill}" ${extra}/>`;
 
+const sq = (x, y, w, fill, r = 2.4) => `<rect x="${x}" y="${y}" width="${w}" height="${w}" rx="${r}" fill="${fill}"/>`;
 const marks = {
-  "00-current": {
-    title: "Current: drop with a door",
-    svg: tile + drop(PAPER) + `<rect x="27.25" y="36" width="9.5" height="13" rx="2.2" fill="${ACCENT}"/>`,
+  "11-four": {
+    title: "Four windows, all paprika",
+    svg: tile + sq(15, 15, 15, ACCENT, 3) + sq(34, 15, 15, ACCENT, 3) + sq(15, 34, 15, ACCENT, 3) + sq(34, 34, 15, ACCENT, 3),
   },
-  "01-window": {
-    title: "Drop with a four-pane window",
-    svg: tile + drop(PAPER) + `<rect x="25" y="33" width="14" height="14" rx="2" fill="${ACCENT}"/><path d="M32 33v14M25 40h14" stroke="${PAPER}" stroke-width="2"/>`,
+  "12-four-one": {
+    title: "Four windows, one lit",
+    svg: tile + sq(15, 15, 15, PAPER, 3) + sq(34, 15, 15, ACCENT, 3) + sq(15, 34, 15, PAPER, 3) + sq(34, 34, 15, PAPER, 3),
   },
-  "02-house": {
-    title: "Drop as a house: door and window",
-    svg: tile + drop(PAPER) + `<rect x="29" y="38" width="7" height="11" rx="1.5" fill="${ACCENT}"/><rect x="24" y="29" width="6" height="6" rx="1.2" fill="${INK}"/><rect x="35" y="29" width="6" height="6" rx="1.2" fill="${INK}"/>`,
+  "13-frame": {
+    title: "Window frame with a paprika pane",
+    svg: tile + `<rect x="14" y="14" width="36" height="36" rx="6" fill="none" stroke="${PAPER}" stroke-width="4"/><path d="M32 14v36M14 32h36" stroke="${PAPER}" stroke-width="4"/>` + sq(35, 17, 12, ACCENT, 2),
   },
-  "03-outline": {
-    title: "Outline drop, paprika door",
-    svg: tile + `<path d="M32 11C38 21 48 29 48 40.5A16 16 0 0 1 16 40.5C16 29 26 21 32 11Z" fill="none" stroke="${PAPER}" stroke-width="3.5" stroke-linejoin="round"/><rect x="27.5" y="37" width="9" height="12" rx="2" fill="${ACCENT}"/>`,
+  "14-arch": {
+    title: "Arched doorway",
+    svg: tile + `<path d="M17 52V30A15 15 0 0 1 47 30V52Z" fill="${PAPER}"/><path d="M25 52V34A7 7 0 0 1 39 34V52Z" fill="${ACCENT}"/>`,
   },
-  "04-pair": {
-    title: "Two drops: a portfolio, not a property",
-    svg: tile + `<path d="M24 12C29 20 37 26 37 35.5A13 13 0 0 1 11 35.5C11 26 19 20 24 12Z" fill="${PAPER}" opacity="0.55"/><path d="M40 18C45 26 53 32 53 41.5A13 13 0 0 1 27 41.5C27 32 35 26 40 18Z" fill="${PAPER}"/><rect x="36.5" y="38" width="7" height="10" rx="1.8" fill="${ACCENT}"/>`,
+  "15-facade": {
+    title: "Facade: six windows and a door",
+    svg: tile + sq(15, 13, 9, PAPER, 1.8) + sq(27.5, 13, 9, PAPER, 1.8) + sq(40, 13, 9, PAPER, 1.8) + sq(15, 26, 9, PAPER, 1.8) + sq(27.5, 26, 9, PAPER, 1.8) + sq(40, 26, 9, PAPER, 1.8) + `<rect x="26" y="39" width="12" height="15" rx="2.2" fill="${ACCENT}"/>`,
   },
-  "05-roof": {
-    title: "Paprika roofline over a drop",
-    svg: tile + `<path d="M14 26L32 10L50 26" fill="none" stroke="${ACCENT}" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/><path d="M32 22C37 30 46 35 46 43A14 14 0 0 1 18 43C18 35 27 30 32 22Z" fill="${PAPER}"/>`,
+  "16-skyline": {
+    title: "Three blocks, stepped",
+    svg: tile + `<rect x="12" y="30" width="12" height="24" rx="2" fill="${PAPER}"/><rect x="26" y="16" width="12" height="38" rx="2" fill="${PAPER}"/><rect x="40" y="24" width="12" height="30" rx="2" fill="${PAPER}"/>` + sq(29.5, 20, 5, ACCENT, 1) + sq(29.5, 28, 5, INK, 1) + sq(29.5, 36, 5, INK, 1),
   },
-  "06-paprika": {
-    title: "Paprika drop on paper, no tile",
-    svg: `<rect width="64" height="64" rx="16" fill="${PAPER}"/><path d="M32 8C39 19.5 51 28.5 51 42A19 19 0 0 1 13 42C13 28.5 25 19.5 32 8Z" fill="${ACCENT}"/><rect x="27" y="37" width="10" height="13.5" rx="2.2" fill="${INK}"/>`,
+  "17-floors": {
+    title: "Floors: three bars, paprika roof",
+    svg: tile + `<rect x="14" y="14" width="36" height="9" rx="3" fill="${ACCENT}"/><rect x="14" y="27.5" width="36" height="9" rx="3" fill="${PAPER}"/><rect x="14" y="41" width="36" height="9" rx="3" fill="${PAPER}"/>`,
   },
-  "07-windows": {
-    title: "Block of flats: nine windows, one lit",
-    svg: tile + [0, 1, 2].flatMap((r) => [0, 1, 2].map((c) => `<rect x="${15 + c * 13}" y="${15 + r * 13}" width="8" height="8" rx="1.6" fill="${r === 1 && c === 1 ? ACCENT : PAPER}"/>`)).join(""),
+  "18-iso": {
+    title: "Isometric block",
+    svg: tile + `<path d="M32 12L50 22V42L32 52L14 42V22Z" fill="${PAPER}"/><path d="M32 32L50 22V42L32 52Z" fill="${ACCENT}"/><path d="M32 32L14 22V42L32 52Z" fill="${INK}" opacity="0.35"/>`,
   },
-  "08-seal": {
-    title: "Drop in a ring: a seal for institutional work",
-    svg: tile + `<circle cx="32" cy="32" r="23" fill="none" stroke="${PAPER}" stroke-width="2.5"/><path d="M32 16C36.5 23.5 44 29 44 37.5A12 12 0 0 1 20 37.5C20 29 27.5 23.5 32 16Z" fill="${PAPER}"/><rect x="28.5" y="34" width="7" height="9.5" rx="1.6" fill="${ACCENT}"/>`,
+  "19-monogram": {
+    title: "PS monogram",
+    svg: tile + `<text x="32" y="45" text-anchor="middle" font-family="Schibsted Grotesk, Helvetica, Arial, sans-serif" font-weight="800" font-size="36" letter-spacing="-2.5" fill="${PAPER}">P<tspan fill="${ACCENT}">S</tspan></text>`,
   },
-  "09-monogram": {
-    title: "P monogram with a drop counter",
-    svg: tile + `<path d="M19 52V12H36A12 12 0 0 1 36 36H27V52Z" fill="${PAPER}"/><path d="M33 17.5C36 21.5 40 24.5 40 29A6.5 6.5 0 0 1 27 29C27 24.5 31 21.5 33 17.5Z" fill="${INK}"/><rect x="31" y="27" width="4" height="5" rx="1" fill="${ACCENT}"/>`,
-  },
-  "10-building": {
-    title: "Three-storey building with a drop for a door",
-    svg: tile + `<rect x="16" y="14" width="32" height="40" rx="3" fill="${PAPER}"/><rect x="21" y="19" width="6" height="6" rx="1.2" fill="${INK}"/><rect x="29" y="19" width="6" height="6" rx="1.2" fill="${INK}"/><rect x="37" y="19" width="6" height="6" rx="1.2" fill="${INK}"/><rect x="21" y="29" width="6" height="6" rx="1.2" fill="${INK}"/><rect x="29" y="29" width="6" height="6" rx="1.2" fill="${INK}"/><rect x="37" y="29" width="6" height="6" rx="1.2" fill="${INK}"/><path d="M32 38C35 42 38 45 38 49A6 6 0 0 1 26 49C26 45 29 42 32 38Z" fill="${ACCENT}"/>`,
+  "20-chevrons": {
+    title: "Stacked rooflines",
+    svg: tile + `<path d="M16 26L32 14L48 26" fill="none" stroke="${ACCENT}" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M16 39L32 27L48 39" fill="none" stroke="${PAPER}" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M16 52L32 40L48 52" fill="none" stroke="${PAPER}" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round"/>`,
   },
 };
 
@@ -82,9 +79,9 @@ body{margin:0;background:${PAPER};font-family:"Schibsted Grotesk",Helvetica,Aria
 .big svg{display:block}.row{display:flex;align-items:center;gap:12px}.word{font-weight:700;font-size:26px;letter-spacing:-1px}
 .small{display:flex;gap:10px;align-items:center}p{margin:0;font-size:17px;line-height:1.35;font-family:Helvetica,Arial,sans-serif}strong{display:inline-block;background:${ACCENT};color:#fff;border-radius:6px;padding:2px 8px;margin-right:6px;font-family:"Schibsted Grotesk"}
 h1{margin:40px 40px 0;font-size:34px;letter-spacing:-1px}</style>
-<h1>Property Sauce mark: current and ten alternatives</h1><div class="grid">${cards}</div>`;
+<h1>Property Sauce mark: ten directions without the drop</h1><div class="grid">${cards}</div>`;
 const p = join(tmpdir(), "ps-variations.html");
 writeFileSync(p, html);
 const chrome = "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome";
-execFileSync(chrome, ["--headless=new", "--disable-gpu", "--no-sandbox", "--hide-scrollbars", "--window-size=1600,1560", `--screenshot=${join(out, "contact-sheet.png")}`, "file://" + p], { stdio: "ignore" });
+execFileSync(chrome, ["--headless=new", "--disable-gpu", "--no-sandbox", "--hide-scrollbars", "--window-size=1600,1500", `--screenshot=${join(out, "contact-sheet-2.png")}`, "file://" + p], { stdio: "ignore" });
 console.log("Wrote", Object.keys(marks).length, "marks to", out);
