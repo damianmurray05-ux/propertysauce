@@ -66,3 +66,15 @@ test("system prompt carries verified tenant details and the knowledge", () => {
   assert.match(p, /0800 111 999/);
   assert.doesNotMatch(p, /[–—]/);
 });
+
+test("scorecard scoring is fair and bounded", async () => {
+  const { scoreTenant } = await import("../src/chat/score.mjs");
+  const perfect = scoreTenant({ rent_history_12m: "OOOOOOOOOOOO", arrears: "0", noise_reports_12m: "0", inspections_passed: "2", inspections_total: "2" });
+  assert.equal(perfect.score, 100); assert.equal(perfect.tier, "Platinum"); assert.equal(perfect.streak, 12);
+  const empty = scoreTenant({});
+  assert.equal(empty.score, 100);
+  const rough = scoreTenant({ rent_history_12m: "OOMLOOOOOOLO", arrears: "£1,200", noise_reports_12m: "2", inspections_passed: "0", inspections_total: "1" });
+  assert.ok(rough.score < 70 && rough.score > 0, String(rough.score));
+  assert.equal(rough.streak, 1);
+  assert.ok(rough.tips.length >= 3);
+});

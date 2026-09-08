@@ -194,11 +194,16 @@ ${body}
       <h2>Company</h2>
       <a href="/about/">About</a>
       <a href="/tenants/">Tenants</a>
-      <a href="/tenants/#repairs">Report a repair</a>
+      <a href="/my-tenancy/">My tenancy scorecard</a>
       <a href="/contact/">Contact</a>
       <a href="/complaints/">Complaints</a>
       <a href="/privacy/">Privacy</a>
       <a href="/terms/">Terms</a>
+    </div>
+    <div class="footer-col">
+      <h2>Calculators</h2>
+      <a href="/leasehold-calculator/">Lease extension calculator</a>
+      <a href="/capital-gains-tax-calculator/">Capital gains tax calculator</a>
     </div>
     <div class="footer-col">
       <h2>Accreditation</h2>

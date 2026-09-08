@@ -1,0 +1,119 @@
+---
+title: Capital gains tax calculator for property in the UK
+description: Free UK capital gains tax calculator for selling a buy-to-let, second home or inherited property: reliefs, exempt amount, 18 and 24 percent rates, joint owners.
+priority: 0.8
+---
+<script type="application/ld+json" data-page-ld>
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {"@type": "WebApplication", "name": "Property Sauce capital gains tax calculator", "applicationCategory": "FinanceApplication", "operatingSystem": "Any", "url": "https://propertysauce.co/capital-gains-tax-calculator/", "offers": {"@type": "Offer", "price": "0", "priceCurrency": "GBP"}, "description": "Estimates UK capital gains tax on the sale of residential property, including private residence relief, the annual exempt amount, the 18 and 24 percent rates and joint ownership."},
+    {"@type": "FAQPage", "mainEntity": [
+      {"@type": "Question", "name": "What are the capital gains tax rates on residential property?", "acceptedAnswer": {"@type": "Answer", "text": "For disposals from 6 April 2024, gains on UK residential property are taxed at 18 percent within the basic rate band and 24 percent above it. The rate depends on your taxable income plus the gain in the tax year of sale."}},
+      {"@type": "Question", "name": "When do I have to report and pay?", "acceptedAnswer": {"@type": "Answer", "text": "UK residents must report a residential property gain and pay the tax within 60 days of completion, using HMRC's capital gains tax on UK property service, and again on the self assessment return."}},
+      {"@type": "Question", "name": "Do I pay capital gains tax on my own home?", "acceptedAnswer": {"@type": "Answer", "text": "Usually not, because of private residence relief. If the property was your only or main home for part of the time you owned it, that part of the gain, plus the final nine months of ownership, is exempt."}},
+      {"@type": "Question", "name": "What costs can I deduct?", "acceptedAnswer": {"@type": "Answer", "text": "Buying costs such as stamp duty, legal and survey fees; selling costs such as agent and legal fees; and capital improvements such as an extension or a new kitchen. Repairs, mortgage interest and running costs are not deductible."}}
+    ]}
+  ]
+}
+</script>
+<section class="intro">
+  <div class="wrap">
+    <h1 data-reveal>Capital gains tax calculator.</h1>
+    <p class="lede" data-reveal style="--d:80ms">For selling a buy-to-let, a second home or an inherited property in England, Wales, Scotland or Northern Ireland. The 2025 to 2026 tax year. Free, no sign-up, nothing stored.</p>
+  </div>
+</section>
+
+<section class="section-tight">
+  <div class="wrap calc-grid">
+    <form class="calc-form" id="cgt-calc" novalidate data-reveal>
+      <div class="form-row">
+        <div class="field"><label for="cg-buy">Purchase price</label><div class="money"><span>£</span><input id="cg-buy" name="buy" type="number" inputmode="numeric" min="0" step="1000" value="180000"></div></div>
+        <div class="field"><label for="cg-sell">Sale price</label><div class="money"><span>£</span><input id="cg-sell" name="sell" type="number" inputmode="numeric" min="0" step="1000" value="300000"></div></div>
+      </div>
+      <div class="form-row">
+        <div class="field"><label for="cg-buycosts">Buying costs</label><div class="money"><span>£</span><input id="cg-buycosts" name="buycosts" type="number" inputmode="numeric" min="0" step="100" value="4000"></div><span class="hint">Stamp duty, legal and survey fees.</span></div>
+        <div class="field"><label for="cg-sellcosts">Selling costs</label><div class="money"><span>£</span><input id="cg-sellcosts" name="sellcosts" type="number" inputmode="numeric" min="0" step="100" value="5000"></div><span class="hint">Agent and legal fees.</span></div>
+      </div>
+      <div class="field"><label for="cg-improve">Capital improvements</label><div class="money"><span>£</span><input id="cg-improve" name="improve" type="number" inputmode="numeric" min="0" step="100" value="0"></div><span class="hint">Extensions, a new kitchen or bathroom. Not repairs or redecoration.</span></div>
+      <div class="form-row">
+        <div class="field"><label for="cg-months">Months owned</label><input id="cg-months" name="months" type="number" inputmode="numeric" min="1" value="120"></div>
+        <div class="field"><label for="cg-lived">Months it was your main home</label><input id="cg-lived" name="lived" type="number" inputmode="numeric" min="0" value="0"><span class="hint">Leave 0 for a pure investment property.</span></div>
+      </div>
+      <div class="form-row">
+        <div class="field"><label for="cg-income">Your taxable income this year</label><div class="money"><span>£</span><input id="cg-income" name="income" type="number" inputmode="numeric" min="0" step="1000" value="45000"></div><span class="hint">Salary, rent and other income before the personal allowance.</span></div>
+        <div class="field"><label for="cg-owners">Owners</label><select id="cg-owners" name="owners"><option value="1">Just me</option><option value="2">Two of us, equal shares</option></select><span class="hint">Two owners each get an exempt amount. Assumes the same income for both.</span></div>
+      </div>
+      <details class="calc-adv">
+        <summary>Tax year figures</summary>
+        <div class="form-row">
+          <div class="field"><label for="cg-aea">Annual exempt amount</label><div class="money"><span>£</span><input id="cg-aea" name="aea" type="number" value="3000"></div></div>
+          <div class="field"><label for="cg-band">Basic rate band</label><div class="money"><span>£</span><input id="cg-band" name="band" type="number" value="37700"></div></div>
+        </div>
+        <div class="form-row">
+          <div class="field"><label for="cg-pa">Personal allowance</label><div class="money"><span>£</span><input id="cg-pa" name="pa" type="number" value="12570"></div></div>
+          <div class="field"><label for="cg-rates">Rates</label><div class="money"><input id="cg-lo" name="lo" type="number" step="1" value="18"><span>% /</span><input id="cg-hi" name="hi" type="number" step="1" value="24"><span>%</span></div></div>
+        </div>
+      </details>
+    </form>
+
+    <div class="calc-out" id="cgt-out" aria-live="polite" data-reveal style="--d:80ms">
+      <div class="calc-headline">
+        <span class="eyebrow">Estimated tax to pay</span>
+        <strong id="co-tax">£0</strong>
+        <span class="muted" id="co-rate">Effective rate 0% of the gain.</span>
+      </div>
+      <div class="calc-rows">
+        <div class="calc-row"><span>Gain before reliefs</span><strong id="co-gain">£0</strong></div>
+        <div class="calc-row" id="co-prr-row"><span>Private residence relief</span><strong id="co-prr">£0</strong></div>
+        <div class="calc-row"><span>Annual exempt amount</span><strong id="co-aea">£0</strong></div>
+        <div class="calc-row"><span>Taxable gain</span><strong id="co-taxable">£0</strong></div>
+      </div>
+      <div class="calc-rows">
+        <div class="calc-row"><span>Taxed at the lower rate</span><strong id="co-lo">£0</strong></div>
+        <div class="calc-row"><span>Taxed at the higher rate</span><strong id="co-hi">£0</strong></div>
+      </div>
+      <p class="calc-note" id="co-note">Report and pay within 60 days of completion using HMRC's capital gains tax on UK property service.</p>
+      <div class="calc-actions">
+        <a class="btn btn-primary btn-sm" href="/sell/">Sell to us <svg class="ic btn-ic" aria-hidden="true"><use href="/assets/icons.svg#arrow-up-right"/></svg></a>
+        <a class="btn btn-ghost btn-sm" href="/landlords/">Or let it instead</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="wrap split">
+    <div class="sh" data-reveal>
+      <h2>How the tax is worked out.</h2>
+      <p>Four steps, and the calculator shows each one.</p>
+    </div>
+    <div class="prose" data-reveal style="--d:80ms">
+      <h3>1. The gain</h3>
+      <p>Sale price, less the price you paid, less the costs of buying and selling, less capital improvements. Repairs, redecoration, mortgage interest and running costs do not count; they were expenses against rent.</p>
+      <h3>2. Private residence relief</h3>
+      <p>If the property was your only or main home for part of the time you owned it, that fraction of the gain is exempt, and the final nine months of ownership always count as if you lived there. Lettings relief now applies only where you shared the home with your tenant, so the calculator leaves it out.</p>
+      <h3>3. The annual exempt amount</h3>
+      <p>Every individual can make gains of a set amount each tax year before tax is due. For 2025 to 2026 it is a modest figure, and unused allowance cannot be carried forward. Joint owners each have their own.</p>
+      <h3>4. The rate</h3>
+      <p>Residential property gains are taxed at the lower rate within whatever is left of your basic rate band after your income, and at the higher rate above it. A large gain will usually push most of itself into the higher rate even for a basic-rate taxpayer.</p>
+      <h3>What this is not</h3>
+      <p>Tax advice. It ignores non-resident rules, trusts and companies, properties held before 1982, gifts, losses brought forward and the tapering of the personal allowance above one hundred thousand pounds of income. If any of those apply, or the numbers are large, speak to an accountant before you exchange. <a href="/sell/">If the plan is to sell a block or a portfolio, we buy.</a></p>
+    </div>
+  </div>
+</section>
+
+<section class="section-tight">
+  <div class="wrap">
+    <div class="cta dark" data-reveal>
+      <div>
+        <h2>Selling a portfolio? One buyer, one completion, one tax year.</h2>
+        <p class="lede">We buy whole holdings across England for our own account, which lets you time the disposal rather than drip it through the market.</p>
+      </div>
+      <div class="cta-side">
+        <a class="btn btn-primary" href="/sell/">Sell to us <svg class="ic btn-ic" aria-hidden="true"><use href="/assets/icons.svg#arrow-up-right"/></svg></a>
+      </div>
+    </div>
+  </div>
+</section>
+<script src="/assets/js/calculators.js" defer></script>

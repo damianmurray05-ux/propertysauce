@@ -1,0 +1,81 @@
+---
+title: My tenancy: your tenant scorecard
+description: Verified Property Sauce tenants can see their tenant score, how it is made up, the rewards it unlocks and what would raise it.
+noindex: true
+---
+<section class="intro">
+  <div class="wrap">
+    <h1 data-reveal>Your tenancy, scored.</h1>
+    <p class="lede" data-reveal style="--d:80ms">Rent on time, account up to date, good neighbour, home looked after. Four things, one score, and rewards for the tenants who keep it high.</p>
+  </div>
+</section>
+
+<section class="section-tight">
+  <div class="wrap">
+    <div class="score-gate" id="score-gate" data-reveal>
+      <div class="score-gate-inner">
+        <h2>Sign in to see your scorecard.</h2>
+        <p class="muted">Your tenancy reference is on your agreement and on our emails. We send a one-time code to the email or mobile we hold, so only you can see this.</p>
+        <form class="score-form" id="score-ref-form" novalidate>
+          <div class="field"><label for="sc-ref">Tenancy reference</label><input id="sc-ref" type="text" autocomplete="off" placeholder="PS-1234" required></div>
+          <button class="btn btn-primary" type="submit">Continue <svg class="ic btn-ic" aria-hidden="true"><use href="/assets/icons.svg#arrow-up-right"/></svg></button>
+        </form>
+        <div id="score-channels" class="score-channels" hidden></div>
+        <form class="score-form" id="score-code-form" novalidate hidden>
+          <div class="field"><label for="sc-code">Six-digit code</label><input id="sc-code" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="7" required></div>
+          <button class="btn btn-primary" type="submit">Show my scorecard <svg class="ic btn-ic" aria-hidden="true"><use href="/assets/icons.svg#arrow-up-right"/></svg></button>
+        </form>
+        <p class="notice" id="score-msg" hidden></p>
+      </div>
+    </div>
+
+    <div class="scorecard" id="scorecard" hidden>
+      <div class="score-head">
+        <div>
+          <span class="eyebrow">Tenant scorecard</span>
+          <h2 id="sc-title">Hello.</h2>
+          <p class="muted" id="sc-address"></p>
+        </div>
+        <div class="score-ring" id="sc-ring" role="img" aria-label="Score"></div>
+      </div>
+      <div class="score-tier" id="sc-tier"></div>
+      <div class="score-parts" id="sc-parts"></div>
+      <div class="score-history">
+        <h3>The last twelve months of rent</h3>
+        <div class="score-months" id="sc-months"></div>
+        <p class="muted" id="sc-streak"></p>
+      </div>
+      <div class="score-cols">
+        <div>
+          <h3>Rewards at your tier</h3>
+          <ul id="sc-rewards" class="score-list"></ul>
+        </div>
+        <div>
+          <h3>What would raise it</h3>
+          <ul id="sc-tips" class="score-list"></ul>
+        </div>
+      </div>
+      <p class="calc-note">Scores are recalculated when we update your file, usually at the start of each month. If something looks wrong, tell us through the assistant and we will check the record.</p>
+      <div class="calc-actions">
+        <button type="button" class="btn btn-primary btn-sm" data-open-chat="repair">Report a repair <svg class="ic btn-ic" aria-hidden="true"><use href="/assets/icons.svg#wrench"/></svg></button>
+        <button type="button" class="btn btn-ghost btn-sm" id="sc-signout">Sign out</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="wrap split">
+    <div class="sh" data-reveal>
+      <h2>How the score works.</h2>
+      <p>One hundred points, four parts, nothing hidden.</p>
+    </div>
+    <div class="steps">
+      <div class="step" data-reveal><span class="step-n">50</span><div><h3>Rent paid on time</h3><p>Every payment in the last twelve months that arrived on or before the due date scores in full. A late payment scores half. A missed payment scores nothing.</p></div></div>
+      <div class="step" data-reveal><span class="step-n">15</span><div><h3>Account up to date</h3><p>Full marks with nothing outstanding. A small balance costs a little; a larger one costs the lot until it is cleared or a plan is agreed.</p></div></div>
+      <div class="step" data-reveal><span class="step-n">20</span><div><h3>Good neighbour</h3><p>Full marks with no upheld noise or disturbance reports. Each report costs seven points and drops off after twelve months.</p></div></div>
+      <div class="step" data-reveal><span class="step-n">15</span><div><h3>Looking after the home</h3><p>Inspections passed, ventilation, repairs reported early. If there has been no inspection yet, you get the points.</p></div></div>
+    </div>
+  </div>
+</section>
+<script src="/assets/js/scorecard.js" defer></script>

@@ -17,7 +17,8 @@ if (existsSync(envFile)) {
 
 const chat = await import("./api/chat.js");
 const verify = await import("./api/verify.js");
-const routes = { "/api/chat": chat, "/api/chat/": chat, "/api/verify": verify, "/api/verify/": verify };
+const scorecard = await import("./api/scorecard.js");
+const routes = { "/api/chat": chat, "/api/chat/": chat, "/api/verify": verify, "/api/verify/": verify, "/api/scorecard": scorecard, "/api/scorecard/": scorecard };
 
 const types = { ".html": "text/html; charset=utf-8", ".css": "text/css", ".js": "text/javascript", ".mjs": "text/javascript", ".svg": "image/svg+xml", ".png": "image/png", ".jpg": "image/jpeg", ".ico": "image/x-icon", ".woff2": "font/woff2", ".json": "application/json", ".xml": "application/xml", ".txt": "text/plain", ".webmanifest": "application/manifest+json", ".pdf": "application/pdf" };
 const dist = join(root, "dist");

@@ -1,0 +1,102 @@
+---
+title: Lease extension calculator
+description: Free lease extension calculator for flats in England and Wales: the premium to extend by 90 years, marriage value under 80 years, and what your lease is worth.
+priority: 0.8
+---
+<script type="application/ld+json" data-page-ld>
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {"@type": "WebApplication", "name": "Property Sauce lease extension calculator", "applicationCategory": "FinanceApplication", "operatingSystem": "Any", "url": "https://propertysauce.co/leasehold-calculator/", "offers": {"@type": "Offer", "price": "0", "priceCurrency": "GBP"}, "description": "Estimates the premium to extend a residential lease by 90 years under the statutory method, the marriage value where the lease is under 80 years, and the current value of the leasehold interest."},
+    {"@type": "FAQPage", "mainEntity": [
+      {"@type": "Question", "name": "How is a lease extension premium calculated?", "acceptedAnswer": {"@type": "Answer", "text": "The premium compensates the freeholder for the ground rent they lose (capitalised at a rate of around 6 to 7 percent), the delay to getting the flat back (the reversion, deferred at 5 percent for flats), and, where the lease has under 80 years left, half of the marriage value: the uplift in the flat's value created by extending the lease."}},
+      {"@type": "Question", "name": "Why does 80 years matter?", "acceptedAnswer": {"@type": "Answer", "text": "Under the current statutory method, once a lease falls below 80 years the freeholder is entitled to half of the marriage value, which makes the premium jump sharply. Extending before the 80-year point is usually much cheaper."}},
+      {"@type": "Question", "name": "Does the Leasehold and Freehold Reform Act 2024 change this?", "acceptedAnswer": {"@type": "Answer", "text": "Yes, once its valuation provisions are brought into force: marriage value is abolished and capitalisation and deferment rates are prescribed. The calculator lets you compare the current method with the reformed method. Check with a valuer which applies on the day you serve notice."}},
+      {"@type": "Question", "name": "Is this calculator a valuation?", "acceptedAnswer": {"@type": "Answer", "text": "No. It is an estimate using standard assumptions. Actual premiums are negotiated or set by the First-tier Tribunal, and the freeholder's valuer will argue for higher figures. Use it to budget and to decide whether to act before 80 years."}}
+    ]}
+  ]
+}
+</script>
+<section class="intro">
+  <div class="wrap">
+    <h1 data-reveal>Lease extension calculator.</h1>
+    <p class="lede" data-reveal style="--d:80ms">Estimate the premium to extend your lease by 90 years, see how much of it is marriage value, and find out what your lease is worth today. Free, no sign-up, nothing stored.</p>
+  </div>
+</section>
+
+<section class="section-tight">
+  <div class="wrap calc-grid">
+    <form class="calc-form" id="lease-calc" novalidate data-reveal>
+      <div class="field"><label for="lc-value">Value of the flat with a long lease</label><div class="money"><span>£</span><input id="lc-value" name="value" type="number" inputmode="numeric" min="10000" step="1000" value="350000"></div><span class="hint">What it would sell for with 999 years or share of freehold.</span></div>
+      <div class="field"><label for="lc-years">Years left on the lease</label><input id="lc-years" name="years" type="number" inputmode="numeric" min="1" max="150" value="78"></div>
+      <div class="field"><label for="lc-rent">Ground rent per year</label><div class="money"><span>£</span><input id="lc-rent" name="rent" type="number" inputmode="numeric" min="0" step="10" value="250"></div></div>
+      <div class="field"><label for="lc-pattern">Ground rent review</label><select id="lc-pattern" name="pattern"><option value="fixed">Fixed for the term</option><option value="double25" selected>Doubles every 25 years</option><option value="double33">Doubles every 33 years</option><option value="double10">Doubles every 10 years</option><option value="rpi">Rises with inflation (RPI)</option></select></div>
+      <details class="calc-adv">
+        <summary>Valuation assumptions</summary>
+        <div class="form-row">
+          <div class="field"><label for="lc-defer">Deferment rate</label><div class="money"><input id="lc-defer" name="defer" type="number" step="0.25" min="2" max="8" value="5"><span>%</span></div><span class="hint">5% for flats, following Sportelli.</span></div>
+          <div class="field"><label for="lc-cap">Capitalisation rate</label><div class="money"><input id="lc-cap" name="cap" type="number" step="0.25" min="3" max="10" value="6"><span>%</span></div><span class="hint">6% to 7% is typical.</span></div>
+        </div>
+        <div class="field"><label class="check"><input id="lc-reform" name="reform" type="checkbox"> Apply the 2024 Act method (no marriage value)</label><span class="hint">Use once the Leasehold and Freehold Reform Act 2024 valuation rules are in force.</span></div>
+      </details>
+    </form>
+
+    <div class="calc-out" id="lease-out" aria-live="polite" data-reveal style="--d:80ms">
+      <div class="calc-headline">
+        <span class="eyebrow">Estimated premium</span>
+        <strong id="lo-premium">£0</strong>
+        <span class="muted" id="lo-range">Likely range £0 to £0, before legal and valuation fees.</span>
+      </div>
+      <div class="calc-rows">
+        <div class="calc-row"><span>Ground rent the freeholder loses</span><strong id="lo-term">£0</strong></div>
+        <div class="calc-row"><span>Reversion (getting the flat back later)</span><strong id="lo-rev">£0</strong></div>
+        <div class="calc-row" id="lo-mv-row"><span>Freeholder's half of the marriage value</span><strong id="lo-mv">£0</strong></div>
+      </div>
+      <div class="calc-rows">
+        <div class="calc-row"><span>Your lease is worth today, roughly</span><strong id="lo-lease">£0</strong></div>
+        <div class="calc-row"><span>Relativity used</span><strong id="lo-rel">0%</strong></div>
+      </div>
+      <p class="calc-note" id="lo-note"></p>
+      <div class="calc-actions">
+        <a class="btn btn-primary btn-sm" href="/contact/">Talk to us <svg class="ic btn-ic" aria-hidden="true"><use href="/assets/icons.svg#arrow-up-right"/></svg></a>
+        <a class="btn btn-ghost btn-sm" href="/sell/">Sell us the block</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="wrap split">
+    <div class="sh" data-reveal>
+      <h2>How the premium is worked out.</h2>
+      <p>The calculator follows the statutory method used by valuers and the tribunal. Three parts, added together.</p>
+    </div>
+    <div class="prose" data-reveal style="--d:80ms">
+      <h3>1. The ground rent</h3>
+      <p>The freeholder loses the ground rent for the rest of the term, because an extended lease is at a peppercorn. That income stream is capitalised: valued today at a rate of around six or seven percent. Doubling ground rents make this part bigger than people expect.</p>
+      <h3>2. The reversion</h3>
+      <p>The freeholder gets the flat back ninety years later than they would have. The value of that delay is the flat's long-lease value, deferred at five percent a year for the years remaining. On a lease with sixty years left this is small; on twenty years it dominates.</p>
+      <h3>3. Marriage value, under eighty years</h3>
+      <p>Extending a short lease creates value: the extended lease is worth more than the short lease and the freeholder's interest put together. Under the current method, if the lease has fewer than eighty years left, the freeholder is entitled to half of that uplift. This is why premiums jump at the eighty-year mark, and why acting at eighty-two is cheaper than at seventy-nine.</p>
+      <h3>The 2024 Act</h3>
+      <p>The Leasehold and Freehold Reform Act 2024 abolishes marriage value and prescribes the rates, once the government brings those provisions into force. The tick box in the assumptions shows what the same lease would cost under the reformed method. Until commencement, the current method applies to notices served.</p>
+      <h3>What this is not</h3>
+      <p>A valuation. The freeholder's valuer will argue for a lower relativity, a lower deferment rate or a higher flat value, and each argument moves the figure. Budget for the top of the range shown, plus your own valuer's and solicitor's fees and the freeholder's reasonable costs. If the block is yours, or you are the freeholder, <a href="/block-management/">we manage blocks</a> and <a href="/sell/">buy them</a>.</p>
+    </div>
+  </div>
+</section>
+
+<section class="section-tight">
+  <div class="wrap">
+    <div class="cta dark" data-reveal>
+      <div>
+        <h2>Own a block with short leases? We are buyers.</h2>
+        <p class="lede">Freeholds with lease extension income, part-let blocks and converted buildings, bought for our own account with a decision in days.</p>
+      </div>
+      <div class="cta-side">
+        <a class="btn btn-primary" href="/sell/">Sell to us <svg class="ic btn-ic" aria-hidden="true"><use href="/assets/icons.svg#arrow-up-right"/></svg></a>
+      </div>
+    </div>
+  </div>
+</section>
+<script src="/assets/js/calculators.js" defer></script>

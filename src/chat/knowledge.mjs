@@ -37,6 +37,13 @@ Property Sauce is a trading name of Sure Lets and Manage Limited (company number
 - Ending the tenancy: two months' notice in writing from the tenant; check-out inspection against the inventory; deposit returned within 10 days of agreeing deductions, disputes go to the scheme's free adjudication.
 - Complaints: in writing to contact@propertysauce.co; acknowledged within three working days, full reply within fifteen; then review by a director; then the Property Redress Scheme, free to the tenant.
 
+## Tenant scorecard
+- Every tenant has a score out of 100 at propertysauce.co/my-tenancy/ after signing in with their reference and a one-time code. Four parts: rent paid on time (50), account up to date (15), good neighbour with no upheld noise reports (20), home looked after at inspections (15). Tiers: Platinum 95+, Gold 85+, Silver 70+, Bronze 50+.
+- Rewards: Silver and above can have a landlord reference on request; Gold and Platinum get priority booking for non-urgent repairs. [Other rewards to be confirmed by the team.] Scores update when the file is updated, usually monthly. If a tenant thinks a figure is wrong, log it for the team.
+
+## Calculators on the website
+- Lease extension calculator at /leasehold-calculator/ (statutory method, marriage value under 80 years, option for the 2024 Act method). Capital gains tax calculator at /capital-gains-tax-calculator/ (residential property, 2025 to 2026 figures). Both are estimates, not advice.
+
 ## Prospective tenants agreeing a new tenancy
 - The assistant can explain the standard terms above and note requested changes (for example start date, pets, decorating, additional occupier, guarantor) for a member of staff to confirm. It cannot agree changes itself.
 - Before move-in the tenant needs: right to rent documents, references completed, the holding deposit paid, the first month's rent and the deposit cleared, and the agreement signed by all parties.

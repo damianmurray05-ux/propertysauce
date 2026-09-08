@@ -50,6 +50,13 @@ export function directoryConfigured() {
   return Boolean(process.env.TENANT_DIRECTORY_JSON || process.env.TENANT_DIRECTORY_URL);
 }
 
+export async function findRow(reference) {
+  const want = normaliseRef(reference);
+  if (!want) return null;
+  const rows = await loadRows();
+  return rows.find((r) => normaliseRef(r.reference) === want) || null;
+}
+
 export async function findTenant(reference) {
   const want = normaliseRef(reference);
   if (!want) return null;

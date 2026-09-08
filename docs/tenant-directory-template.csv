@@ -1,2 +1,2 @@
-reference,name,email,phone,address,notes
-PS-1001,Example Tenant,tenant@example.com,+447700900000,"Flat 1, 1 Example Street, London E10 0AA",Example row: replace with real tenancies. Phone in international format.
+reference,name,email,phone,address,rent_history_12m,arrears,noise_reports_12m,inspections_passed,inspections_total,tenancy_start,reward_note,notes
+PS-1001,Example Tenant,tenant@example.com,+447700900000,"Flat 1, 1 Example Street, London E10 0AA",OOOOLOOOOOOO,0,0,2,2,2024-03-01,,Example row. rent_history_12m is twelve letters oldest first: O on time L late M missed - not yet due.
