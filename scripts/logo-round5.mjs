@@ -20,7 +20,7 @@ const R = 27, C = 32;
 const half = (r = R) => `M${C} ${C - r}A${r} ${r} 0 0 0 ${C} ${C + r}A${r / 2} ${r / 2} 0 0 0 ${C} ${C}A${r / 2} ${r / 2} 0 0 1 ${C} ${C - r}Z`;
 const other = (r = R) => `M${C} ${C - r}A${r} ${r} 0 0 1 ${C} ${C + r}A${r / 2} ${r / 2} 0 0 0 ${C} ${C}A${r / 2} ${r / 2} 0 0 1 ${C} ${C - r}Z`;
 const letter = (ch, x, y, fill, size = 13) => `<text x="${x}" y="${y}" text-anchor="middle" font-family="Schibsted Grotesk, Helvetica, Arial, sans-serif" font-weight="800" font-size="${size}" fill="${fill}">${ch}</text>`;
-const seam = (r, bg, w = 2.6) => `<path d="M${C} ${C - r}A${r / 2} ${r / 2} 0 0 0 ${C} ${C}A${r / 2} ${r / 2} 0 0 1 ${C} ${C + r}" fill="none" stroke="${bg}" stroke-width="${w}" stroke-linecap="round"/>`;
+const seam = (r, bg, w = 2.6) => `<path d="${half(r)}" fill="none" stroke="${bg}" stroke-width="${w}" stroke-linecap="round"/>`;
 const tile = (bg) => `<rect width="64" height="64" rx="16" fill="${bg}"/>`;
 const rot = (deg, inner) => `<g transform="rotate(${deg} ${C} ${C})">${inner}</g>`;
 

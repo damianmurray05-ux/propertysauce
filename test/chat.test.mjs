@@ -37,7 +37,7 @@ test("directory lookup is forgiving about formatting", async () => {
 });
 
 test("verification flow: lookup, start, check", async () => {
-  const post = (body) => verifyApi.POST(new Request("http://x/api/verify", { method: "POST", body: JSON.stringify(body) }));
+  const post = (body) => verifyApi.POST(new Request("http://x/api/verify/", { method: "POST", body: JSON.stringify(body) }));
   let r = await post({ action: "lookup", reference: "PS-1001" });
   assert.equal(r.status, 200);
   const ch = await r.json();
