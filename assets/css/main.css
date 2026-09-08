@@ -538,3 +538,10 @@ body.menu-open .header-cta { visibility: hidden; }
 .doc-group li span { color: var(--muted); white-space: nowrap; }
 .score-months .part i { background: var(--gold-soft); border-color: var(--gold); }
 @media (max-width: 900px) { .portal-totals { grid-template-columns: 1fr 1fr; } .prop-body { grid-template-columns: 1fr; } }
+
+/* Header fit: keep the navigation on one line on narrower desktops. */
+@media (max-width: 1400px) and (min-width: 1024px) {
+  .nav a { font-size: 0.66rem; letter-spacing: 0.1em; padding: 0.5rem 0.55rem; }
+  .brand-tag { display: none; }
+  .header-inner { gap: var(--space-4); }
+}
