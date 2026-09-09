@@ -15,9 +15,9 @@ noindex: true
     <div class="score-gate" id="portal-gate" data-reveal>
       <div class="score-gate-inner">
         <h2>Sign in to your portal.</h2>
-        <p class="muted">Your landlord reference is on your management agreement and on our statements. We send a one-time code to the email or mobile we hold for you.</p>
+        <p class="muted">Enter the email address we hold for you, or the landlord reference on your management agreement. We send a one-time code to that email or to your mobile.</p>
         <form class="score-form" id="portal-ref-form" novalidate>
-          <div class="field"><label for="pl-ref">Landlord reference</label><input id="pl-ref" type="text" autocomplete="off" placeholder="PSL-1234" required></div>
+          <div class="field"><label for="pl-ref">Email address or landlord reference</label><input id="pl-ref" type="text" autocomplete="email" placeholder="you@example.com" required></div>
           <button class="btn btn-primary" type="submit">Continue <svg class="ic btn-ic" aria-hidden="true"><use href="/assets/icons.svg#arrow-up-right"/></svg></button>
         </form>
         <div id="portal-channels" class="score-channels" hidden></div>

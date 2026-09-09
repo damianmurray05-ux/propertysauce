@@ -25,7 +25,9 @@ node scripts/brand.mjs # regenerate logo files, favicon and social image
 | `src/chat/knowledge.mjs` | What the assistant knows. Edit this to change what it tells tenants |
 | `src/chat/prompt.mjs` | The assistant's instructions per mode |
 | `src/chat/tools.mjs` | What happens when the assistant raises a repair or logs an enquiry (email, webhook) |
-| `src/chat/directory.mjs` | Tenant lookup from the Google Sheet or JSON directory |
+| `src/chat/zoho.mjs` | Live Zoho CRM access: tenants, properties, landlords, maintenance tickets, attachments |
+| `src/chat/landlords.mjs`, `src/chat/score.mjs` | Landlord portfolio and tenant scoring |
+| `src/chat/directory.mjs` | Tenant lookup: Zoho when configured, otherwise a sheet |
 | `api/chat.js`, `api/verify.js` | The two server functions (Vercel) |
 | `assets/css/tokens.css` | Colour, type, spacing and motion tokens, plus the self-hosted fonts |
 | `assets/css/main.css` | The design system and every component |

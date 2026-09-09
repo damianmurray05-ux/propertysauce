@@ -1,6 +1,8 @@
 // The tenant scorecard. POST { session } with a verified session token from
 // /api/verify. Returns the tenant's score, tier, breakdown and rewards.
 import { findRow } from "../src/chat/directory.mjs";
+import { zohoConfigured, tenantById, jobsForTenant } from "../src/chat/zoho.mjs";
+import { tenantRowFromZoho } from "../src/chat/score.mjs";
 import { verify } from "../src/chat/crypto.mjs";
 import { scoreTenant } from "../src/chat/score.mjs";
 import { limit } from "../src/chat/ratelimit.mjs";
@@ -14,7 +16,14 @@ export async function POST(request) {
   try { body = await request.json(); } catch { return json(400, { error: "bad_json" }); }
   const s = verify(body.session);
   if (!s || s.t !== "session" || s.expired) return json(401, { error: "session_expired" });
-  const row = await findRow(s.ref);
+  let row;
+  if (zohoConfigured() && s.id) {
+    const [t, jobs] = await Promise.all([tenantById(s.id), jobsForTenant(s.id).catch(() => [])]);
+    if (!t) return json(404, { error: "not_found" });
+    row = tenantRowFromZoho(t, jobs);
+  } else {
+    row = await findRow(s.ref);
+  }
   if (!row) return json(404, { error: "not_found" });
   const card = scoreTenant(row);
   return json(200, {

@@ -108,3 +108,23 @@ test("landlord portfolio scoring, certificates and sign-in", async () => {
   r = await post({ action: "portfolio", session }); assert.equal(r.status, 200);
   const d = await r.json(); assert.equal(d.firstName, "Bea"); assert.equal(d.totals.properties, 2);
 });
+
+test("Zoho mapping: property, job and tenant scorecard row", async () => {
+  const { mapProperty, mapJob, mapRecord } = await import("../src/chat/zoho.mjs");
+  const { tenantRowFromZoho, scoreTenant } = await import("../src/chat/score.mjs");
+  const p = mapProperty({ id: "1", Account_Name: "Flat 3, Catterick House, S65 1LD", Last_Name: "Beaucatt Homes LTD", Vendor_Email: "Info@PropertySauce.co", Vendor_Phone: "0208 988 8434", Status: "Rented", Occupied: "Occupied", Monthly_Rent: 620, Gas_Safety_Applicable: "No Gas Supply - N/A", NICEIC_Certificate: "2030-03-26", EPC_Expiry: "2028-07-16", EPC_Rating: "D", Landlords_Property_License: "2025-04-30", Landlord_License_Exempt: "Requires Licensing", Existing_Tenant: { id: "9", name: "Flat 3 - Someone" } });
+  assert.equal(p.landlord.email, "info@propertysauce.co");
+  assert.equal(p.landlord.phone, "+442089888434");
+  assert.equal(p.gasApplicable, false);
+  assert.equal(p.licenceRequired, true);
+  assert.equal(p.tenantId, "9");
+  const j = mapJob({ id: "5", Name: "Boiler", Maintenance_Ticket_Number: "MT-12", Job_Status: "Contractor Instructed", Created_Time: "2026-08-01T10:00:00+01:00", Landlord: { id: "1" }, Tenant: { id: "9" }, Invoiced_Amount: 120 });
+  assert.equal(j.ticket, "MT-12"); assert.equal(j.closed, false); assert.equal(j.created, "2026-08-01");
+  const t = mapRecord({ id: "9", Last_Name: "Flat 3 - Ada Example", Status: "Arrears", Rent_Payment_Reference: "PS1001", Tenant_1_Phone: "07700 900000", Email: "ada@example.com", Account_Name: { id: "1", name: "Flat 3, Catterick House" }, Rent: 620, Tenants_Missed_Payment_Date: new Date(Date.now() - 45 * 86400000).toISOString().slice(0, 10), Days_Since_Missed_Payment: 45 });
+  assert.equal(t.current, true); assert.equal(t.propertyId, "1");
+  const row = tenantRowFromZoho(t, [j]);
+  assert.match(row.rent_history_12m, /M/);
+  assert.ok(row.arrears > 0);
+  const card = scoreTenant(row);
+  assert.ok(card.score < 100 && card.score > 0, String(card.score));
+});

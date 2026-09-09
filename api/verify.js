@@ -56,7 +56,7 @@ export async function POST(request) {
     if (code.length !== 6 || hashCode(ch.ref, code) !== ch.h) return json(400, { error: "wrong_code" });
     const t = await findTenant(ch.ref);
     if (!t) return json(404, { error: "not_found" });
-    const session = sign({ t: "session", ref: t.reference, name: t.name, address: t.address, email: t.email, phone: t.phone, exp: Date.now() + 2 * 60 * 60 * 1000 });
+    const session = sign({ t: "session", ref: t.reference, id: t.id || "", pid: t.propertyId || "", name: t.name, address: t.address, email: t.email, phone: t.phone, exp: Date.now() + 2 * 60 * 60 * 1000 });
     return json(200, { ok: true, session, tenant: { firstName: t.firstName, address: t.address } });
   }
 

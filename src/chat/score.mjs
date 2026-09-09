@@ -73,3 +73,33 @@ export function scoreTenant(row) {
     tenancyStart: row.tenancy_start || "",
   };
 }
+
+
+/* Build the scorecard row from a Zoho tenancy and its maintenance jobs. The
+   CRM holds a missed-payment date rather than a month-by-month history, so
+   the history is inferred from it; noise reports and inspections are not
+   recorded in the CRM and score neutrally. */
+export function tenantRowFromZoho(t, jobs = []) {
+  const r = t.raw || {};
+  const missedDate = r.Tenants_Missed_Payment_Date || "";
+  let history = "OOOOOOOOOOOO";
+  if (missedDate) {
+    const monthsAgo = Math.floor((Date.now() - Date.parse(missedDate)) / (30.44 * 86400000));
+    if (monthsAgo >= 0 && monthsAgo < 12) history = history.slice(0, 11 - monthsAgo) + "M" + history.slice(12 - monthsAgo);
+  }
+  if (t.status === "Arrears" && !missedDate) history = history.slice(0, 11) + "L";
+  const rent = Number(r.Rent) || 0;
+  const missedDays = Number(r.Days_Since_Missed_Payment) || 0;
+  const inArrears = ["Arrears", "Possession Proceedings", "Court"].includes(t.status);
+  const closed = jobs.filter((j) => j.closed).length;
+  return {
+    name: t.name, address: t.address,
+    rent_history_12m: history,
+    arrears: inArrears ? (missedDays ? Math.round((missedDays / 30) * rent) : rent) : 0,
+    noise_reports_12m: "",
+    inspections_passed: "", inspections_total: "",
+    tenancy_start: r.Original_Tenancy_Start_Date || r.Tenancy_Start_Date || "",
+    reward_note: "",
+    repairs: { open: jobs.length - closed, closed, rated: jobs.filter((j) => j.rating).length },
+  };
+}

@@ -545,3 +545,11 @@ body.menu-open .header-cta { visibility: hidden; }
   .brand-tag { display: none; }
   .header-inner { gap: var(--space-4); }
 }
+
+.jobs { margin-top: 1.5rem; }
+.jobs ul { margin: 0; padding: 0; list-style: none; }
+.jobs li { display: grid; grid-template-columns: auto 1fr; gap: 0.25rem 0.75rem; align-items: baseline; padding: 0.6rem 0; border-top: 1px solid var(--line); font-size: var(--fs-0); }
+.jobs li strong { font-family: var(--font-display); font-size: var(--fs-2); font-weight: 600; }
+.jobs li small { grid-column: 2; color: var(--muted); }
+.job-status { font-size: 0.62rem; letter-spacing: 0.16em; text-transform: uppercase; padding: 0.3rem 0.5rem; border: 1px solid var(--gold-soft); color: var(--ink); white-space: nowrap; }
+.job-closed { color: var(--muted); border-color: var(--line); }

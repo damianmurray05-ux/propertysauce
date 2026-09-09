@@ -6,6 +6,8 @@
 // Columns / keys: reference, name, email, phone, address, notes (optional).
 // See docs/tenant-directory-template.csv.
 
+import { zohoConfigured, findTenantInZoho, normalisePhone } from "./zoho.mjs";
+
 let cache = { at: 0, rows: [] };
 const TTL = 5 * 60 * 1000;
 
@@ -47,7 +49,7 @@ async function loadRows() {
 }
 
 export function directoryConfigured() {
-  return Boolean(process.env.TENANT_DIRECTORY_JSON || process.env.TENANT_DIRECTORY_URL);
+  return zohoConfigured() || Boolean(process.env.TENANT_DIRECTORY_JSON || process.env.TENANT_DIRECTORY_URL);
 }
 
 export async function findRow(reference) {
@@ -58,6 +60,7 @@ export async function findRow(reference) {
 }
 
 export async function findTenant(reference) {
+  if (zohoConfigured()) return findTenantInZoho(reference);
   const want = normaliseRef(reference);
   if (!want) return null;
   const rows = await loadRows();
@@ -68,7 +71,7 @@ export async function findTenant(reference) {
     name: row.name || "",
     firstName: (row.name || "").split(/\s+/)[0] || "there",
     email: (row.email || "").trim(),
-    phone: (row.phone || "").replace(/[\s()-]/g, ""),
+    phone: normalisePhone(row.phone),
     address: row.address || "",
     notes: row.notes || "",
   };

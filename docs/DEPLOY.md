@@ -38,7 +38,37 @@ Optional:
 After adding variables, go to **Deployments** and click **Redeploy** on the
 latest one.
 
-## 3. The tenant directory
+## 3. Zoho CRM: tenants, landlords, properties, repairs and documents
+
+The live site reads Zoho CRM directly, the same way the Sure Lets site does,
+so there is nothing to keep in step: tenants verify against the "Tenant"
+records (rent payment reference, email and mobile), landlords sign in with the
+email address on their "Landlord" property records, certificates and rent come
+from those records, repairs raised through the assistant become Maintenance
+tickets with the photos attached, and the documents landlords see are the
+attachments on their property records.
+
+One-off setup, about five minutes, because this site needs wider permissions
+than the Sure Lets one (properties, maintenance and attachments as well as
+tenants):
+
+1. Go to <https://api-console.zoho.com> signed in as the CRM admin. Open the
+   existing **Self Client** (the one used for Marchbank and Sure Lets), or
+   **Add Client > Self Client** if there is none.
+2. Copy the **Client ID** and **Client Secret** from the Client Secret tab.
+3. On the **Generate Code** tab, paste this scope exactly:
+   `ZohoCRM.modules.contacts.READ,ZohoCRM.modules.accounts.READ,ZohoCRM.modules.custom.ALL,ZohoCRM.modules.attachments.ALL,ZohoCRM.settings.modules.READ,ZohoCRM.settings.fields.READ`
+   Set duration to 10 minutes, any description, click **Create**, copy the code.
+4. Within ten minutes, in a terminal on this machine, run
+   `node scripts/zoho-token.mjs <client id> <client secret> <code>`.
+   It writes `scripts/zoho.env` with the values Vercel needs.
+5. In Vercel, **Add Environment Variable**, paste the whole contents of
+   `scripts/zoho.env` into the Key box (Vercel splits it into the separate
+   variables), save, redeploy, then delete `scripts/zoho.env`.
+
+When the Zoho keys are present the sheet variables below are ignored.
+
+## 3a. Fallback only: the tenant directory as a sheet
 
 The assistant verifies a tenant by looking up their tenancy reference and
 sending a code to the email or mobile on file. That list lives outside the
@@ -56,7 +86,7 @@ code, in a Google Sheet you control:
 Give every tenant their reference (it is what they will be asked for). The
 format `PS-1234` is a suggestion; anything unique works.
 
-## 3b. The landlord portal
+## 3b. Fallback only: the landlord portal sheets
 
 Landlords sign in the same way tenants do, and see their properties scored,
 with certificates and documents. It reads three more sheets, or three tabs of

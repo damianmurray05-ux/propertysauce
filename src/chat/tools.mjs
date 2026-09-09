@@ -4,6 +4,7 @@
 // session, never from the model.
 import { reference } from "./crypto.mjs";
 import { sendEmail, postWebhook, TEAM_EMAIL, escapeHtml } from "./notify.mjs";
+import { zohoConfigured, createJob } from "./zoho.mjs";
 
 export const tools = [
   {
@@ -67,15 +68,20 @@ export const tools = [
 const lines = (obj) => Object.entries(obj).filter(([, v]) => v !== undefined && v !== "").map(([k, v]) => `${k.replace(/_/g, " ")}: ${v}`).join("\n");
 
 export async function runTool(name, input, ctx) {
-  const ref = reference();
+  let ref = reference();
   const when = new Date().toLocaleString("en-GB", { timeZone: "Europe/London" });
   if (name === "raise_repair") {
     const verified = Boolean(ctx.tenant);
+    let ticket = "";
+    if (verified && zohoConfigured() && ctx.tenant.id) {
+      try { ticket = (await createJob({ tenant: ctx.tenant, input, photos: ctx.photos })).ticket; } catch (e) { console.error("zoho job failed", e.message); }
+    }
+    const ref = ticket ? `Ticket ${ticket}` : reference();
     const who = verified
       ? { name: ctx.tenant.name, address: ctx.tenant.address, tenancy_reference: ctx.tenant.reference, email: ctx.tenant.email, phone: ctx.tenant.phone }
       : { name: input.reporter_name, address: input.reporter_address, email: input.reporter_email };
     const subject = `${input.urgency === "emergency" ? "EMERGENCY " : input.urgency === "urgent" ? "URGENT " : ""}Repair ${ref}: ${input.summary}${verified ? "" : " (UNVERIFIED)"}`;
-    const text = `Repair report ${ref}\nRaised ${when} via the website assistant\nVerified: ${verified ? "yes, by one-time code" : "NO, details unchecked"}\n\n${lines(who)}\n\n${lines({ category: input.category, urgency: input.urgency, summary: input.summary, location: input.location_in_property, started: input.started, details: input.details, access: input.access, contact_phone: input.contact_phone })}\n\nPhotos attached: ${ctx.photos.length}`;
+    const text = `Repair report ${ref}\nRaised ${when} via the website assistant${ticket ? " and logged in Zoho CRM Maintenance" : ""}\nVerified: ${verified ? "yes, by one-time code" : "NO, details unchecked"}\n\n${lines(who)}\n\n${lines({ category: input.category, urgency: input.urgency, summary: input.summary, location: input.location_in_property, started: input.started, details: input.details, access: input.access, contact_phone: input.contact_phone })}\n\nPhotos attached: ${ctx.photos.length}`;
     const attachments = ctx.photos.map((p, i) => ({ filename: `${ref}-photo-${i + 1}.jpg`, data: p.data }));
     const team = await sendEmail({ to: TEAM_EMAIL, subject, text, attachments, replyTo: who.email || undefined });
     if (who.email) {
@@ -86,9 +92,9 @@ export async function runTool(name, input, ctx) {
       });
     }
     await postWebhook({ type: "repair", reference: ref, raised: new Date().toISOString(), verified, reporter: who, ...input, photos: ctx.photos.length });
-    ctx.raised.push({ reference: ref, note: verified ? "The team has it and will be in touch about access." : "The team will check these details against your file before booking." });
+    ctx.raised.push({ reference: ref, note: ticket ? "It is logged on your file and the team will be in touch about access." : verified ? "The team has it and will be in touch about access." : "The team will check these details against your file before booking." });
     if (!team.ok && !team.skipped) console.error("repair email failed", team.error);
-    return `Raised. Reference ${ref}. ${team.ok ? "The team has been emailed." : team.skipped ? "Email delivery is not configured yet, so the report is logged only; tell the person to also ring or email if it is urgent." : "Email delivery failed; tell the person to ring the office to be safe."}`;
+    return `Raised. Reference ${ref}. ${ticket ? "Logged as a maintenance ticket on the tenancy file. " : ""}${team.ok ? "The team has been emailed." : team.skipped ? (ticket ? "" : "Email delivery is not configured yet, so the report is logged only; tell the person to also ring or email if it is urgent.") : "Email delivery failed; tell the person to ring the office to be safe."}`;
   }
   if (name === "log_tenancy_question" || name === "handoff_to_team") {
     const kind = name === "log_tenancy_question" ? "Tenancy question" : "Enquiry";

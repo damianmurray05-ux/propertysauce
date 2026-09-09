@@ -53,7 +53,7 @@ export async function POST(request) {
   if (mode === "repair") {
     const s = verify(body.session);
     if (!s || s.t !== "session" || s.expired) return json(401, { error: "session_expired" });
-    tenant = { reference: s.ref, name: s.name, address: s.address, email: s.email, phone: s.phone };
+    tenant = { reference: s.ref, id: s.id || "", propertyId: s.pid || "", name: s.name, address: s.address, email: s.email, phone: s.phone };
   }
 
   const client = new Anthropic({ maxRetries: 2, timeout: 60_000 });
