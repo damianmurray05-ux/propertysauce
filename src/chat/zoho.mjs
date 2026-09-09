@@ -178,7 +178,7 @@ export async function propertiesByLandlordEmail(email) {
 }
 export async function findLandlordByEmail(email) {
   const e = normaliseEmail(email);
-  if (isAdminEmail(e)) return { reference: e, email: e, phone: "", name: process.env.PORTAL_ADMIN_NAME || "Property Sauce", firstName: (process.env.PORTAL_ADMIN_NAME || "there").split(/\s+/)[0], properties: null };
+  if (isAdminEmail(e)) return { reference: e, email: e, phone: "", name: process.env.PORTAL_ADMIN_NAME || "", firstName: (process.env.PORTAL_ADMIN_NAME || "there").split(/\s+/)[0], properties: null };
   const props = await propertiesByLandlordEmail(e);
   if (!props.length) return null;
   const l = props[0].landlord;
