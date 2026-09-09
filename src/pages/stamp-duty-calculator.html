@@ -1,0 +1,94 @@
+---
+title: Stamp duty calculator for buy-to-let and residential property
+description: Free stamp duty land tax calculator for England and Northern Ireland: standard rates, the 5 percent additional property surcharge for landlords and second homes, first-time buyer relief and the non-resident surcharge, for 2025 to 2026.
+priority: 0.8
+---
+<script type="application/ld+json" data-page-ld>
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {"@type": "WebApplication", "name": "Property Sauce stamp duty calculator", "applicationCategory": "FinanceApplication", "operatingSystem": "Any", "url": "https://propertysauce.co/stamp-duty-calculator/", "offers": {"@type": "Offer", "price": "0", "priceCurrency": "GBP"}, "description": "Calculates stamp duty land tax on residential property in England and Northern Ireland, including the additional property surcharge, first-time buyer relief and the non-resident surcharge."},
+    {"@type": "FAQPage", "mainEntity": [
+      {"@type": "Question", "name": "How much is stamp duty on a buy-to-let?", "acceptedAnswer": {"@type": "Answer", "text": "A buy-to-let or second home pays the standard rates plus a 5 percent surcharge on every band, so 5 percent up to 125,000 pounds, 7 percent to 250,000, 10 percent to 925,000, 15 percent to 1.5 million and 17 percent above that. Companies pay the same surcharge, and a flat 17 percent can apply to company purchases over 500,000 pounds that are not let commercially."}},
+      {"@type": "Question", "name": "When does stamp duty have to be paid?", "acceptedAnswer": {"@type": "Answer", "text": "Within 14 days of completion, with a return to HMRC. Your solicitor normally files the return and pays from completion funds."}},
+      {"@type": "Question", "name": "Do I pay the surcharge if I am replacing my main home?", "acceptedAnswer": {"@type": "Answer", "text": "No, if you sell your previous main residence on or before the day you complete on the new one. If you sell it within three years afterwards you pay the surcharge and then claim it back."}},
+      {"@type": "Question", "name": "Does this cover Scotland and Wales?", "acceptedAnswer": {"@type": "Answer", "text": "No. Scotland charges Land and Buildings Transaction Tax and Wales charges Land Transaction Tax, with different bands. This calculator is for England and Northern Ireland."}}
+    ]}
+  ]
+}
+</script>
+<section class="intro">
+  <div class="wrap">
+    <h1 data-reveal>Stamp duty calculator.</h1>
+    <p class="lede" data-reveal style="--d:80ms">Stamp duty land tax on residential property in England and Northern Ireland, for owner-occupiers, first-time buyers, landlords, second homes and companies. The rates from 1 April 2025. Free, nothing stored.</p>
+  </div>
+</section>
+
+<section class="section-tight">
+  <div class="wrap calc-grid">
+    <form class="calc-form" id="sdlt-calc" novalidate data-reveal>
+      <div class="field"><label for="sd-price">Purchase price</label><div class="money"><span>£</span><input id="sd-price" name="price" type="number" inputmode="numeric" min="0" step="1000" value="350000"></div></div>
+      <div class="field"><label for="sd-type">Who is buying</label><select id="sd-type" name="type">
+        <option value="additional" selected>A landlord, investor or second-home buyer</option>
+        <option value="company">A company</option>
+        <option value="main">Someone buying their main home (replacing or first)</option>
+        <option value="ftb">A first-time buyer</option>
+      </select><span class="hint">Landlords, second homes and companies pay the 5% surcharge on every band.</span></div>
+      <div class="field"><label class="check"><input id="sd-nonres" name="nonres" type="checkbox"> Buyer is not UK resident</label><span class="hint">Adds the 2% non-resident surcharge on every band.</span></div>
+      <details class="calc-adv">
+        <summary>Rates in use</summary>
+        <p class="hint">Standard bands from 1 April 2025: 0% to £125,000, 2% to £250,000, 5% to £925,000, 10% to £1,500,000, 12% above. Surcharge on additional properties 5%. First-time buyers: 0% to £300,000 and 5% to £500,000, no relief above £500,000. Non-resident surcharge 2%. Edit the code in assets/js/calculators.js when the rates change.</p>
+      </details>
+    </form>
+
+    <div class="calc-out" id="sdlt-out" aria-live="polite" data-reveal style="--d:80ms">
+      <div class="calc-headline">
+        <span class="eyebrow">Stamp duty to pay</span>
+        <strong id="sd-tax">£0</strong>
+        <span class="muted" id="sd-rate">Effective rate 0% of the price.</span>
+      </div>
+      <div class="calc-rows" id="sd-bands"></div>
+      <p class="calc-note" id="sd-note">Payable within 14 days of completion; your solicitor files the return.</p>
+      <div class="calc-actions">
+        <a class="btn btn-primary btn-sm" href="/landlords/">Let it with us <svg class="ic btn-ic" aria-hidden="true"><use href="/assets/icons.svg#arrow-up-right"/></svg></a>
+        <a class="btn btn-ghost btn-sm" href="/sell/">Sell to us</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="wrap split">
+    <div class="sh" data-reveal>
+      <h2>How stamp duty is worked out.</h2>
+      <p>Bands, not a flat rate. Each slice of the price is taxed at its own rate.</p>
+    </div>
+    <div class="prose" data-reveal style="--d:80ms">
+      <h3>The standard bands</h3>
+      <p>Nothing on the first 125,000 pounds, 2 percent on the slice up to 250,000, 5 percent up to 925,000, 10 percent up to 1.5 million and 12 percent on anything above. The nil-rate band was cut from 250,000 on 1 April 2025, which is why bills went up for everyone.</p>
+      <h3>The additional property surcharge</h3>
+      <p>If the purchase leaves you owning more than one dwelling, or the buyer is a company, every band carries an extra 5 percent. The surcharge was raised from 3 percent on 31 October 2024. Replacing your only main home is exempt, and if the old home sells within three years of the purchase you can reclaim the surcharge.</p>
+      <h3>First-time buyers</h3>
+      <p>No tax on the first 300,000 pounds and 5 percent on the slice to 500,000, provided every buyer is a first-time buyer and the home will be lived in. Above 500,000 the relief disappears entirely and the standard bands apply to the whole price.</p>
+      <h3>Non-residents</h3>
+      <p>A buyer who has not spent at least 183 days in the UK in the year before completion pays a further 2 percent on every band, on top of any other surcharge.</p>
+      <h3>What this is not</h3>
+      <p>Advice. Mixed-use property, six or more dwellings in one transaction, multiple dwellings, linked transactions, shared ownership, leases with rent, and the flat 17 percent company rate all have their own rules. For a block of flats the answer is often much better than this calculator shows, because six or more dwellings can be taxed at non-residential rates. <a href="/sell/">If you are buying or selling a block, talk to us.</a></p>
+    </div>
+  </div>
+</section>
+
+<section class="section-tight">
+  <div class="wrap">
+    <div class="cta dark" data-reveal>
+      <div>
+        <h2>Buying to let? We will manage it from day one.</h2>
+        <p class="lede">Compliance sorted before completion, tenant found before the mortgage payment lands, rent in your account with a statement.</p>
+      </div>
+      <div class="cta-side">
+        <a class="btn btn-primary" href="/contact/">Talk to us <svg class="ic btn-ic" aria-hidden="true"><use href="/assets/icons.svg#arrow-up-right"/></svg></a>
+      </div>
+    </div>
+  </div>
+</section>
+<script src="/assets/js/calculators.js" defer></script>

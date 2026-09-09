@@ -102,3 +102,45 @@
     calc();
   }
 })();
+
+/* ---------- Stamp duty land tax, England and Northern Ireland ---------- */
+(() => {
+  const $ = (s, r = document) => r.querySelector(s);
+  const form = $("#sdlt-calc");
+  if (!form) return;
+  const gbp = (n) => (Number.isFinite(n) ? n : 0).toLocaleString("en-GB", { style: "currency", currency: "GBP", maximumFractionDigits: 0 });
+  const STANDARD = [[125000, 0], [250000, 0.02], [925000, 0.05], [1500000, 0.10], [Infinity, 0.12]];
+  const FTB = [[300000, 0], [500000, 0.05]];
+  const calc = () => {
+    const price = Math.max(0, Number($("#sd-price").value) || 0);
+    const type = $("#sd-type").value;
+    const nonres = $("#sd-nonres").checked ? 0.02 : 0;
+    const surcharge = type === "additional" || type === "company" ? 0.05 : 0;
+    let bands = STANDARD, note = "Payable within 14 days of completion; your solicitor files the return.";
+    if (type === "ftb") {
+      if (price <= 500000) { bands = FTB; note = "First-time buyer relief applied: nothing on the first £300,000 and 5% on the slice to £500,000."; }
+      else note = "First-time buyer relief does not apply above £500,000, so the standard bands apply to the whole price.";
+    } else if (type === "main") note = "No surcharge, because this replaces your only main home. If you still own the old one on completion day, the surcharge applies and can be reclaimed when it sells within three years.";
+    else if (type === "company" && price > 500000) note = "Company purchase above £500,000: a flat 17% can apply unless the property is let commercially or used in a qualifying business. The figure shown assumes the banded rates with the surcharge.";
+    else if (surcharge) note = "Includes the 5% additional property surcharge on every band. Payable within 14 days of completion.";
+    if (nonres) note += " Includes the 2% non-resident surcharge.";
+    let lower = 0, total = 0;
+    const rows = [];
+    for (const [upper, rate] of bands) {
+      if (price <= lower) break;
+      const slice = Math.min(price, upper) - lower;
+      const r = rate + surcharge + nonres;
+      const tax = slice * r;
+      total += tax;
+      rows.push(`<div class="calc-row"><span>${gbp(lower)} to ${upper === Infinity ? "above" : gbp(upper)} at ${Math.round(r * 100)}%</span><strong>${gbp(tax)}</strong></div>`);
+      lower = upper;
+    }
+    $("#sd-tax").textContent = gbp(total);
+    $("#sd-rate").textContent = price ? `Effective rate ${((total / price) * 100).toFixed(2)}% of the price.` : "Enter a price.";
+    $("#sd-bands").innerHTML = rows.join("");
+    $("#sd-note").textContent = note;
+  };
+  form.addEventListener("input", calc);
+  form.addEventListener("change", calc);
+  calc();
+})();

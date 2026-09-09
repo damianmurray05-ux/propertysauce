@@ -155,14 +155,31 @@ export function mapProperty(rec) {
     raw: rec,
   };
 }
+/* PORTAL_ADMIN_EMAILS: comma-separated addresses that see every property. */
+export const isAdminEmail = (email) => String(process.env.PORTAL_ADMIN_EMAILS || "").toLowerCase().split(",").map((s) => s.trim()).filter(Boolean).includes(normaliseEmail(email));
+const LIVE_STATUSES = /^(rented|let|managed|tenanted|occupied|void|vacant|available|maintenance only)$/i;
+async function allProperties() {
+  const out = [];
+  let pageToken = "";
+  for (let i = 0; i < 5; i++) {
+    const d = await call(`/Accounts?fields=${PROPERTY_FIELDS}&per_page=200&sort_by=Modified_Time&sort_order=desc${pageToken ? `&page_token=${encodeURIComponent(pageToken)}` : ""}`);
+    out.push(...(d.data || []));
+    if (!d.info || !d.info.more_records || !d.info.next_page_token) break;
+    pageToken = d.info.next_page_token;
+  }
+  return out.map(mapProperty).filter((p) => p.rentPcm || LIVE_STATUSES.test(p.status) || p.tenantId);
+}
 export async function propertiesByLandlordEmail(email) {
   const e = normaliseEmail(email);
   if (!e || !e.includes("@")) return [];
+  if (isAdminEmail(e)) return allProperties();
   const rows = await search("Accounts", `(Vendor_Email:equals:${e})`, PROPERTY_FIELDS, 200);
   return rows.map(mapProperty).filter((p) => p.landlord.email === e);
 }
 export async function findLandlordByEmail(email) {
-  const props = await propertiesByLandlordEmail(email);
+  const e = normaliseEmail(email);
+  if (isAdminEmail(e)) return { reference: e, email: e, phone: "", name: process.env.PORTAL_ADMIN_NAME || "Property Sauce", firstName: (process.env.PORTAL_ADMIN_NAME || "there").split(/\s+/)[0], properties: null };
+  const props = await propertiesByLandlordEmail(e);
   if (!props.length) return null;
   const l = props[0].landlord;
   return { reference: l.email, email: l.email, phone: l.phone, name: l.name, firstName: (l.name.split(/\s+/)[0] || "there"), properties: props.length };

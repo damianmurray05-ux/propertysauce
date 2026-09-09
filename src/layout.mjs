@@ -192,6 +192,14 @@ ${body}
       <a href="/sell/">Sell a property or block</a>
     </div>
     <div class="footer-col">
+      <h2>Tools</h2>
+      <a href="/landlord-portal/">Landlord portal</a>
+      <a href="/my-tenancy/">My tenancy</a>
+      <a href="/leasehold-calculator/">Lease extension calculator</a>
+      <a href="/capital-gains-tax-calculator/">Capital gains tax calculator</a>
+      <a href="/stamp-duty-calculator/">Stamp duty calculator</a>
+    </div>
+    <div class="footer-col">
       <h2>Company</h2>
       <a href="/about/">About</a>
       <a href="/tenants/">Tenants</a>
