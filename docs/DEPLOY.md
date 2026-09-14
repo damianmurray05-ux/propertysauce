@@ -108,10 +108,19 @@ within five minutes.
 
 ## 4. Email sending
 
-Codes and job notifications go out through Resend. In Resend, add the domain
-`propertysauce.co` and copy the three DNS records it gives you into the
-domain's DNS (see step 5). Until the domain is verified, Resend will only
-deliver to your own address, which is fine for testing.
+Codes and job notifications go out through Resend. The domain
+`propertysauce.co` is added in Resend (region Ireland, return path `send`).
+These are the records it needs in the domain's DNS (see step 5). Until they
+are in place and Resend shows the domain as verified, keep `MAIL_FROM` on
+`onboarding@resend.dev`; afterwards set it to
+`Property Sauce <assistant@propertysauce.co>`.
+
+| Type | Host | Value |
+|---|---|---|
+| TXT | `resend._domainkey` | `p=MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQC8Io/brmzr+TRFuOdWMdLruA8m+iGylv1D+UDvFYBqmALyWU+X1uK4qMPsWLXdxpVLJwUDamR/+jCi+Gm/Q71HZQKCvYfV8MfDFYQWfHtojd0WH00g6viBZ465M8hwM7tXkmpWNRioFmSWQV0WUYKZ3Xvnl+R/OynbH/l/B7VpqQIDAQAB` |
+| CNAME | `rsend` | `rsend-euw1.forge.rmta.net` |
+| CNAME | `send` | `send.forge.rmta.net` |
+| TXT | `_dmarc` | `v=DMARC1; p=none;` (optional) |
 
 ## 5. Point the domain at Vercel
 
@@ -120,12 +129,23 @@ In the Vercel project, **Settings > Domains**, add `propertysauce.co` and
 DNS is currently at Squarespace Domains (formerly Google Domains): sign in
 there, open the DNS settings for `propertysauce.co`, and add
 
-- an `A` record for `@` pointing to Vercel's IP (shown in Vercel, currently `76.76.21.21`)
-- a `CNAME` record for `www` pointing to `cname.vercel-dns.com`
+- an `A` record for `@` pointing to `216.198.79.1`
+- a `CNAME` record for `www` pointing to `3a647868d5b71d9d.vercel-dns-017.com`
 
-plus the Resend records from step 4. Delete the old Squarespace website
-records for `@` and `www` at the same time. DNS takes up to an hour to move
-across; Vercel issues the SSL certificate itself.
+plus the Resend records from step 4. First delete the Squarespace domain
+forwarding rule (Website tab, Domain Forwarding) that sends the domain to
+`www.propertysauce.org`; it owns the old `@` and `www` records. Squarespace
+asks you to sign in with Google (`damian@propertysauce.co`) before it will
+change anything. Leave every Google Workspace record alone: the five `MX`
+records, the `spf1` TXT, `google._domainkey`, the `googlehosted` CNAME and
+the `mail` A record all carry the company email. DNS takes up to an hour to
+move across; Vercel issues the SSL certificate itself.
+
+`propertysauce.org` (the old Wix site's domain) expired on 25 August 2026 and
+by 14 September 2026 had dropped out of the .org registry entirely, so it
+cannot be renewed, only registered again. Once re-registered, forward it to
+`https://propertysauce.co` and add it back as a secondary domain in Google
+Workspace if mail to it still matters.
 
 ## Testing the assistant before tenants use it
 
