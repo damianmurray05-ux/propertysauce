@@ -77,7 +77,7 @@ function fromZoho(p, tenant, jobs, attachments) {
   const rent = p.rentPcm || Number(t.Rent) || 0;
   const arrears = status === "Arrears" || status === "Possession Proceedings" || status === "Court" ? (missedDays ? Math.round((missedDays / 30) * rent) : rent) : 0;
   const invoices = jobs.filter((j) => j.invoiced).map((j) => ({ type: "invoice", title: `${j.ticket ? `Ticket ${j.ticket}: ` : ""}${j.title}`, date: j.paid || j.updated, url: "", amount: j.invoiced, job: j }));
-  const documents = attachments.map((a) => ({ type: classify(a.name), title: a.name, date: a.date, url: `/api/file?m=${a.module}&r=${a.record}&a=${a.id}`, amount: null })).concat(invoices);
+  const documents = attachments.map((a) => ({ type: classify(a.name), title: a.name, date: a.date, url: `/api/file/?m=${a.module}&r=${a.record}&a=${a.id}`, amount: null })).concat(invoices);
   return {
     property_ref: p.reference || p.id, address: p.address, tenant_ref: tenant ? tenant.reference : "", rent_pcm: rent,
     rent_history_12m: history, rent_due_12m: tenant && CURRENT.has(status) ? rent * 12 : 0, rent_collected_12m: tenant && CURRENT.has(status) ? rent * 12 - arrears : 0,
