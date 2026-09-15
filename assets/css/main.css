@@ -548,7 +548,9 @@ body.menu-open .header-cta { visibility: hidden; }
 
 .jobs { margin-top: 1.5rem; }
 .jobs ul { margin: 0; padding: 0; list-style: none; }
-.jobs li { display: grid; grid-template-columns: auto 1fr; gap: 0.25rem 0.75rem; align-items: baseline; padding: 0.6rem 0; border-top: 1px solid var(--line); font-size: var(--fs-0); }
+.jobs li { display: grid; gap: 0.35rem; padding: 0.7rem 0; border-top: 1px solid var(--line); font-size: var(--fs-0); }
+.job-top { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem 0.75rem; }
+.job-top small { color: var(--muted); }
 .jobs li strong { font-family: var(--font-display); font-size: var(--fs-2); font-weight: 600; }
 .jobs li small { grid-column: 2; color: var(--muted); }
 .job-status { font-size: 0.62rem; letter-spacing: 0.16em; text-transform: uppercase; padding: 0.3rem 0.5rem; border: 1px solid var(--gold-soft); color: var(--ink); white-space: nowrap; }
@@ -760,3 +762,5 @@ table.mini .bad { color: var(--accent-ink); font-weight: 500; }
 .sc .score-part-head span, .sc .score-part-head strong, .sc .cert strong, .sc .jobs li strong { font-family: var(--font-body); font-weight: 600; font-size: 1rem; }
 [data-page="my-tenancy"] .step-n, [data-page="landlord-portal"] .step-n { font-weight: 600; letter-spacing: -0.02em; }
 .sc-tier strong, [data-page="my-tenancy"] .sh h2, [data-page="landlord-portal"] .sh h2 { font-weight: 600; letter-spacing: -0.03em; }
+
+@media (max-width: 640px) { .sc-joblist li { grid-template-columns: 1fr; gap: 0.4rem; } .sc-stat strong { font-size: 1.6rem; } }

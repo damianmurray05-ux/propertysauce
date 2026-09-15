@@ -35,5 +35,10 @@ window.PSCharts = (() => {
     return `<div class="tier-track"><i style="--p:${Math.max(0, Math.min(100, value)) / 100}"></i>${marks.map((m) => `<b style="left:${m.min}%" class="${value >= m.min ? "hit" : ""}"><span>${esc(m.name)}</span></b>`).join("")}</div>`;
   }
 
-  return { C, donut, bars, legend, progress, fmt, esc };
+  /* Zoho's job stages are long; these are the words a tenant or landlord needs. */
+  const STAGES = { "Reported": "Reported", "Inspection Confirmed": "Inspection booked", "Awaiting Quotation": "Awaiting quote", "Quotation Received": "Quote received", "Quotation Sent to Landlord": "Quote with landlord", "Quotation Approved by Landlord": "Quote approved", "Contractor Instructed": "Contractor booked", "Contractor Confirmed Job Complete": "Work done", "Requested Tenant to Sign Off": "Awaiting sign-off", "Tenant Signed Off": "Signed off", "Invoice Received": "Completed" };
+  const stage = (s, closed) => STAGES[s] || s || (closed ? "Closed" : "Open");
+  // Job titles from Zoho start with the address; drop it when the card already says where.
+  const jobTitle = (title, address) => { const t = String(title || ""); const i = t.indexOf(" - "); if (i > 0 && address && t.slice(0, i).trim().toLowerCase().startsWith(String(address).split(",")[0].trim().toLowerCase().slice(0, 6))) return t.slice(i + 3).trim() || t; return t; };
+  return { C, donut, bars, legend, progress, fmt, esc, stage, jobTitle };
 })();

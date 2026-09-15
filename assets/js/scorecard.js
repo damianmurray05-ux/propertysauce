@@ -170,7 +170,7 @@
     $("#sc-rewards").innerHTML = rewards.length ? rewards.join("") : `<li class="soon">${icon("clock")}<span>Rewards start at Silver. ${d.next ? `${d.next.pointsNeeded} points to go.` : ""}</span></li>`;
     $("#sc-tips").innerHTML = d.tips.map((t) => `<li>${icon("arrow-right")}<span>${esc(t)}</span></li>`).join("");
 
-    $("#sc-jobs").innerHTML = jobs.length ? `<section class="sc-card"><h3>Your repairs <span class="sc-count">${open} open</span></h3><ul class="sc-joblist">${jobs.map((j) => `<li><span class="sc-status ${j.closed ? "done" : "open"}">${esc(j.status || (j.closed ? "Closed" : "Open"))}</span><div><strong>${esc(j.title)}</strong><small>${esc(j.ticket ? `Ticket ${j.ticket} · ` : "")}${esc(j.created || "")}</small></div></li>`).join("")}</ul></section>` : "";
+    $("#sc-jobs").innerHTML = jobs.length ? `<section class="sc-card"><h3>Your repairs <span class="sc-count">${open} open</span></h3><ul class="sc-joblist">${jobs.map((j) => `<li><span class="sc-status ${j.closed ? "done" : "open"}">${esc(window.PSCharts.stage(j.status, j.closed))}</span><div><strong>${esc(window.PSCharts.jobTitle(j.title, d.address))}</strong><small>${esc(j.ticket ? `Ticket ${j.ticket} · ` : "")}${esc(j.created || "")}</small></div></li>`).join("")}</ul></section>` : "";
   }
 
   $("#sc-signout").addEventListener("click", () => { saveSession(null, null); card.hidden = true; gate.hidden = false; refForm.hidden = false; codeForm.hidden = true; channels.hidden = true; msg.hidden = true; $("#sc-ref").value = ""; });
