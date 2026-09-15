@@ -707,3 +707,27 @@ table.mini .bad { color: var(--accent-ink); font-weight: 500; }
 .sc .calc-actions { margin-top: 0.25rem; }
 @media (max-width: 860px) { .sc-hero { grid-template-columns: 1fr; grid-template-areas: "ring" "text" "stats"; justify-items: start; } .sc-ring { justify-self: center; } .sc-grid { grid-template-columns: 1fr; } .sc-stats { grid-template-columns: 1fr 1fr; } .sc-medal span { font-size: 0.6rem; } }
 @media (prefers-reduced-motion: reduce) { .sc-ring-arc, .sc-track i, .sc-bar i, .sc-line, .sc-dot { transition: none; } .sc-line { stroke-dashoffset: 0; } .sc-dot { opacity: 1; transform: none; } .sc-area { animation: none; opacity: 1; } .sc-track i, .sc-bar i { width: calc(var(--p) * 100%); } }
+
+/* Landlord portal shares the scorecard's app styling. */
+.portal.sc { border: 0; background: transparent; padding: 0; }
+.sc-stats-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.sc-stats-4 .sc-stat strong { font-size: 1.7rem; }
+.sc-pill-amber { background: linear-gradient(135deg, #F1E3BD, #B4924A); } .sc-pill-red { background: linear-gradient(135deg, #F0B9A3, #C8502A); color: #fff; }
+.sc .chart-card, .sc .table-card { border-radius: var(--sc-r); padding: clamp(1.4rem, 3vw, 1.9rem); box-shadow: 0 1px 0 rgba(15,42,34,0.04), 0 18px 40px -28px rgba(15,42,34,0.35); border: 1px solid rgba(15,42,34,0.06); }
+.sc .chart-head h3, .sc .table-card h3 { font-size: 1.35rem; margin-bottom: 0.5rem; }
+.sc .chart-legend li strong { font-size: 1.25rem; }
+.sc .bar-stack i { border-radius: 6px 6px 0 0; }
+.sc .prop { border-radius: var(--sc-r); border: 1px solid rgba(15,42,34,0.06); border-top-width: 4px; box-shadow: 0 1px 0 rgba(15,42,34,0.04), 0 18px 40px -28px rgba(15,42,34,0.3); background: var(--white); }
+.sc .prop-head h3 { font-size: 1.5rem; margin: 0 0 0.25rem; display: block; }
+.sc .portal-toolbar h3 { margin: 0; }
+.sc .portal-toolbar input, .sc .portal-toolbar select { border-radius: 999px; padding: 0.7rem 1.1rem; }
+.sc .chip { border-radius: 999px; }
+.sc .portal-alerts { background: var(--white); border-radius: var(--sc-r); padding: 1.25rem 1.5rem; border: 1px solid rgba(15,42,34,0.06); }
+.sc .portal-alerts .notice { margin: 0; }
+.sc .score-bar { height: 8px; border-radius: 999px; }
+.sc .score-bar i { border-radius: 999px; background: linear-gradient(to right, #7FB89A, #2E7D5B); }
+.sc .score-months .m i { border-radius: 50%; }
+.sc .cert { border-radius: 12px; }
+.sc table.mini td, .sc table.mini th { padding-left: 0.25rem; }
+.sc .pill { border-radius: 999px; }
+@media (max-width: 860px) { .sc-stats-4 { grid-template-columns: 1fr 1fr; } }

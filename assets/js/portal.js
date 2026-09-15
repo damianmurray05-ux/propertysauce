@@ -165,17 +165,35 @@
     if (!more.hidden) more.textContent = `Show ${Math.min(24, list.length - state.shown)} more`;
   }
 
+  const heroRing = (score, rag) => {
+    const size = 232, r = 100, c = 2 * Math.PI * r, cx = size / 2;
+    const stops = rag === "red" ? ["#E8A98E", "#C8502A", "#9C3A1C"] : rag === "amber" ? ["#E7D2A0", "#B4924A", "#8C6D2F"] : ["#E7D2A0", "#B4924A", "#7FB89A"];
+    return `<svg viewBox="0 0 ${size} ${size}" width="${size}" height="${size}"><defs><linearGradient id="pl-grad" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${stops[0]}"/><stop offset="0.55" stop-color="${stops[1]}"/><stop offset="1" stop-color="${stops[2]}"/></linearGradient><filter id="pl-glow" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="6" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs><circle cx="${cx}" cy="${cx}" r="${r}" fill="none" stroke="rgba(255,255,255,0.10)" stroke-width="14"/><circle class="sc-ring-arc" cx="${cx}" cy="${cx}" r="${r}" fill="none" stroke="url(#pl-grad)" stroke-width="14" stroke-linecap="round" stroke-dasharray="${c}" stroke-dashoffset="${c}" transform="rotate(-90 ${cx} ${cx})" filter="url(#pl-glow)" style="--target:${c * (1 - score / 100)}"/><text class="sc-ring-num" x="${cx}" y="${cx + 22}" text-anchor="middle" font-family="Cormorant Garamond, Cormorant, Georgia, serif" font-size="84" font-weight="500" fill="#F4F5F1">0</text><text x="${cx}" y="${cx + 52}" text-anchor="middle" font-family="Geist, sans-serif" font-size="12" letter-spacing="2.5" fill="rgba(244,245,241,0.7)">PORTFOLIO SCORE</text></svg>`;
+  };
+  const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  function countUp(el, to, fmtFn) {
+    const f = fmtFn || ((n) => String(n));
+    if (reduce) { el.textContent = f(to); return; }
+    const t0 = performance.now(), dur = 1100;
+    const step = (t) => { const p = Math.min(1, (t - t0) / dur), e = 1 - Math.pow(1 - p, 3); el.textContent = f(Math.round(to * e)); if (p < 1) requestAnimationFrame(step); };
+    requestAnimationFrame(step);
+  }
   function render(d) {
     $("#pl-title").textContent = d.firstName && d.firstName !== "there" ? `Hello ${d.firstName}.` : "Your portfolio.";
     $("#pl-sub").textContent = `${d.totals.properties} propert${d.totals.properties === 1 ? "y" : "ies"} under management · updated ${new Date().toLocaleDateString("en-GB", { day: "numeric", month: "long" })}`;
-    $("#pl-ring").innerHTML = ring(d.overall, d.rag);
+    const word = d.rag === "green" ? "Healthy" : d.rag === "amber" ? "Needs a look" : "Needs attention";
+    $("#pl-tier").innerHTML = `<span class="sc-pill ${d.rag === "green" ? "" : d.rag === "amber" ? "sc-pill-amber" : "sc-pill-red"}"><svg class="ic" aria-hidden="true"><use href="/assets/icons.svg#shield-check"/></svg> ${word}</span><span class="sc-tier-note">Green is 85 and above, amber 65 to 84, red below 65.</span>`;
+    $("#pl-ring").innerHTML = heroRing(d.overall, d.rag);
     $("#pl-ring").setAttribute("aria-label", `Portfolio score ${d.overall} out of 100`);
+    requestAnimationFrame(() => requestAnimationFrame(() => { const arc = $("#pl-ring .sc-ring-arc"); if (arc) arc.style.strokeDashoffset = arc.style.getPropertyValue("--target"); countUp($("#pl-ring .sc-ring-num"), d.overall); }));
     $("#pl-totals").innerHTML = [
-      ["Rent roll", gbp(d.totals.rentPcm) + " pcm"],
-      ["Collected, last 12 months", `${gbp(d.totals.collected)} of ${gbp(d.totals.due)}`],
-      ["Arrears today", gbp(d.totals.arrears)],
-      ["Items needing attention", String(d.totals.alerts)],
-    ].map(([k, v]) => `<div class="fact"><strong>${esc(v)}</strong><span>${esc(k)}</span></div>`).join("");
+      [d.totals.rentPcm, "rent roll per month", gbp],
+      [d.totals.collected, `collected of ${gbp(d.totals.due)} due, 12 months`, gbp],
+      [d.totals.arrears, "in arrears today", gbp],
+      [d.totals.alerts, "items needing attention", String],
+    ].map(([n, l, f], i) => `<div class="sc-stat"><strong data-i="${i}">0</strong><span>${esc(l)}</span></div>`).join("");
+    const fmts = [gbp, gbp, gbp, String], vals = [d.totals.rentPcm, d.totals.collected, d.totals.arrears, d.totals.alerts];
+    document.querySelectorAll("#pl-totals strong").forEach((el) => countUp(el, vals[Number(el.dataset.i)], fmts[Number(el.dataset.i)]));
     dashboards(d);
     const alerts = d.properties.flatMap((p) => p.alerts.map((a) => `<li><strong>${esc(p.address.split(",")[0])}</strong> ${esc(a)}</li>`));
     $("#pl-alerts").innerHTML = alerts.length ? `<details ${alerts.length <= 6 ? "open" : ""}><summary><h3>Needs attention (${alerts.length})</h3></summary><ul class="score-list">${alerts.join("")}</ul></details>` : `<p class="notice">Nothing needs your attention. Every certificate is in date and there are no arrears.</p>`;
