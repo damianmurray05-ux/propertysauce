@@ -583,7 +583,9 @@ a.cell-link .link { color: var(--ink); }
 .bar-stack i { display: block; flex: 1 1 0; height: var(--h); min-height: 2px; border-radius: 2px 2px 0 0; transition: height 0.9s cubic-bezier(.16,1,.3,1); }
 .bar-group span { font-size: 0.66rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
 .bars-months .bar-stack { height: 6rem; }
-.swatch { display: inline-block; width: 0.6rem; height: 0.6rem; border-radius: 2px; margin-right: 0.5rem; vertical-align: 0; }
+.dot-swatch { display: inline-block; width: 0.6rem; height: 0.6rem; border-radius: 2px; margin-right: 0.5rem; vertical-align: 0; }
+.score-history .chart-legend { display: flex; flex-wrap: wrap; gap: 0.5rem 1.5rem; }
+.score-history .chart-legend li { grid-template-columns: auto auto auto; }
 .tables { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
 .table-card { border: 1px solid var(--line); background: var(--white); padding: 1.25rem; min-width: 0; overflow-x: auto; }
 .table-card h3 { font-size: var(--fs-2); font-weight: 600; margin-bottom: 0.75rem; }

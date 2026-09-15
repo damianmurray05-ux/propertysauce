@@ -90,7 +90,7 @@
     const segs = d.parts.map((p, i) => ({ value: p.score, color: partColours[i % 4], label: p.label, text: `${p.score} / ${p.max}` }));
     const lost = Math.max(0, 100 - d.score);
     $("#sc-donut").innerHTML = CH.donut(segs.concat(lost ? [{ value: lost, color: C.paper2, label: "Still to earn" }] : []), { label: d.score, sub: "out of 100", aria: `Score ${d.score} out of 100` }) + CH.legend(segs);
-    $("#sc-parts").innerHTML = d.parts.map((p, i) => `<div class="score-part"><div class="score-part-head"><span><i class="swatch" style="background:${partColours[i % 4]}"></i>${p.label}</span><strong>${p.score} / ${p.max}</strong></div><div class="score-bar"><i style="--p:${p.score / p.max};background:${partColours[i % 4]}"></i></div><small>${p.detail}</small></div>`).join("");
+    $("#sc-parts").innerHTML = d.parts.map((p, i) => `<div class="score-part"><div class="score-part-head"><span><i class="dot-swatch" style="background:${partColours[i % 4]}"></i>${p.label}</span><strong>${p.score} / ${p.max}</strong></div><div class="score-bar"><i style="--p:${p.score / p.max};background:${partColours[i % 4]}"></i></div><small>${p.detail}</small></div>`).join("");
     const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
     const now = new Date(); const start = (now.getMonth() - 11 + 12) % 12;
     const hist = (d.history || "").padStart(12, "-");
