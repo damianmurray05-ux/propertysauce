@@ -1,0 +1,156 @@
+---
+title: Email signature and footer
+description: Internal page for the Property Sauce email signature and legal footer, one per mailbox, ready to paste into Gmail.
+noindex: true
+---
+<section class="intro">
+  <div class="wrap">
+    <span class="eyebrow">Internal</span>
+    <h1 data-reveal>Email signature and footer.</h1>
+    <p class="lede" data-reveal style="--d:80ms">One signature for every Property Sauce mailbox, signed by the team rather than a person. Pick the mailbox, press copy, paste into Gmail. The legal footer is built in, and there is a separate copy of it for Google Workspace's append-footer setting.</p>
+  </div>
+</section>
+
+<section class="section-tight">
+  <div class="wrap">
+    <div class="sig-bar" data-reveal>
+      <label for="sig-box">Mailbox</label>
+      <select id="sig-box">
+        <option value="contact">contact@ (general enquiries)</option>
+        <option value="lettings">lettings@ (landlords and new tenants)</option>
+        <option value="repairs">repairs@ (maintenance)</option>
+        <option value="accounts">accounts@ (rent and statements)</option>
+        <option value="blocks">blocks@ (block and portfolio management)</option>
+        <option value="acquisitions">acquisitions@ (buying blocks and portfolios)</option>
+        <option value="admin">admin@ (administration)</option>
+        <option value="info">info@ (general)</option>
+        <option value="custom">Another address</option>
+      </select>
+      <input id="sig-custom" type="email" placeholder="name@propertysauce.co" hidden>
+      <button type="button" class="btn btn-primary btn-sm" id="sig-copy">Copy signature</button>
+      <button type="button" class="btn btn-ghost btn-sm" id="sig-copy-text">Copy plain text</button>
+      <span class="notice" id="sig-msg" hidden>Copied. Paste it into Gmail.</span>
+    </div>
+    <div class="sig-stage" id="sig-stage"></div>
+  </div>
+</section>
+
+<section class="section-tight">
+  <div class="wrap split">
+    <div class="sh"><h2>Put it in Gmail.</h2><p>Two minutes per mailbox.</p></div>
+    <div class="prose">
+      <ol>
+        <li>Sign in to Gmail as the mailbox. Click the gear, then <strong>See all settings</strong>, then the <strong>General</strong> tab.</li>
+        <li>Scroll to <strong>Signature</strong> and click <strong>Create new</strong>. Name it <em>Property Sauce</em>.</li>
+        <li>Click in the box and paste.</li>
+        <li>Below the box, set <strong>For new emails use</strong> and <strong>On reply/forward use</strong> to <em>Property Sauce</em>.</li>
+        <li>Scroll to the bottom and click <strong>Save changes</strong>. Send yourself a test.</li>
+      </ol>
+      <p>Phones: the Gmail app uses its own mobile signature. In the app, Settings, the account, Mobile signature, paste the plain-text version.</p>
+    </div>
+  </div>
+</section>
+
+<section class="section-tight">
+  <div class="wrap">
+    <div class="sh"><h2>Footer for every message.</h2><p>Google Workspace can add this to every outgoing email from every mailbox, including replies sent from a phone. Admin console, Apps, Google Workspace, Gmail, Compliance, Append footer.</p></div>
+    <div class="sig-stage" id="sig-footer"></div>
+    <div class="sig-bar"><button type="button" class="btn btn-ghost btn-sm" id="sig-copy-footer">Copy footer</button><span class="notice" id="sig-msg-footer" hidden>Copied.</span></div>
+  </div>
+</section>
+
+<section class="section-tight">
+  <div class="wrap">
+    <div class="sh"><h2>Plain text.</h2><p>For text messages, letters and anything that strips formatting.</p></div>
+    <pre class="sig-plain" id="sig-plain"></pre>
+  </div>
+</section>
+
+<script>
+(() => {
+  const SITE = "https://propertysauce.co";
+  const PHONE = "+44 (0)20 8988 8434", TEL = "+442089888434";
+  const ADDRESS = "Top Floor, 55 Coopers Lane, Leyton, London E10 5DG";
+  const MAPS = "https://www.google.com/maps/search/?api=1&query=55+Coopers+Lane+Leyton+London+E10+5DG";
+  const BOXES = {
+    contact: { role: "The Property Sauce team", line: "" },
+    lettings: { role: "The Property Sauce lettings team", line: "Landlords: full management from 8% of the rent collected." },
+    repairs: { role: "The Property Sauce repairs team", line: "Tenants can report a repair any hour at propertysauce.co and get a ticket number straight away." },
+    accounts: { role: "The Property Sauce accounts team", line: "Please quote the property address and the statement or invoice number in any payment query." },
+    blocks: { role: "The Property Sauce block management team", line: "" },
+    acquisitions: { role: "The Property Sauce acquisitions team", line: "We buy blocks of flats and small portfolios for our own account, including distressed sales, with proof of funds on request." },
+    admin: { role: "The Property Sauce team", line: "" },
+    info: { role: "The Property Sauce team", line: "" },
+    custom: { role: "The Property Sauce team", line: "" },
+  };
+  const FOOTER = `<div style="font-family:Arial,Helvetica,sans-serif;font-size:10px;line-height:1.65;color:#7B8781">
+      Property Sauce is a trading name of <span style="color:#55655E;font-weight:bold">Sure Lets and Manage Limited</span>, registered in England and Wales, company number <span style="color:#55655E;font-weight:bold">16613860</span>. Director: Usman Tufail. Registered office: Lancaster House, Brownrigg Drive, Cramlington NE23&nbsp;6UN. Member of the Property Redress Scheme, PRS058008. ICO registration ZC027659.<br>
+      This message and any attachments are confidential and intended only for the named recipient. If it has reached you in error, please tell us and delete it. How we handle personal data is set out in our <a href="${SITE}/privacy/" style="color:#7B8781;text-decoration:underline">privacy notice</a>.
+    </div>`;
+  const email = (key) => key === "custom" ? (document.getElementById("sig-custom").value.trim() || "contact@propertysauce.co") : `${key}@propertysauce.co`;
+  const sig = (key) => {
+    const b = BOXES[key] || BOXES.custom, addr = email(key);
+    const row = (label, inner) => `<tr><td style="padding:0 10px 4px 0;vertical-align:top;font-family:Arial,Helvetica,sans-serif;font-size:9.5px;font-weight:bold;letter-spacing:1.6px;text-transform:uppercase;color:#B4924A;white-space:nowrap;line-height:1.9">${label}</td><td style="padding:0 0 4px;vertical-align:top;font-family:Arial,Helvetica,sans-serif;font-size:12.5px;line-height:1.5;color:#3B4A44">${inner}</td></tr>`;
+    return `<table cellpadding="0" cellspacing="0" border="0" role="presentation" style="border-collapse:collapse;font-family:Georgia,'Times New Roman',serif;color:#0F2A22;max-width:560px">
+  <tr>
+    <td style="vertical-align:top;padding:0 22px 0 0"><a href="${SITE}" style="text-decoration:none"><img src="${SITE}/brand/mark-512.png" width="72" height="72" alt="Property Sauce" style="display:block;width:72px;height:72px;border:0;border-radius:2px"></a></td>
+    <td style="vertical-align:top;border-left:1px solid #B4924A;padding:0 0 0 22px">
+      <div style="font-family:Georgia,'Times New Roman',serif;font-size:18px;letter-spacing:2.5px;text-transform:uppercase;color:#0F2A22;line-height:1.2">Property Sauce</div>
+      <div style="font-family:Arial,Helvetica,sans-serif;font-size:9px;font-weight:bold;letter-spacing:2px;text-transform:uppercase;color:#B4924A;padding:5px 0 0">Portfolios &middot; Block management &middot; Acquisitions</div>
+      <div style="font-family:Georgia,'Times New Roman',serif;font-size:14px;color:#0F2A22;padding:10px 0 0">${b.role}</div>
+      <div style="height:1px;background:#B4924A;font-size:0;line-height:0;margin:10px 0 10px">&nbsp;</div>
+      <table cellpadding="0" cellspacing="0" border="0" role="presentation" style="border-collapse:collapse">
+        ${row("Email", `<a href="mailto:${addr}" style="color:#0F2A22;text-decoration:none">${addr}</a>`)}
+        ${row("Phone", `<a href="tel:${TEL}" style="color:#0F2A22;text-decoration:none">${PHONE}</a>`)}
+        ${row("Web", `<a href="${SITE}" style="color:#0F2A22;text-decoration:none">propertysauce.co</a>`)}
+        ${row("Office", `<a href="${MAPS}" style="color:#3B4A44;text-decoration:none">${ADDRESS}</a>`)}
+      </table>
+      <table cellpadding="0" cellspacing="0" border="0" role="presentation" style="border-collapse:collapse;margin-top:12px">
+        <tr>
+          <td style="padding:0 8px 0 0"><a href="${SITE}/landlord-portal/" style="display:inline-block;font-family:Arial,Helvetica,sans-serif;font-size:10px;font-weight:bold;letter-spacing:1.4px;text-transform:uppercase;color:#ffffff;background:#0F2A22;padding:9px 14px;text-decoration:none;border-radius:2px">Landlord portal</a></td>
+          <td style="padding:0 8px 0 0"><a href="${SITE}/tenants/#repair" style="display:inline-block;font-family:Arial,Helvetica,sans-serif;font-size:10px;font-weight:bold;letter-spacing:1.4px;text-transform:uppercase;color:#0F2A22;border:1px solid #0F2A22;padding:8px 13px;text-decoration:none;border-radius:2px">Report a repair</a></td>
+          <td><a href="${SITE}/tools/" style="font-family:Arial,Helvetica,sans-serif;font-size:10px;font-weight:bold;letter-spacing:1.4px;text-transform:uppercase;color:#B4924A;text-decoration:none">Free calculators &rarr;</a></td>
+        </tr>
+      </table>
+      ${b.line ? `<div style="font-family:Arial,Helvetica,sans-serif;font-size:11px;line-height:1.5;color:#3B4A44;padding:12px 0 0">${b.line}</div>` : ""}
+    </td>
+  </tr>
+  <tr><td colspan="2" style="padding:16px 0 0"><div style="height:1px;background:#E1E4DC;font-size:0;line-height:0">&nbsp;</div><div style="padding:10px 0 0">${FOOTER}</div></td></tr>
+</table>`;
+  };
+  const plain = (key) => {
+    const b = BOXES[key] || BOXES.custom;
+    return `Property Sauce
+Portfolios | Block management | Acquisitions
+${b.role}
+
+${email(key)}
+${PHONE}
+propertysauce.co
+${ADDRESS}
+${b.line ? "\n" + b.line + "\n" : ""}
+Property Sauce is a trading name of Sure Lets and Manage Limited, registered
+in England and Wales, company number 16613860. Director: Usman Tufail.
+Registered office: Lancaster House, Brownrigg Drive, Cramlington NE23 6UN.
+Property Redress Scheme member PRS058008. ICO registration ZC027659.
+
+This message and any attachments are confidential and intended only for the
+named recipient. If it has reached you in error, please tell us and delete
+it. Our privacy notice is at propertysauce.co/privacy/`;
+  };
+  const $ = (s) => document.querySelector(s);
+  const box = $("#sig-box"), custom = $("#sig-custom"), stage = $("#sig-stage");
+  const draw = () => { custom.hidden = box.value !== "custom"; stage.innerHTML = sig(box.value); $("#sig-plain").textContent = plain(box.value); };
+  box.addEventListener("change", draw); custom.addEventListener("input", draw); draw();
+  $("#sig-footer").innerHTML = FOOTER;
+  const flash = (el) => { el.hidden = false; setTimeout(() => { el.hidden = true; }, 2500); };
+  const copyHtml = async (html, text, el, node) => {
+    try { await navigator.clipboard.write([new ClipboardItem({ "text/html": new Blob([html], { type: "text/html" }), "text/plain": new Blob([text], { type: "text/plain" }) })]); }
+    catch { const r = document.createRange(); r.selectNodeContents(node); const s = getSelection(); s.removeAllRanges(); s.addRange(r); document.execCommand("copy"); s.removeAllRanges(); }
+    flash(el);
+  };
+  $("#sig-copy").addEventListener("click", () => copyHtml(sig(box.value), plain(box.value), $("#sig-msg"), stage));
+  $("#sig-copy-text").addEventListener("click", async () => { await navigator.clipboard.writeText(plain(box.value)); flash($("#sig-msg")); });
+  $("#sig-copy-footer").addEventListener("click", () => copyHtml(FOOTER, plain("contact").split("\n\n").slice(2).join("\n\n"), $("#sig-msg-footer"), $("#sig-footer")));
+})();
+</script>

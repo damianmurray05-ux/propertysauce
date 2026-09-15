@@ -623,3 +623,11 @@ table.mini .bad { color: var(--accent-ink); font-weight: 500; }
 @media (max-width: 1100px) { .dash { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 @media (max-width: 860px) { .tables, .score-grid { grid-template-columns: 1fr; } .portal-toolbar { grid-template-columns: 1fr; } .bar-cols { gap: 0.25rem; } .bar-group span { font-size: 0.55rem; letter-spacing: 0; } }
 @media (max-width: 600px) { .dash { grid-template-columns: 1fr; } .chart-row { flex-direction: column; align-items: flex-start; } }
+
+/* Email signature page (internal). */
+.sig-bar { display: flex; flex-wrap: wrap; gap: 0.75rem; align-items: center; margin-bottom: 1rem; }
+.sig-bar label { font-size: var(--fs-0); color: var(--muted); }
+.sig-bar select, .sig-bar input { font: inherit; font-size: var(--fs-0); padding: 0.6rem 0.8rem; border: 1px solid var(--line); border-radius: var(--r-ctl); background: var(--white); color: var(--ink); min-width: 16rem; }
+.sig-bar .notice { margin: 0; }
+.sig-stage { background: var(--white); border: 1px solid var(--line); padding: clamp(1.25rem, 3vw, 2.5rem); overflow-x: auto; }
+.sig-plain { background: var(--white); border: 1px solid var(--line); padding: 1.25rem; white-space: pre-wrap; font-family: ui-monospace, Menlo, monospace; font-size: 0.8rem; line-height: 1.6; color: var(--ink); overflow-x: auto; }
