@@ -29,38 +29,28 @@ noindex: true
       </div>
     </div>
 
-    <div class="scorecard" id="scorecard" hidden>
-      <div class="score-head">
-        <div>
-          <span class="eyebrow">Tenant scorecard</span>
+    <div class="scorecard sc" id="scorecard" hidden>
+      <div class="sc-hero">
+        <div class="sc-hero-text">
+          <span class="sc-kicker">Tenant scorecard</span>
           <h2 id="sc-title">Hello.</h2>
-          <p class="muted" id="sc-address"></p>
+          <p class="sc-address" id="sc-address"></p>
+          <div class="sc-tier" id="sc-tier"></div>
         </div>
-        <div class="score-ring" id="sc-ring" role="img" aria-label="Score"></div>
+        <div class="sc-ring" id="sc-ring" role="img" aria-label="Score"></div>
+        <div class="sc-stats" id="sc-stats"></div>
       </div>
-      <div class="score-tier" id="sc-tier"></div>
-      <div class="tier-progress" id="sc-progress"></div>
-      <div class="score-grid">
-        <div class="chart-card"><div class="chart-head"><h3>What makes up your score</h3></div><div class="chart-row" id="sc-donut"></div></div>
-        <div class="score-parts one" id="sc-parts"></div>
+      <div class="sc-journey" id="sc-progress"></div>
+      <div class="sc-grid">
+        <section class="sc-card"><h3>How your score is made</h3><div class="sc-parts" id="sc-parts"></div></section>
+        <section class="sc-card"><h3>Rent, the last twelve months</h3><div class="sc-chart" id="sc-bars"></div><div class="sc-legend" id="sc-months"></div><p class="sc-note" id="sc-streak"></p></section>
       </div>
-      <div class="chart-card chart-wide score-history">
-        <div class="chart-head"><h3>The last twelve months of rent</h3><span class="muted" id="sc-streak"></span></div>
-        <div id="sc-bars"></div>
-        <div class="score-months" id="sc-months"></div>
+      <div class="sc-grid">
+        <section class="sc-card"><h3>Rewards at your tier</h3><ul id="sc-rewards" class="sc-list"></ul></section>
+        <section class="sc-card"><h3>What would raise it</h3><ul id="sc-tips" class="sc-list"></ul></section>
       </div>
-      <div class="score-jobs" id="sc-jobs"></div>
-      <div class="score-cols">
-        <div>
-          <h3>Rewards at your tier</h3>
-          <ul id="sc-rewards" class="score-list"></ul>
-        </div>
-        <div>
-          <h3>What would raise it</h3>
-          <ul id="sc-tips" class="score-list"></ul>
-        </div>
-      </div>
-      <p class="calc-note">Scores are recalculated when we update your file, usually at the start of each month. If something looks wrong, tell us through the assistant and we will check the record.</p>
+      <div class="sc-jobs" id="sc-jobs"></div>
+      <p class="sc-note">Scores are recalculated when we update your file, usually at the start of each month. If something looks wrong, tell us through the assistant and we will check the record.</p>
       <div class="calc-actions">
         <button type="button" class="btn btn-primary btn-sm" data-open-chat="repair">Report a repair <svg class="ic btn-ic" aria-hidden="true"><use href="/assets/icons.svg#wrench"/></svg></button>
         <button type="button" class="btn btn-ghost btn-sm" id="sc-signout">Sign out</button>
