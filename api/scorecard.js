@@ -30,5 +30,6 @@ export async function POST(request) {
     firstName: (row.name || "").split(/\s+/)[0] || "there",
     address: row.address || "",
     ...card,
+    jobs: (row.jobs || []).slice(0, 8),
   });
 }

@@ -39,8 +39,33 @@ noindex: true
         <div class="score-ring" id="pl-ring" role="img" aria-label="Portfolio score"></div>
       </div>
       <div class="portal-totals" id="pl-totals"></div>
+      <div class="dash" id="pl-dash"></div>
+      <div class="tables" id="pl-tables"></div>
       <div class="portal-alerts" id="pl-alerts"></div>
+      <div class="portal-toolbar">
+        <div class="portal-toolbar-left">
+          <h3>Properties</h3>
+          <span class="muted" id="pl-count"></span>
+        </div>
+        <div class="portal-toolbar-right">
+          <input id="pl-search" type="search" placeholder="Search address or tenant" aria-label="Search properties">
+          <select id="pl-sort" aria-label="Sort properties">
+            <option value="score">Lowest score first</option>
+            <option value="arrears">Highest arrears first</option>
+            <option value="rent">Highest rent first</option>
+            <option value="address">Address A to Z</option>
+          </select>
+        </div>
+        <div class="portal-filters" id="pl-filters" role="group" aria-label="Filter by score band">
+          <button type="button" class="chip active" data-band="all">All</button>
+          <button type="button" class="chip chip-red" data-band="red">Red</button>
+          <button type="button" class="chip chip-amber" data-band="amber">Amber</button>
+          <button type="button" class="chip chip-green" data-band="green">Green</button>
+          <button type="button" class="chip" data-band="arrears">In arrears</button>
+        </div>
+      </div>
       <div class="portal-props" id="pl-props"></div>
+      <button type="button" class="btn btn-ghost btn-sm" id="pl-more" hidden>Show more</button>
       <p class="calc-note">Figures are updated when we update your file, usually with the monthly statement. Documents open in Google Drive. If anything looks wrong, use the assistant or ring the office.</p>
       <div class="calc-actions">
         <a class="btn btn-primary btn-sm" href="/contact/">Talk to us <svg class="ic btn-ic" aria-hidden="true"><use href="/assets/icons.svg#arrow-up-right"/></svg></a>
@@ -64,4 +89,5 @@ noindex: true
     </div>
   </div>
 </section>
+<script src="/assets/js/charts.js" defer></script>
 <script src="/assets/js/portal.js" defer></script>

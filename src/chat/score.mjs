@@ -101,5 +101,6 @@ export function tenantRowFromZoho(t, jobs = []) {
     tenancy_start: r.Original_Tenancy_Start_Date || r.Tenancy_Start_Date || "",
     reward_note: "",
     repairs: { open: jobs.length - closed, closed, rated: jobs.filter((j) => j.rating).length },
+    jobs,
   };
 }

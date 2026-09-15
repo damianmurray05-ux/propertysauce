@@ -39,12 +39,17 @@ noindex: true
         <div class="score-ring" id="sc-ring" role="img" aria-label="Score"></div>
       </div>
       <div class="score-tier" id="sc-tier"></div>
-      <div class="score-parts" id="sc-parts"></div>
-      <div class="score-history">
-        <h3>The last twelve months of rent</h3>
-        <div class="score-months" id="sc-months"></div>
-        <p class="muted" id="sc-streak"></p>
+      <div class="tier-progress" id="sc-progress"></div>
+      <div class="score-grid">
+        <div class="chart-card"><div class="chart-head"><h3>What makes up your score</h3></div><div class="chart-row" id="sc-donut"></div></div>
+        <div class="score-parts one" id="sc-parts"></div>
       </div>
+      <div class="chart-card chart-wide score-history">
+        <div class="chart-head"><h3>The last twelve months of rent</h3><span class="muted" id="sc-streak"></span></div>
+        <div id="sc-bars"></div>
+        <div class="score-months" id="sc-months"></div>
+      </div>
+      <div class="score-jobs" id="sc-jobs"></div>
       <div class="score-cols">
         <div>
           <h3>Rewards at your tier</h3>
@@ -78,4 +83,5 @@ noindex: true
     </div>
   </div>
 </section>
+<script src="/assets/js/charts.js" defer></script>
 <script src="/assets/js/scorecard.js" defer></script>
