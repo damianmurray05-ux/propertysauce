@@ -9,6 +9,21 @@ import { fileURLToPath } from "node:url";
 import { layout, site } from "./src/layout.mjs";
 
 const root = dirname(fileURLToPath(import.meta.url));
+
+// Assets are served with a one-year immutable cache, so every CSS and JS
+// reference carries a short hash of the file's content. A changed file gets a
+// new URL and every browser fetches it on the next visit.
+import { createHash } from "node:crypto";
+const assetHash = new Map();
+function version(html) {
+  return html.replace(/(\/assets\/(?:css|js)\/[\w.-]+\.(?:css|js))(?=["'])/g, (m, file) => {
+    if (!assetHash.has(file)) {
+      try { assetHash.set(file, createHash("sha1").update(readFileSync(join(root, file.slice(1)))).digest("hex").slice(0, 8)); } catch { assetHash.set(file, ""); }
+    }
+    const h = assetHash.get(file);
+    return h ? `${file}?v=${h}` : file;
+  });
+}
 const dist = join(root, "dist");
 
 rmSync(dist, { recursive: true, force: true });
@@ -38,7 +53,7 @@ for (const file of readdirSync(pagesDir).filter((f) => f.endsWith(".html"))) {
     meta.jsonld = JSON.stringify(JSON.parse(ld[1]));
     bodyHtml = bodyHtml.replace(ld[0], "");
   }
-  const html = layout({ ...meta, path, slug }, bodyHtml);
+  const html = version(layout({ ...meta, path, slug }, bodyHtml));
   if (slug === "404") {
     writeFileSync(join(dist, "404.html"), html);
     continue;

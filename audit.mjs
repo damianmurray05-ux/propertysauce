@@ -38,7 +38,7 @@ for (const f of pages) {
   for (const m of html.matchAll(/(?:href|src|srcset)="([^"]+)"/g)) {
     for (let u of m[1].split(",").map((s) => s.trim().split(" ")[0])) {
       if (!u.startsWith("/") || u.startsWith("//")) continue;
-      const [path, hash] = u.split("#");
+      const [path, hash] = u.split("?")[0].split("#");
       if (path) {
         if (path.startsWith("/api/")) continue;
         const target = path.endsWith("/") ? join(dist, path, "index.html") : join(dist, path);
