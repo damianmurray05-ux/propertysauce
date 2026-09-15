@@ -1,0 +1,36 @@
+property_id,address,field,current_zoho_date,proposed_date,source_file,confidence
+2406742000016173028,1 Lovinya Court Hillingdon Avenue Sevenoaks TN13 3QZ,Gas_Safe_Certificate,2026-12-16,2023-07-01,"zoho: 1 Lovinya Court gas certificate, 4.7.23.pdf",medium
+2406742000000703006,1 Onslow Close E4 6QD,Gas_Safe_Certificate,2026-11-05,2024-01-10,zoho: 1 Onslow Close Gas cert. 10.1.24.pdf,medium
+2406742000000266403,1 Valley Side Parade E4 8AJ,Gas_Safe_Certificate,2026-11-24,2023-07-04,"zoho: 1 Velly Side Prade gas  certificate, 4.7.23.pdf",medium
+2406742000003304001,"10 Claremont Road, E17 5RJ",Gas_Safe_Certificate,2026-10-02,2024-01-10,zoho: 10 Claremont Road Gas cert. 10.1.24.pdf,medium
+2406742000002188082,"125 Kitchener Road, E17 4LJ",Gas_Safe_Certificate,2026-11-11,2023-11-18,"zoho: 125 Kitchener Road Gas cert, 18.11.23.pdf",medium
+2406742000004042001,"127 C Grange Park, Leyton, E10 5ET",Landlords_Property_License,2025-10-08,2025-11-08,zoho: 127C Grange Road License.pdf,high
+2406742000002373678,"15 Heathcote Grove, E4 6RZ",Gas_Safe_Certificate,2026-10-06,2023-07-04,"zoho: 15 Heathcote Grove gas certificate, 4.7.23.pdf",medium
+2406742000001950006,"26 Kenilworth Gardens, IG10 3AF",Gas_Safe_Certificate,2026-10-01,2023-09-02,"zoho: 26 Kenilworth Garden Gas cerificate, 2.9.23.pdf",medium
+2406742000011018050,"3 Radley Court, 144 Selhurst Rd, London SE25 6LP",Gas_Safe_Certificate,2026-10-03,2024-01-09,zoho: Radley Court Gas certificate. 9.1.23.pdf,medium
+2406742000039924091,32D Hollybush Lodge E10 5JD,Landlords_Property_License,2028-08-16,2028-08-15,zoho: 101 Fortitude Properties Licence 15 Aug 2028.pdf,low
+2406742000081745022,"37 Lancaster House, Brownrigg Drive, Cramlington, NE23 6UN",EPC_Expiry,2036-04-11,2036-04-12,zoho: EPC – 37 Lancaster.pdf,low
+2406742000034662056,"4 High Street, Saffron Walden, Essex, CB10 1AY",EPC_Expiry,2032-05-25,2032-05-26,zoho: EPC Energy performance certificate 4 High St.pdf,low
+2406742000081586005,"44 Lancaster House, Brownrigg Drive, Cramlington, NE23 6UN",EPC_Expiry,2036-04-11,2036-04-12,zoho: EPC – 44 Lancaster.pdf,low
+2406742000006947092,"45a Seaview Road, Shoeburyness, SS3 9DX",Gas_Safe_Certificate,2027-07-15,2023-07-04,"zoho: 45a Sea View Road gas certificate, 4.7.23.pdf",medium
+2406742000011018001,"52b Beedell Avenue, Southend-on-Sea, SS0 9JS",Gas_Safe_Certificate,2027-05-25,2024-03-28,zoho: Gas Cert - 52B Bedell Avenue.28.3.24.pdf,medium
+2406742000014557056,"6 January House, 28 Birdhurst Rise, CR2 7ED",Gas_Safe_Certificate,2026-11-25,2023-11-01,zoho: Flat 6 Jnauary House gas cert. 1.11.23.pdf,medium
+2406742000002188071,"72 Kettlebaston Road, E10 7PF",EPC_Expiry,2028-03-01,2028-02-29,drive: 2024-02-11__gmail__EPC - 72 kettlebaston.pdf,low
+2406742000000266038,"72C Kingswood Road, E11 1SF",Gas_Safe_Certificate,2026-11-01,2023-11-18,"zoho: 72C Kingswood Gas cert, 18.11.23.pdf",medium
+2406742000000266038,"72C Kingswood Road, E11 1SF",Landlords_Property_License,2026-10-27,2026-11-23,zoho: 72C Kingswood property license.pdf,high
+2406742000000266021,"72D Kingswood Road, E11 1SF",EPC_Expiry,2035-08-26,2035-09-26,zoho: 72 d Kingswood Road - Energy performance certificate (EPC) –.pdf,high
+2406742000000266021,"72D Kingswood Road, E11 1SF",Gas_Safe_Certificate,2026-11-01,2023-09-02,zoho: 72D Kingswood Road Gas certificate.2.9.23.pdf,medium
+2406742000000266043,F1 474 Lea Bridge Road E10 7DU,Gas_Safe_Certificate,2027-03-20,2024-03-18,"zoho: Flat 1, 474 Lea Bridge Road, Gas cert. 18.3.24.pdf",medium
+2406742000028830153,"Flat 1, 253 Lea Bridge Road, E10 7NE",Gas_Safe_Certificate,2027-03-24,2023-11-18,"zoho: Flat 1, 253 Lea Bridge Gas cert, 18.11.23.pdf",medium
+2406742000028830153,"Flat 1, 253 Lea Bridge Road, E10 7NE",Landlords_Property_License,2020-03-31,2026-02-21,"zoho: Selective License Flat1, 253 Lea Bridge Road.pdf",high
+2406742000008555001,"Flat 1, 96 Pearcroft Road - E11 4DR",Gas_Safe_Certificate,2026-12-17,2024-01-10,"drive: 2026-03-18__propertysauce-co__Gas cert - Flat 1, 96 Peacroft  10.1.24.pdf",medium
+2406742000024062409,"Flat 2, 35 Lord Street, Blackpool, FY1 2BD",NICEIC_Certificate,2030-09-23,2026-04-28,"zoho: Flat 2, 35 Lord Street Electric certificate.pdf",medium
+2406742000013464072,"Flat 23, Catterick House, Cottenham Road, S65 1LD",EPC_Expiry,2032-03-29,2022-01-03,"zoho: 23 Catterick House, - EPC.pdf",medium
+2406742000028830183,"Flat 3, 253 Lea Bridge Road, E10 7NE",Gas_Safe_Certificate,2027-07-14,2023-07-04,"zoho: Flat 3, 253 Lea Bridge Raod gas cetificate, 4.7.23.pdf",medium
+2406742000028830183,"Flat 3, 253 Lea Bridge Road, E10 7NE",Landlords_Property_License,2020-03-31,2026-03-23,zoho: F3 253 Lea Bridge License.pdf,high
+2406742000013464054,"Flat 4, Catterick House, Cottenham Road, S65 1LD",EPC_Expiry,2034-06-25,2034-08-20,zoho: Flat 4 Catterick House - EPC.pdf,high
+2406742000024062445,"Flat 5, 35 Lord Street, Blackpool, FY1 2BD",EPC_Expiry,2034-04-06,2034-04-07,zoho: EPC - Flat 5 Lord Street 7.04.34.pdf,low
+2406742000024062456,"Flat 6, 35 Lord Street, Blackpool, FY1 2BD",EPC_Expiry,2034-01-25,2034-01-30,"zoho: Flat 6, 35 Lord Street EPC.pdf",high
+2406742000046460068,"Flat C, Hollybush Lodge, 32 Grange Rd, E10 5JD",Landlords_Property_License,,2025-03-23,zoho: 32c Hollbysh Landlord License.pdf,high
+2406742000000266097,GF 55 Coopers Lane E10 5DG,Gas_Safe_Certificate,2027-07-14,2023-07-26,"zoho: GF 55 Cooper Lane gas certificate, 25.7.23.pdf",medium
+2406742000002373578,"Hawkesmead, CB10 2QS",EPC_Expiry,2031-10-24,2027-12-16,zoho: EPC - Hawksmead.pdf,medium
