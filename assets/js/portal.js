@@ -175,7 +175,7 @@
     const f = fmtFn || ((n) => String(n));
     if (reduce) { el.textContent = f(to); return; }
     const t0 = performance.now(), dur = 1100;
-    const step = (t) => { const p = Math.min(1, (t - t0) / dur), e = 1 - Math.pow(1 - p, 3); el.textContent = f(Math.round(to * e)); if (p < 1) requestAnimationFrame(step); };
+    const step = (t) => { const p = Math.max(0, Math.min(1, (t - t0) / dur)), e = 1 - Math.pow(1 - p, 3); el.textContent = f(Math.round(to * e)); if (p < 1) requestAnimationFrame(step); };
     requestAnimationFrame(step);
   }
   function render(d) {

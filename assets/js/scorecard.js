@@ -87,7 +87,7 @@
   function countUp(el, to, suffix = "") {
     if (reduce) { el.textContent = `${to}${suffix}`; return; }
     const t0 = performance.now(), dur = 1100;
-    const step = (t) => { const p = Math.min(1, (t - t0) / dur), e = 1 - Math.pow(1 - p, 3); el.textContent = `${Math.round(to * e)}${suffix}`; if (p < 1) requestAnimationFrame(step); };
+    const step = (t) => { const p = Math.max(0, Math.min(1, (t - t0) / dur)), e = 1 - Math.pow(1 - p, 3); el.textContent = `${Math.round(to * e)}${suffix}`; if (p < 1) requestAnimationFrame(step); };
     requestAnimationFrame(step);
   }
 
