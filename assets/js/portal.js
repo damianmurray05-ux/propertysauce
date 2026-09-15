@@ -134,7 +134,7 @@
     const months = [...hist].map((ch, i) => { const cls = ch === "O" ? "on" : ch === "L" ? "late" : ch === "P" ? "part" : ch === "M" ? "missed" : "none"; const t = ch === "O" ? "On time" : ch === "L" ? "Late" : ch === "P" ? "Part paid" : ch === "M" ? "Missed" : "Not due"; return `<span class="m ${cls}" title="${t}"><i></i>${names[i][0]}</span>`; }).join("");
     const bars = p.parts.map((x) => `<div class="score-part"><div class="score-part-head"><span>${esc(x.label)}</span><strong>${x.score} / ${x.max}</strong></div><div class="score-bar"><i style="--p:${x.score / x.max}"></i></div><small>${esc(x.detail)}</small></div>`).join("");
     const certs = p.certificates.map((c) => `<div class="cert cert-${c.status}"><i></i><div><strong>${esc(c.label)}</strong><span>${esc(statusWord[c.status] || c.status)}${c.extra ? ` · ${esc(c.extra)}` : ""}</span><small>${esc(c.note)}</small></div></div>`).join("");
-    const jobs = (p.jobs || []).length ? `<div class="jobs"><h4>Repairs</h4><ul>${p.jobs.slice(0, 6).map((j) => `<li><div class="job-top"><span class="job-status job-${j.closed ? "closed" : "open"}">${esc(CH.stage(j.status, j.closed))}</span><small>${esc(j.ticket ? `Ticket ${j.ticket} · ` : "")}${esc(j.created)}${j.quote ? ` · quote ${gbp(j.quote)}` : ""}${j.invoiced ? ` · invoiced ${gbp(j.invoiced)}` : ""}</small></div><strong>${esc(CH.jobTitle(j.title, p.address))}</strong></li>`).join("")}</ul>${p.jobs.length > 6 ? `<p class="muted">${p.jobs.length - 6} older repair${p.jobs.length - 6 === 1 ? "" : "s"} in the file.</p>` : ""}</div>` : "";
+    const jobs = (p.jobs || []).length ? `<div class="jobs"><h4>Repairs</h4><ul>${p.jobs.slice(0, 8).map((j) => `<li><div class="job-top"><span class="job-status job-${j.closed ? "closed" : "open"}">${esc(CH.stage(j.status, j.closed))}</span><small>${esc(j.ticket ? `Ticket ${j.ticket} · ` : "")}${esc(j.created)}${j.quote ? ` · quote ${gbp(j.quote)}` : ""}${j.invoiced ? ` · invoiced ${gbp(j.invoiced)}` : ""}</small></div><strong>${esc(CH.jobTitle(j.title, p.address))}</strong></li>`).join("")}</ul>${p.jobs.length > 6 ? `<p class="muted">${p.jobs.length - 6} older repair${p.jobs.length - 6 === 1 ? "" : "s"} in the file.</p>` : ""}</div>` : "";
     const groups = {};
     for (const doc of p.documents) (groups[TYPES[doc.type] ? doc.type : "other"] ||= []).push(doc);
     const docs = Object.keys(TYPES).filter((k) => groups[k]).map((k) => `<div class="doc-group"><h4>${TYPES[k]}</h4><ul>${groups[k].map((doc) => `<li>${doc.url ? `<a href="${esc(doc.url.startsWith("/api/file") ? doc.url + "&s=" + encodeURIComponent(currentSession) : doc.url)}" target="_blank" rel="noopener">${esc(doc.title)}</a>` : `<span class="doc-title">${esc(doc.title)}</span>`}<span>${esc(doc.date)}${doc.amount ? ` · ${gbp(doc.amount)}` : ""}</span></li>`).join("")}</ul></div>`).join("");
@@ -142,8 +142,9 @@
       <div class="prop-head"><div><h3>${esc(p.address)}</h3><p class="muted">${gbp(p.rentPcm)} pcm${p.tenantName ? ` · ${esc(p.tenantName)}` : p.tenant_ref ? ` · tenant ${esc(p.tenant_ref)}` : ""}${p.status ? ` · ${esc(p.status)}` : ""}${p.arrears ? ` · <span class="bad">arrears ${gbp(p.arrears)}</span>` : ""}</p></div>${ring(p.score, p.rag, 96)}</div>
       <div class="prop-body">
         <div><div class="score-parts one">${bars}</div><div class="score-history"><h4>Rent, last twelve months</h4><div class="score-months">${months}</div></div></div>
-        <div><h4>Certificates</h4><div class="certs">${certs}</div>${jobs}</div>
+        <div><h4>Certificates</h4><div class="certs">${certs}</div></div>
       </div>
+      ${jobs ? `<div class="prop-jobs">${jobs}</div>` : ""}
       <details class="prop-docs"><summary>Documents (${p.documents.length})</summary>${docs || '<p class="muted">No documents filed yet.</p>'}</details>
     </article>`;
   }

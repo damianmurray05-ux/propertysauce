@@ -1,7 +1,7 @@
 // The tenant scorecard. POST { session } with a verified session token from
 // /api/verify. Returns the tenant's score, tier, breakdown and rewards.
 import { findRow } from "../src/chat/directory.mjs";
-import { zohoConfigured, tenantById, jobsForTenant } from "../src/chat/zoho.mjs";
+import { zohoConfigured, tenantById, jobsForTenant, propertyById } from "../src/chat/zoho.mjs";
 import { tenantRowFromZoho } from "../src/chat/score.mjs";
 import { verify } from "../src/chat/crypto.mjs";
 import { scoreTenant } from "../src/chat/score.mjs";
@@ -18,9 +18,9 @@ export async function POST(request) {
   if (!s || s.t !== "session" || s.expired) return json(401, { error: "session_expired" });
   let row;
   if (zohoConfigured() && s.id) {
-    const [t, jobs] = await Promise.all([tenantById(s.id), jobsForTenant(s.id).catch(() => [])]);
+    const [t, jobs, property] = await Promise.all([tenantById(s.id), jobsForTenant(s.id).catch(() => []), s.pid ? propertyById(s.pid).catch(() => null) : null]);
     if (!t) return json(404, { error: "not_found" });
-    row = tenantRowFromZoho(t, jobs);
+    row = tenantRowFromZoho(t, jobs, property);
   } else {
     row = await findRow(s.ref);
   }
@@ -31,5 +31,6 @@ export async function POST(request) {
     address: row.address || "",
     ...card,
     jobs: (row.jobs || []).slice(0, 8),
+    inspection: row.inspection || null,
   });
 }

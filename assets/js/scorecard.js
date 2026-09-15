@@ -155,6 +155,10 @@
       <div class="sc-bar"><i style="--p:${p.score / p.max}"></i></div><p>${esc(p.detail)}</p></div>
     </div>`).join("");
     document.querySelectorAll("#sc-parts b[data-n]").forEach((el) => countUp(el, Number(el.dataset.n)));
+    if (d.inspection && (d.inspection.next || d.inspection.last)) {
+      const fmt = (iso) => { const x = new Date(iso); return isNaN(x) ? "" : x.toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" }); };
+      $("#sc-parts").insertAdjacentHTML("beforeend", `<p class="sc-note">${d.inspection.last ? `Last inspection ${fmt(d.inspection.last)}${d.inspection.outcome ? `, ${esc(d.inspection.outcome.toLowerCase())}` : ""}. ` : ""}${d.inspection.next ? `Next inspection ${fmt(d.inspection.next)}${d.inspection.inspector ? ` with ${esc(d.inspection.inspector)}` : ""}.` : ""}</p>`);
+    }
     requestAnimationFrame(() => requestAnimationFrame(() => document.querySelectorAll(".sc-bar i, .sc-track i").forEach((el) => el.classList.add("go"))));
 
     const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];

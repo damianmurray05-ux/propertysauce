@@ -77,7 +77,7 @@ function fromZoho(p, tenant, jobs, attachments) {
   const rent = p.rentPcm || Number(t.Rent) || 0;
   const arrears = status === "Arrears" || status === "Possession Proceedings" || status === "Court" ? (missedDays ? Math.round((missedDays / 30) * rent) : rent) : 0;
   const invoices = jobs.filter((j) => j.invoiced).map((j) => ({ type: "invoice", title: `${j.ticket ? `Ticket ${j.ticket}: ` : ""}${j.title}`, date: j.paid || j.updated, url: "", amount: j.invoiced, job: j }));
-  const documents = attachments.map((a) => ({ type: classify(a.name), title: a.name, date: a.date, url: `/api/file/?m=${a.module}&r=${a.record}&a=${a.id}`, amount: null })).concat(invoices);
+  const documents = attachments.map((a) => { const type = classify(a.name); return { type, title: docTitle(type, a.name, a.date), file: a.name, date: a.date, url: `/api/file/?m=${a.module}&r=${a.record}&a=${a.id}`, amount: null }; }).concat(invoices);
   return {
     property_ref: p.reference || p.id, address: p.address, tenant_ref: tenant ? tenant.reference : "", rent_pcm: rent,
     rent_history_12m: history, rent_due_12m: tenant && CURRENT.has(status) ? rent * 12 : 0, rent_collected_12m: tenant && CURRENT.has(status) ? rent * 12 - arrears : 0,
@@ -85,8 +85,25 @@ function fromZoho(p, tenant, jobs, attachments) {
     gas_expiry: p.gasApplicable ? p.gas : "none", eicr_expiry: p.eicr, epc_expiry: p.epc, epc_rating: p.epcRating,
     licence_expiry: p.licenceRequired ? p.licence || "missing" : "", deposit_protected: tenant ? (/protected|periodical/i.test(String(t.Deposit_Statue || "")) || t.Deposit_Registered === true ? "yes" : t.Deposit_Statue ? "no" : "") : "",
     tenancy_start: p.tenancyStart || t.Tenancy_Start_Date || "", tenant_name: p.tenantName, occupied: p.occupied, status: p.status, tenancy_status: status,
-    jobs, documents, notes: "",
+    jobs, documents, notes: "", inspection: p.inspection || null, owner: p.owner || "",
   };
+}
+/* Every document of a kind gets the same title; only the date changes. The date
+   comes from the file name when it carries one, otherwise from when it was filed. */
+const DOC_LABEL = { gas: "Gas safety certificate", eicr: "Electrical installation report", epc: "Energy performance certificate", tenancy: "Tenancy agreement", licence: "Property licence", inventory: "Inventory and inspection", invoice: "Invoice", statement: "Statement" };
+const MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+function niceDate(iso) { const d = new Date(iso); return isNaN(d) ? "" : `${d.getDate()} ${MONTHS[d.getMonth()]} ${d.getFullYear()}`; }
+function dateInName(name) {
+  const m = String(name).match(/(\d{1,2})[-._ ](\d{1,2})[-._ ](20\d{2})/) || String(name).match(/(20\d{2})[-._](\d{2})[-._](\d{2})/);
+  if (!m) return "";
+  const [d, mo, y] = m[0].startsWith("20") ? [m[3], m[2], m[1]] : [m[1], m[2], m[3]];
+  return niceDate(`${y}-${String(mo).padStart(2, "0")}-${String(d).padStart(2, "0")}`);
+}
+export function docTitle(type, name, filedDate) {
+  const label = DOC_LABEL[type];
+  if (!label) return String(name || "").replace(/\.[a-z0-9]{2,4}$/i, "");
+  const when = dateInName(name) || niceDate(filedDate);
+  return when ? `${label}, ${when}` : label;
 }
 const CURRENT = new Set(["Tenanted", "Arrears", "Possession Proceedings", "Court", "Let Agreed", "Maintenance Only"]);
 function classify(name) {

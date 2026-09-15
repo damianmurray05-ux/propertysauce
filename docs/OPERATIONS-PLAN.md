@@ -6,7 +6,7 @@ No em dashes. Everything in square brackets is a decision or fact still needed f
 
 ## 1. The honest answer
 
-Doable. About eighty percent of the day-to-day work of a lettings and management business is intake, chasing, matching, drafting and reporting, and every one of those runs well on the pieces that already exist: the website and its assistant, Zoho CRM as the record, Zoho Books for money, Resend for email, Twilio for text and WhatsApp, the Wise bank feed, and Claude in the middle. The site already verifies tenants against Zoho, writes maintenance tickets, and shows landlords a live portfolio. The rest is more of the same pattern: read the record, decide within a written limit, act through a channel, write the result back, and escalate when the limit is reached.
+Doable. About eighty percent of the day-to-day work of a lettings and management business is intake, chasing, matching, drafting and reporting, and every one of those runs well on the pieces that already exist: the website and its assistant, Zoho CRM as the record, Zoho Books for money, Resend for email, Twilio for text and WhatsApp, the bank feed inside Zoho Books, and Claude in the middle. The site already verifies tenants against Zoho, writes maintenance tickets, and shows landlords a live portfolio. The rest is more of the same pattern: read the record, decide within a written limit, act through a channel, write the result back, and escalate when the limit is reached.
 
 What stays with a person, by law or by good sense:
 
@@ -67,7 +67,7 @@ What is missing and must be added, all through the Zoho API or the settings scre
 
 Zoho Books, Property Sauce organisation 678590019, becomes the rent ledger: one customer per tenancy, a recurring invoice on the rent due day, a payment recorded when money arrives, a credit note for agreed adjustments. Landlord statements come out of the same ledger: rent received less fees and contractor invoices, paid over on a set day.
 
-The bank feed is Wise, Sure Lets business profile 80650774. Wise webhooks announce credits in real time. The Rent Ledger agent matches each credit to a tenancy by payment reference, then by amount and payer name, records it in Books and updates the Tenant record. Unmatched credits go to the exceptions queue. [Confirm that all rent arrives into Wise. If any goes to another bank, that bank needs a feed too, or a daily statement import.]
+The bank feed is the one attached to Zoho Books; Wise is only used for direct Airbnb bookings at Luxe Stay. Zoho Books matches feed lines to invoices and the agent works from that. The Rent Ledger agent matches each credit to a tenancy by payment reference, then by amount and payer name, records it in Books and updates the Tenant record. Unmatched credits go to the exceptions queue. [Confirm every account that receives rent is connected to the Zoho Books bank feed.]
 
 Payments out to landlords and contractors are prepared as a batch with every line justified, and a person authorises the batch in Wise. Claude never holds a payment credential.
 
@@ -113,7 +113,7 @@ Purpose: no certificate or licence lapses, and the evidence is on the record.
 
 Purpose: every pound of rent recorded the day it arrives, every late payment chased the same way every time, and arrears handed on before they grow.
 
-- Wise webhook on each credit: match, record in Zoho Books, update the Tenant record, thank the tenant if they asked to be told.
+- Zoho Books bank feed on each credit: match to the tenancy, record the payment, update the Tenant record, thank the tenant if they asked to be told.
 - Due day plus one: friendly reminder by the tenant's preferred channel. Day seven: firmer reminder with the balance and a payment link. Day fourteen: formal letter by email and post, and a call from Front Desk. Day twenty-one: hand to Marchbank and Vale Associates with the file, and start tracking section 8 grounds. [Confirm the cadence and wording; the drafts follow the pre-action protocol.]
 - Payment plans: can agree a plan within a written envelope (for example, arrears cleared within three months on top of rent) and records it; anything outside goes to Damian.
 - Monthly: landlord statement per property from Books, sent on the statement day, with the arrears position and the actions taken.
@@ -173,8 +173,8 @@ Each phase is shippable on its own. Weeks are working time in sessions like this
 - Deliverable: the average ticket moves from Reported to Contractor Instructed without a person touching it; certificates are booked sixty days out.
 
 **Phase 3, weeks 4 to 6: rent ledger and arrears.**
-- Zoho Books as the ledger: customers, recurring invoices, payment recording. [Damian: confirm tenants and rent due days are right in Zoho; confirm Wise is where rent lands.]
-- Wise webhooks, matching, exceptions queue.
+- Zoho Books as the ledger: customers, recurring invoices, payment recording. [Damian: confirm tenants and rent due days are right in Zoho; confirm the Zoho Books bank feed covers every rent account.]
+- Zoho Books feed polling, matching, exceptions queue.
 - Reminder cadence and letters; hand-off to Marchbank and Vale at the agreed day.
 - Monthly statements from Books, and the portal's rent figures switched from CRM guesses to Books.
 - Deliverable: every payment recorded on the day; every late payment chased identically; statements sent without a person.
@@ -231,7 +231,7 @@ Where everything lives:
 - Code and documents: github.com/damianmurray05-ux/propertysauce, folder docs. This plan is docs/OPERATIONS-PLAN.md. Deployment steps are docs/DEPLOY.md.
 - Live site and functions: Vercel project propertysauce under team Property Sauce. Environment variables are the only configuration; secrets are entered by Damian.
 - Records: Zoho CRM (tenants, landlords, properties, maintenance, contractors) and Zoho Books (rent ledger, statements).
-- Channels: Twilio (text, WhatsApp, voice), Resend (email), Google Workspace (mailboxes), Wise (bank feed).
+- Channels: Twilio (text, WhatsApp, voice), Resend (email), Google Workspace (mailboxes), Zoho Books (bank feed and ledger).
 - Recovery: Marchbank and Vale Associates for arrears from the agreed day.
 
 How to intervene: pause an agent with its environment variable; edit an authority limit in Zoho; reply to any tenant or landlord thread from the mailbox and the agents will read it as a human reply and stand back on that thread for 24 hours.
@@ -244,7 +244,7 @@ Who decides what: Damian for anything over a limit, any legal step, any money ou
 2. The contractor list: who, which trades, which properties, rates, and a default authority limit per property (for example £250) and per landlord where different.
 3. Which mailboxes exist on propertysauce.co, and which should feed the agents.
 4. The phone number for the line, and whether Twilio or Inkbox carries text.
-5. Confirmation that rent lands in Wise, and the statement day for landlords.
+5. Confirmation that the Zoho Books bank feed covers every rent account, and the statement day for landlords.
 6. The arrears cadence: reminder days and the day it goes to Marchbank and Vale.
 7. The tenancy agreement template, the deposit scheme, the referencing provider, and how viewings are done.
 8. Retention period for call recordings and messages.

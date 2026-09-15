@@ -79,8 +79,14 @@ export function scoreTenant(row) {
    CRM holds a missed-payment date rather than a month-by-month history, so
    the history is inferred from it; noise reports and inspections are not
    recorded in the CRM and score neutrally. */
-export function tenantRowFromZoho(t, jobs = []) {
+export function tenantRowFromZoho(t, jobs = [], property = null) {
   const r = t.raw || {};
+  // Conduct log: five slots on the tenant record. Anything dated within the last
+  // year that was not marked "Not upheld" counts against the good-neighbour score.
+  const year = Date.now() - 365 * 86400000;
+  const conduct = [1, 2, 3, 4, 5].map((i) => ({ date: r[`Conduct_${i}_Date`] || "", type: r[`Conduct_${i}_Type`] || "", details: r[`Conduct_${i}_Details`] || "", status: r[`Conduct_${i}_Status`] || "" })).filter((c) => c.date || c.type);
+  const upheld = conduct.filter((c) => c.date && Date.parse(c.date) >= year && !/not upheld/i.test(c.status)).length;
+  const insp = property && property.inspection ? property.inspection : null;
   const missedDate = r.Tenants_Missed_Payment_Date || "";
   let history = "OOOOOOOOOOOO";
   if (missedDate) {
@@ -96,8 +102,10 @@ export function tenantRowFromZoho(t, jobs = []) {
     name: t.name, address: t.address,
     rent_history_12m: history,
     arrears: inArrears ? (missedDays ? Math.round((missedDays / 30) * rent) : rent) : 0,
-    noise_reports_12m: "",
-    inspections_passed: "", inspections_total: "",
+    noise_reports_12m: conduct.length ? String(upheld) : "",
+    inspections_passed: insp && insp.outcome ? (/good|fair/i.test(insp.outcome) ? "1" : "0") : "", inspections_total: insp && insp.outcome ? "1" : "",
+    inspection: insp ? { last: insp.last, outcome: insp.outcome, next: insp.next, inspector: insp.inspector } : null,
+    conduct,
     tenancy_start: r.Original_Tenancy_Start_Date || r.Tenancy_Start_Date || "",
     reward_note: "",
     repairs: { open: jobs.length - closed, closed, rated: jobs.filter((j) => j.rating).length },

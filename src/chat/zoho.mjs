@@ -21,8 +21,8 @@ const API = `https://www.zohoapis.${DC}/crm/v8`;
 // Tenancies in these states may verify, report repairs and see a scorecard.
 export const CURRENT_STATUSES = new Set(["Tenanted", "Arrears", "Possession Proceedings", "Court", "Let Agreed", "Maintenance Only"]);
 
-const TENANT_FIELDS = "id,Last_Name,Full_Name,Email,Tenant_1_Name,Tenant_1_Phone,Tenant_1_Phone1,Tenant_2_Name,Tenant_2_Email,Tenant_2_Phone,Mobile,Phone,Status,Account_Name,Rent_Payment_Reference,Property_Sauce_Reference,Homelet_Number,Rent,Rent_Due_Date,Tenancy_Start_Date,Original_Tenancy_Start_Date,Tenants_Missed_Payment_Date,Days_Since_Missed_Payment,Deposit_Statue,Deposit_Registered,Deposit_Scheme,Gas_Safe_Certificate,Rent_Received,Total_Monies_Received";
-const PROPERTY_FIELDS = "id,Account_Name,Property_Reference,Property_Sauce_Reference,Last_Name,First_Name,Company_Name,Vendor_Email,Vendor_Phone,Status,Occupied,Balance,Monthly_Rent,New_Rent_Amount,Gas_Safe_Certificate,Gas_Safety_Applicable,NICEIC_Certificate,EPC_Expiry,EPC_Rating,Landlords_Property_License,Landlord_License_Exempt,Insurance_Expiry_Date,Tenancy_Start_Date,Tenancy_End_Date,Tenants_Name,Existing_Tenant,Street,Town,City,Post_Code,Landlord_Payment_Date,Modified_Time";
+const TENANT_FIELDS = "id,Conduct_1_Date,Conduct_1_Type,Conduct_1_Details,Conduct_1_Status,Conduct_2_Date,Conduct_2_Type,Conduct_2_Details,Conduct_2_Status,Conduct_3_Date,Conduct_3_Type,Conduct_3_Details,Conduct_3_Status,Conduct_4_Date,Conduct_4_Type,Conduct_4_Details,Conduct_4_Status,Conduct_5_Date,Conduct_5_Type,Conduct_5_Details,Conduct_5_Status,Last_Name,Full_Name,Email,Tenant_1_Name,Tenant_1_Phone,Tenant_1_Phone1,Tenant_2_Name,Tenant_2_Email,Tenant_2_Phone,Mobile,Phone,Status,Account_Name,Rent_Payment_Reference,Property_Sauce_Reference,Homelet_Number,Rent,Rent_Due_Date,Tenancy_Start_Date,Original_Tenancy_Start_Date,Tenants_Missed_Payment_Date,Days_Since_Missed_Payment,Deposit_Statue,Deposit_Registered,Deposit_Scheme,Gas_Safe_Certificate,Rent_Received,Total_Monies_Received";
+const PROPERTY_FIELDS = "id,Established_Vendor,Inspection_Area,Inspector,Inspection_Every_Months,Next_Inspection_Due,Last_Inspection_Date,Last_Inspection_Outcome,Last_Inspection_Notes,Account_Name,Property_Reference,Property_Sauce_Reference,Last_Name,First_Name,Company_Name,Vendor_Email,Vendor_Phone,Status,Occupied,Balance,Monthly_Rent,New_Rent_Amount,Gas_Safe_Certificate,Gas_Safety_Applicable,NICEIC_Certificate,EPC_Expiry,EPC_Rating,Landlords_Property_License,Landlord_License_Exempt,Insurance_Expiry_Date,Tenancy_Start_Date,Tenancy_End_Date,Tenants_Name,Existing_Tenant,Street,Town,City,Post_Code,Landlord_Payment_Date,Modified_Time";
 const MAINTENANCE_FIELDS = "id,Name,Maintenance_Ticket_Number,Maintenance_Issue,Maintenance_Issue1,Job_Status,Appointment_Status,Agreed_Date_Time,Created_Time,Modified_Time,Tenant,Landlord,Contractor1,Quote_To_Landlord,Contractors_Quote,Invoiced_Amount,Invoice_Number,Invoice_Paid_Date,Date_Tenant_Signed_Off,Date_Staff_Signed_Off,Tenants_Star_Rating,Tenants_Comments,Contractors_Comments";
 
 let token = { value: null, exp: 0 };
@@ -158,6 +158,8 @@ export function mapProperty(rec) {
     tenantName: rec.Tenants_Name || (rec.Existing_Tenant && rec.Existing_Tenant.name) || "",
     tenantId: rec.Existing_Tenant && rec.Existing_Tenant.id,
     paymentDay: rec.Landlord_Payment_Date || "",
+    owner: (rec.Established_Vendor || "").trim(),
+    inspection: { area: rec.Inspection_Area || "", inspector: rec.Inspector || "", every: Number(rec.Inspection_Every_Months) || 3, next: rec.Next_Inspection_Due || "", last: rec.Last_Inspection_Date || "", outcome: rec.Last_Inspection_Outcome || "", notes: rec.Last_Inspection_Notes || "" },
     raw: rec,
   };
 }
@@ -175,20 +177,35 @@ async function allProperties() {
   }
   return out.map(mapProperty).filter((p) => p.rentPcm || LIVE_STATUSES.test(p.status) || p.tenantId);
 }
+const GONE = /^(sold|archived)$/i;
+/* A landlord is identified by the "Established Landlord" picklist on each property
+   (Established_Vendor). The email a landlord signs in with is matched to the
+   properties carrying it, and every property with the same Established Landlord
+   is theirs. Properties marked Sold or Archived never appear. */
 export async function propertiesByLandlordEmail(email) {
   const e = normaliseEmail(email);
   if (!e || !e.includes("@")) return [];
-  if (isAdminEmail(e)) return allProperties();
-  const rows = await search("Accounts", `(Vendor_Email:equals:${e})`, PROPERTY_FIELDS, 200);
-  return rows.map(mapProperty).filter((p) => p.landlord.email === e);
+  if (isAdminEmail(e)) return (await allProperties()).filter((p) => !GONE.test(p.status));
+  const rows = (await search("Accounts", `(Vendor_Email:equals:${e})`, PROPERTY_FIELDS, 200)).map(mapProperty).filter((p) => p.landlord.email === e);
+  const owners = new Set(rows.map((p) => p.owner).filter(Boolean));
+  if (!owners.size) return rows.filter((p) => !GONE.test(p.status));
+  const all = await allProperties();
+  return all.filter((p) => owners.has(p.owner) && !GONE.test(p.status));
 }
+const isPerson = (name) => /^[A-Z][a-z]+ [A-Z][a-z]+$/.test(name) && !/(ltd|limited|residential|homes|property|group|co)$/i.test(name);
 export async function findLandlordByEmail(email) {
   const e = normaliseEmail(email);
   if (isAdminEmail(e)) return { reference: e, email: e, phone: "", name: process.env.PORTAL_ADMIN_NAME || "", firstName: (process.env.PORTAL_ADMIN_NAME || "there").split(/\s+/)[0], properties: null };
   const props = await propertiesByLandlordEmail(e);
   if (!props.length) return null;
-  const l = props[0].landlord;
-  return { reference: l.email, email: l.email, phone: l.phone, name: l.name, firstName: (l.name.split(/\s+/)[0] || "there"), properties: props.length };
+  const owners = [...new Set(props.map((p) => p.owner).filter(Boolean))];
+  const name = owners.join(" and ") || props[0].landlord.name;
+  const phone = (props.find((p) => p.landlord.email === e && p.landlord.phone) || props[0]).landlord.phone;
+  return { reference: e, email: e, phone, name, firstName: owners.length === 1 && isPerson(owners[0]) ? owners[0].split(/\s+/)[0] : "there", properties: props.length };
+}
+export async function propertyById(id) {
+  const rec = await getRecord("Accounts", id, PROPERTY_FIELDS);
+  return rec ? mapProperty(rec) : null;
 }
 
 /* ---------- maintenance ---------- */
