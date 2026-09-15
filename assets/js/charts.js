@@ -15,7 +15,7 @@ window.PSCharts = (() => {
       const el = `<circle cx="${cx}" cy="${cx}" r="${r}" fill="none" stroke="${s.color}" stroke-width="${thick}" stroke-dasharray="${len} ${c - len}" stroke-dashoffset="${-offset}" transform="rotate(-90 ${cx} ${cx})"><title>${esc(s.label)}: ${fmt(s.value)}</title></circle>`;
       offset += len; return el;
     }).join("");
-    const label = o.label != null ? `<text x="${cx}" y="${cx + (o.sub ? 4 : 10)}" text-anchor="middle" font-family="Cormorant Garamond, Cormorant, Georgia, serif" font-size="${o.labelSize || 40}" font-weight="500" fill="${C.ink}">${esc(o.label)}</text>` : "";
+    const label = o.label != null ? `<text x="${cx}" y="${cx + (o.sub ? 4 : 10)}" text-anchor="middle" font-family="Geist, system-ui, sans-serif" font-size="${o.labelSize || 34}" font-weight="600" fill="${C.ink}">${esc(o.label)}</text>` : "";
     const sub = o.sub ? `<text x="${cx}" y="${cx + 24}" text-anchor="middle" font-family="Geist, sans-serif" font-size="9" letter-spacing="1.8" fill="${C.slate}">${esc(o.sub).toUpperCase()}</text>` : "";
     return `<svg viewBox="0 0 ${size} ${size}" width="${size}" height="${size}" role="img" aria-label="${esc(o.aria || o.label || "")}"><circle cx="${cx}" cy="${cx}" r="${r}" fill="none" stroke="${C.paper2}" stroke-width="${thick}"/>${arcs}${label}${sub}</svg>`;
   }

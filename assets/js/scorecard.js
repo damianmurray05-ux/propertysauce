@@ -100,7 +100,7 @@
       </defs>
       <circle cx="${cx}" cy="${cx}" r="${r}" fill="none" stroke="rgba(255,255,255,0.10)" stroke-width="14"/>
       <circle class="sc-ring-arc" cx="${cx}" cy="${cx}" r="${r}" fill="none" stroke="url(#sc-grad)" stroke-width="14" stroke-linecap="round" stroke-dasharray="${c}" stroke-dashoffset="${c}" transform="rotate(-90 ${cx} ${cx})" filter="url(#sc-glow)" style="--target:${c * (1 - score / 100)}"/>
-      <text class="sc-ring-num" x="${cx}" y="${cx + 22}" text-anchor="middle" font-family="Cormorant Garamond, Cormorant, Georgia, serif" font-size="84" font-weight="500" fill="#F4F5F1">0</text>
+      <text class="sc-ring-num" x="${cx}" y="${cx + 22}" text-anchor="middle" font-family="Geist, system-ui, sans-serif" font-size="72" font-weight="600" letter-spacing="-2" fill="#F4F5F1">0</text>
       <text x="${cx}" y="${cx + 52}" text-anchor="middle" font-family="Geist, sans-serif" font-size="12" letter-spacing="2.5" fill="rgba(244,245,241,0.7)">OUT OF 100</text>
     </svg>`;
   }

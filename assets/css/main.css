@@ -744,3 +744,19 @@ table.mini .bad { color: var(--accent-ink); font-weight: 500; }
 .quote figcaption span { font-size: 0.85rem; color: var(--muted); }
 @media (max-width: 1000px) { .quotes { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 @media (max-width: 640px) { .quotes { grid-template-columns: 1fr; } }
+
+/* Scorecard and portal pages: sans headings and figures throughout, at Damian's request. */
+[data-page="my-tenancy"], [data-page="landlord-portal"] { --font-display: var(--font-body); }
+[data-page="my-tenancy"] h1, [data-page="landlord-portal"] h1 { font-weight: 600; letter-spacing: -0.03em; font-size: clamp(2.4rem, 5vw, 3.6rem); }
+[data-page="my-tenancy"] h2, [data-page="landlord-portal"] h2, [data-page="my-tenancy"] h3, [data-page="landlord-portal"] h3, [data-page="my-tenancy"] h4, [data-page="landlord-portal"] h4 { font-weight: 600; letter-spacing: -0.02em; }
+.sc-hero h2 { font-size: clamp(2.1rem, 4.2vw, 3rem); }
+.sc h3, .sc .chart-head h3, .sc .table-card h3 { font-size: 1.25rem; }
+.sc .prop-head h3 { font-size: 1.3rem; }
+.sc-stat strong { font-size: 1.9rem; font-weight: 600; letter-spacing: -0.02em; }
+.sc-stats-4 .sc-stat strong { font-size: 1.5rem; }
+.sc-part-head strong { font-size: 1.35rem; font-weight: 600; letter-spacing: -0.02em; }
+.sc-part-head strong small { font-weight: 500; }
+.sc .chart-legend li strong { font-size: 1.05rem; font-weight: 600; }
+.sc .score-part-head span, .sc .score-part-head strong, .sc .cert strong, .sc .jobs li strong { font-family: var(--font-body); font-weight: 600; font-size: 1rem; }
+[data-page="my-tenancy"] .step-n, [data-page="landlord-portal"] .step-n { font-weight: 600; letter-spacing: -0.02em; }
+.sc-tier strong, [data-page="my-tenancy"] .sh h2, [data-page="landlord-portal"] .sh h2 { font-weight: 600; letter-spacing: -0.03em; }
