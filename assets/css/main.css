@@ -540,8 +540,8 @@ body.menu-open .header-cta { visibility: hidden; }
 @media (max-width: 900px) { .portal-totals { grid-template-columns: 1fr 1fr; } .prop-body { grid-template-columns: 1fr; } }
 
 /* Header fit: keep the navigation on one line on narrower desktops. */
-@media (max-width: 1400px) and (min-width: 1024px) {
-  .nav a { font-size: 0.66rem; letter-spacing: 0.1em; padding: 0.5rem 0.55rem; }
+@media (max-width: 1520px) and (min-width: 1024px) {
+  .nav a { font-size: 0.64rem; letter-spacing: 0.09em; padding: 0.5rem 0.5rem; white-space: nowrap; }
   .brand-tag { display: none; }
   .header-inner { gap: var(--space-4); }
 }
@@ -553,3 +553,10 @@ body.menu-open .header-cta { visibility: hidden; }
 .jobs li small { grid-column: 2; color: var(--muted); }
 .job-status { font-size: 0.62rem; letter-spacing: 0.16em; text-transform: uppercase; padding: 0.3rem 0.5rem; border: 1px solid var(--gold-soft); color: var(--ink); white-space: nowrap; }
 .job-closed { color: var(--muted); border-color: var(--line); }
+
+/* Tools page: even card grids and cards that are links. */
+.grid3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1rem; }
+.grid2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; }
+a.cell-link { text-decoration: none; color: inherit; }
+a.cell-link .link { color: var(--ink); }
+@media (max-width: 900px) { .grid3, .grid2 { grid-template-columns: 1fr; } }

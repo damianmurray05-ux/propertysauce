@@ -29,6 +29,7 @@ export const nav = [
   ["/block-management/", "Block management"],
   ["/sell/", "Sell to us"],
   ["/tenants/", "Tenants"],
+  ["/tools/", "Tools"],
   ["/about/", "About"],
   ["/contact/", "Contact"],
 ];
@@ -213,6 +214,7 @@ ${body}
       <h2>Calculators</h2>
       <a href="/leasehold-calculator/">Lease extension calculator</a>
       <a href="/capital-gains-tax-calculator/">Capital gains tax calculator</a>
+      <a href="/stamp-duty-calculator/">Stamp duty calculator</a>
     </div>
     <div class="footer-col">
       <h2>Accreditation</h2>
@@ -222,7 +224,7 @@ ${body}
     </div>
   </div>
   <div class="footer-legal">
-    <p>Property Sauce is a trading name of ${site.legalName}, registered in England and Wales, company number ${site.companyNumber}. Registered office: ${site.registeredOffice}. Sure Lets &amp; Manage and Luxe Stay are trading names of the same company.</p>
+    <p>Property Sauce is a trading name of ${site.legalName}, registered in England and Wales, company number ${site.companyNumber}. Director: Usman Tufail. Registered office: ${site.registeredOffice}. Sure Lets &amp; Manage and Luxe Stay are trading names of the same company.</p>
     <p>&copy; ${new Date().getFullYear()} ${site.legalName}. <a href="/credits/">Photography credits</a>. <a href="/brand/">Brand</a>.</p>
   </div>
 </footer>
