@@ -746,7 +746,7 @@ table.mini .bad { color: var(--accent-ink); font-weight: 500; }
 @media (max-width: 640px) { .quotes { grid-template-columns: 1fr; } }
 
 /* Scorecard and portal pages: sans headings and figures throughout, at Damian's request. */
-[data-page="my-tenancy"], [data-page="landlord-portal"] { --font-display: var(--font-body); }
+[data-page="my-tenancy"] main, [data-page="landlord-portal"] main { --font-display: var(--font-body); }
 [data-page="my-tenancy"] h1, [data-page="landlord-portal"] h1 { font-weight: 600; letter-spacing: -0.03em; font-size: clamp(2.4rem, 5vw, 3.6rem); }
 [data-page="my-tenancy"] h2, [data-page="landlord-portal"] h2, [data-page="my-tenancy"] h3, [data-page="landlord-portal"] h3, [data-page="my-tenancy"] h4, [data-page="landlord-portal"] h4 { font-weight: 600; letter-spacing: -0.02em; }
 .sc-hero h2 { font-size: clamp(2.1rem, 4.2vw, 3rem); }
