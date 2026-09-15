@@ -203,6 +203,7 @@ ${body}
     <div class="footer-col">
       <h2>Company</h2>
       <a href="/about/">About</a>
+      <a href="/testimonials/">What landlords say</a>
       <a href="/tenants/">Tenants</a>
       <a href="/my-tenancy/">My tenancy scorecard</a>
       <a href="/contact/">Contact</a>

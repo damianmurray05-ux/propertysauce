@@ -7,6 +7,7 @@ import { readFileSync, writeFileSync, mkdirSync, readdirSync, cpSync, rmSync, ex
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import { layout, site } from "./src/layout.mjs";
+import { renderTestimonials } from "./src/testimonials.mjs";
 
 const root = dirname(fileURLToPath(import.meta.url));
 
@@ -53,7 +54,8 @@ for (const file of readdirSync(pagesDir).filter((f) => f.endsWith(".html"))) {
     meta.jsonld = JSON.stringify(JSON.parse(ld[1]));
     bodyHtml = bodyHtml.replace(ld[0], "");
   }
-  const html = version(layout({ ...meta, path, slug }, bodyHtml));
+  const withQuotes = bodyHtml.replace(/<!-- testimonials:([^>]*?) -->/g, (m, spec) => renderTestimonials(spec));
+  const html = version(layout({ ...meta, path, slug }, withQuotes));
   if (slug === "404") {
     writeFileSync(join(dist, "404.html"), html);
     continue;
