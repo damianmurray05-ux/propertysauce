@@ -580,7 +580,7 @@ a.cell-link .link { color: var(--ink); }
 .bar-cols { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 0.5rem; align-items: end; }
 .bar-group { display: grid; gap: 0.35rem; justify-items: center; min-width: 0; }
 .bar-stack { display: flex; align-items: flex-end; gap: 2px; height: 10rem; width: 100%; border-bottom: 1px solid var(--line); background: repeating-linear-gradient(to top, transparent 0 calc(25% - 1px), var(--paper-2) calc(25% - 1px) 25%); }
-.bar-stack i { display: block; flex: 1 1 0; height: var(--h); min-height: 2px; border-radius: 2px 2px 0 0; transition: height 0.9s cubic-bezier(.16,1,.3,1); }
+.bar-stack i { display: block; flex: 1 1 0; height: var(--h); min-height: 2px; border-radius: 2px 2px 0 0; }
 .bar-group span { font-size: 0.66rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
 .bars-months .bar-stack { height: 6rem; }
 .dot-swatch { display: inline-block; width: 0.6rem; height: 0.6rem; border-radius: 2px; margin-right: 0.5rem; vertical-align: 0; }
@@ -615,7 +615,7 @@ table.mini .bad { color: var(--accent-ink); font-weight: 500; }
 .score-grid { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: 1.5rem; align-items: start; }
 .tier-progress { padding: 0.5rem 0 1.75rem; }
 .tier-track { position: relative; height: 6px; background: var(--paper-2); border-radius: 3px; }
-.tier-track > i { position: absolute; left: 0; top: 0; bottom: 0; width: calc(var(--p) * 100%); background: linear-gradient(to right, var(--gold-soft), var(--gold)); border-radius: 3px; transition: width 1.2s cubic-bezier(.16,1,.3,1); }
+.tier-track > i { position: absolute; left: 0; top: 0; bottom: 0; width: calc(var(--p) * 100%); background: linear-gradient(to right, var(--gold-soft), var(--gold)); border-radius: 3px; }
 .tier-track b { position: absolute; top: 50%; width: 10px; height: 10px; margin-left: -5px; border-radius: 50%; background: var(--white); border: 2px solid var(--line); transform: translateY(-50%); }
 .tier-track b.hit { border-color: var(--gold); background: var(--gold); }
 .tier-track b span { position: absolute; top: 0.9rem; left: 50%; transform: translateX(-50%); font-size: 0.62rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); white-space: nowrap; font-weight: 400; }
@@ -655,8 +655,8 @@ table.mini .bad { color: var(--accent-ink); font-weight: 500; }
 .sc-stat span { color: rgba(244,245,241,0.7); font-size: 0.9rem; }
 .sc-journey { padding: 0.5rem 0.5rem 2.6rem; }
 .sc-track { position: relative; height: 10px; border-radius: 999px; background: var(--paper-2); overflow: hidden; }
-.sc-track i { position: absolute; inset: 0 auto 0 0; width: 0; border-radius: 999px; background: linear-gradient(to right, #7FB89A, #B4924A, #E7D2A0); transition: width 1.6s cubic-bezier(.16,1,.3,1); }
-.sc-track i.go { width: calc(var(--p) * 100%); }
+.sc-track i { position: absolute; inset: 0 auto 0 0; width: calc(var(--p) * 100%); border-radius: 999px; background: linear-gradient(to right, #7FB89A, #B4924A, #E7D2A0); transform: scaleX(0); transform-origin: left; transition: transform 1.6s cubic-bezier(.16,1,.3,1); }
+.sc-track i.go { transform: scaleX(1); }
 .sc-medals { position: relative; height: 0; }
 .sc-medal { position: absolute; left: var(--at); top: -1.35rem; transform: translateX(-50%); display: grid; justify-items: center; gap: 0.35rem; }
 .sc-medal b { width: 1.7rem; height: 1.7rem; border-radius: 50%; display: grid; place-items: center; font-family: var(--font-body); font-size: 0.6rem; font-weight: 600; color: var(--muted); background: var(--white); border: 2px solid var(--line); box-shadow: 0 2px 8px rgba(15,42,34,0.08); }
@@ -675,8 +675,8 @@ table.mini .bad { color: var(--accent-ink); font-weight: 500; }
 .sc-part-head strong { font-family: var(--font-display); font-size: 1.6rem; font-weight: 500; color: var(--ink); line-height: 1; white-space: nowrap; }
 .sc-part-head strong small { font-family: var(--font-body); font-size: 0.85rem; color: var(--muted); margin-left: 0.25rem; }
 .sc-bar { height: 10px; border-radius: 999px; background: var(--paper-2); overflow: hidden; }
-.sc-bar i { display: block; height: 100%; width: 0; border-radius: 999px; background: linear-gradient(to right, #7FB89A, #2E7D5B); transition: width 1.4s cubic-bezier(.16,1,.3,1); }
-.sc-bar i.go { width: calc(var(--p) * 100%); }
+.sc-bar i { display: block; height: 100%; width: calc(var(--p) * 100%); border-radius: 999px; background: linear-gradient(to right, #7FB89A, #2E7D5B); transform: scaleX(0); transform-origin: left; transition: transform 1.4s cubic-bezier(.16,1,.3,1); }
+.sc-bar i.go { transform: scaleX(1); }
 .sc-part p { margin: 0.5rem 0 0; color: var(--muted); font-size: 0.95rem; }
 .sc-chart svg { width: 100%; height: auto; display: block; }
 .sc-line { stroke-dasharray: 1; stroke-dashoffset: 1; transition: stroke-dashoffset 1.8s cubic-bezier(.4,0,.2,1); }
@@ -706,7 +706,7 @@ table.mini .bad { color: var(--accent-ink); font-weight: 500; }
 .sc-status.done { background: #D9EADF; color: var(--success); }
 .sc .calc-actions { margin-top: 0.25rem; }
 @media (max-width: 860px) { .sc-hero { grid-template-columns: 1fr; grid-template-areas: "ring" "text" "stats"; justify-items: start; } .sc-ring { justify-self: center; } .sc-grid { grid-template-columns: 1fr; } .sc-stats { grid-template-columns: 1fr 1fr; } .sc-medal span { font-size: 0.6rem; } }
-@media (prefers-reduced-motion: reduce) { .sc-ring-arc, .sc-track i, .sc-bar i, .sc-line, .sc-dot { transition: none; } .sc-line { stroke-dashoffset: 0; } .sc-dot { opacity: 1; transform: none; } .sc-area { animation: none; opacity: 1; } .sc-track i, .sc-bar i { width: calc(var(--p) * 100%); } }
+@media (prefers-reduced-motion: reduce) { .sc-ring-arc, .sc-track i, .sc-bar i, .sc-line, .sc-dot { transition: none; } .sc-line { stroke-dashoffset: 0; } .sc-dot { opacity: 1; transform: none; } .sc-area { animation: none; opacity: 1; } .sc-track i, .sc-bar i { transform: scaleX(1); } }
 
 /* Landlord portal shares the scorecard's app styling. */
 .portal.sc { border: 0; background: transparent; padding: 0; }
