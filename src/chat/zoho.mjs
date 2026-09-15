@@ -67,6 +67,12 @@ export async function createRecord(module, record) {
   if (!first || first.status !== "success") throw new Error(`zoho create ${module}: ${JSON.stringify(first || d).slice(0, 200)}`);
   return first.details;
 }
+export async function addNote(module, id, title, content) {
+  const d = await call(`/${module}/${id}/Notes`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ data: [{ Note_Title: title.slice(0, 120), Note_Content: content.slice(0, 30000) }] }) });
+  const first = (d.data || [])[0];
+  if (!first || first.status !== "success") throw new Error(`zoho note ${module}: ${JSON.stringify(first || d).slice(0, 200)}`);
+  return first.details;
+}
 export async function listAttachments(module, id) {
   const d = await call(`/${module}/${id}/Attachments?fields=id,File_Name,Size,Created_Time,Modified_Time,$file_id`);
   return (d.data || []).map((a) => ({ id: a.id, name: a.File_Name, size: Number(a.Size) || 0, date: (a.Modified_Time || a.Created_Time || "").slice(0, 10), module, record: id }));
@@ -214,10 +220,12 @@ export async function createJob({ tenant, input, photos = [] }) {
     Name: `${(tenant.address || "").split(",")[0] || "Repair"}: ${input.summary}`.slice(0, 120),
     Tenant: tenant.id ? { id: tenant.id } : undefined,
     Landlord: tenant.propertyId ? { id: tenant.propertyId } : undefined,
-    Maintenance_Issue: [input.summary, "", input.details, "", `Location: ${input.location_in_property}`, `Started: ${input.started}`, `Access: ${input.access}`, `Urgency: ${input.urgency}`, "Reported through the website assistant after one-time-code verification."].join("\n").slice(0, 2000),
+    // Maintenance_Issue is a 255-character field in Zoho; the full report goes on as a note.
+    Maintenance_Issue: `${input.summary}${input.location_in_property ? ` (${input.location_in_property})` : ""}`.slice(0, 255),
     Maintenance_Issue1: CATEGORY_TO_ISSUE[input.category],
     Job_Status: "Reported",
     Tenants_Phone: input.contact_phone,
+    Tenants_Comments: [input.details, input.started ? `Started: ${input.started}` : "", input.access ? `Access: ${input.access}` : ""].filter(Boolean).join(" | ").slice(0, 255),
     Email: tenant.email || undefined,
     Access_Via_Keys: /key/i.test(input.access || "") ? "Yes" : undefined,
     Maintenance_Issue_Logged: true,
@@ -225,6 +233,9 @@ export async function createJob({ tenant, input, photos = [] }) {
   Object.keys(record).forEach((k) => record[k] === undefined && delete record[k]);
   const details = await createRecord("Maintenance", record);
   const id = details.id;
+  const report = [input.summary, "", input.details, "", `Location: ${input.location_in_property || "not given"}`, `Started: ${input.started || "not given"}`, `Access: ${input.access || "not given"}`, `Urgency: ${input.urgency || "routine"}`, `Contact phone: ${input.contact_phone || tenant.phone || "not given"}`, "", "Reported through the website assistant after one-time-code verification."].join("\n");
+  // Needs the ZohoCRM.modules.notes.ALL scope; until the token carries it this quietly does nothing.
+  try { await addNote("Maintenance", id, "Tenant's report from the website assistant", report); } catch (e) { if (!/SCOPE/.test(e.message)) console.error("note failed", e.message); }
   for (const [i, p] of photos.slice(0, 4).entries()) {
     try { await uploadAttachment("Maintenance", id, `photo-${i + 1}.jpg`, Buffer.from(p.data, "base64")); } catch (e) { console.error("photo upload failed", e.message); }
   }
