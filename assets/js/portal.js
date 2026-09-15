@@ -181,7 +181,7 @@
   }
   function render(d) {
     $("#pl-title").textContent = d.firstName && d.firstName !== "there" ? `Hello ${d.firstName}.` : "Your portfolio.";
-    $("#pl-sub").textContent = `${d.totals.properties} propert${d.totals.properties === 1 ? "y" : "ies"} under management · updated ${new Date().toLocaleDateString("en-GB", { day: "numeric", month: "long" })}`;
+    $("#pl-sub").textContent = `${d.name ? d.name + " · " : ""}${d.totals.properties} propert${d.totals.properties === 1 ? "y" : "ies"} under management · updated ${new Date().toLocaleDateString("en-GB", { day: "numeric", month: "long" })}`;
     const word = d.rag === "green" ? "Healthy" : d.rag === "amber" ? "Needs a look" : "Needs attention";
     $("#pl-tier").innerHTML = `<span class="sc-pill ${d.rag === "green" ? "" : d.rag === "amber" ? "sc-pill-amber" : "sc-pill-red"}"><svg class="ic" aria-hidden="true"><use href="/assets/icons.svg#shield-check"/></svg> ${word}</span><span class="sc-tier-note">Green is 85 and above, amber 65 to 84, red below 65.</span>`;
     $("#pl-ring").innerHTML = heroRing(d.overall, d.rag);

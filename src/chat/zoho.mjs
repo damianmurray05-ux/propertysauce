@@ -178,30 +178,37 @@ async function allProperties() {
   return out.map(mapProperty).filter((p) => p.rentPcm || LIVE_STATUSES.test(p.status) || p.tenantId);
 }
 const GONE = /^(sold|archived)$/i;
-/* A landlord is identified by the "Established Landlord" picklist on each property
-   (Established_Vendor). The email a landlord signs in with is matched to the
-   properties carrying it, and every property with the same Established Landlord
-   is theirs. Properties marked Sold or Archived never appear. */
+/* Ownership is the "Established Landlord" picklist on each property
+   (Established_Vendor) and nothing else. Which email address may sign in for
+   which Established Landlord is configuration, PORTAL_LANDLORD_EMAILS, a JSON
+   object of email to a list of Established Landlord names, for example
+   {"info@beaumonthomes.co": ["Michelle Murray", "Beaumont Residential"]}.
+   The email held on the property record is never used to decide ownership. */
+function landlordMap() {
+  try { const m = JSON.parse(process.env.PORTAL_LANDLORD_EMAILS || "{}"); const out = {}; for (const [k, v] of Object.entries(m)) out[normaliseEmail(k)] = Array.isArray(v) ? v : [v]; return out; } catch { return {}; }
+}
+export async function ownersForEmail(email) {
+  const e = normaliseEmail(email);
+  return landlordMap()[e] || [];
+}
 export async function propertiesByLandlordEmail(email) {
   const e = normaliseEmail(email);
   if (!e || !e.includes("@")) return [];
   if (isAdminEmail(e)) return (await allProperties()).filter((p) => !GONE.test(p.status));
-  const rows = (await search("Accounts", `(Vendor_Email:equals:${e})`, PROPERTY_FIELDS, 200)).map(mapProperty).filter((p) => p.landlord.email === e);
-  const owners = new Set(rows.map((p) => p.owner).filter(Boolean));
-  if (!owners.size) return rows.filter((p) => !GONE.test(p.status));
+  const owners = new Set(await ownersForEmail(e));
+  if (!owners.size) return [];
   const all = await allProperties();
   return all.filter((p) => owners.has(p.owner) && !GONE.test(p.status));
 }
 const isPerson = (name) => /^[A-Z][a-z]+ [A-Z][a-z]+$/.test(name) && !/(ltd|limited|residential|homes|property|group|co)$/i.test(name);
 export async function findLandlordByEmail(email) {
   const e = normaliseEmail(email);
-  if (isAdminEmail(e)) return { reference: e, email: e, phone: "", name: process.env.PORTAL_ADMIN_NAME || "", firstName: (process.env.PORTAL_ADMIN_NAME || "there").split(/\s+/)[0], properties: null };
+  if (isAdminEmail(e)) return { reference: e, email: e, phone: "", name: process.env.PORTAL_ADMIN_NAME || "Property Sauce", firstName: (process.env.PORTAL_ADMIN_NAME || "there").split(/\s+/)[0], properties: null, admin: true };
+  const owners = await ownersForEmail(e);
+  if (!owners.length) return null;
   const props = await propertiesByLandlordEmail(e);
-  if (!props.length) return null;
-  const owners = [...new Set(props.map((p) => p.owner).filter(Boolean))];
-  const name = owners.join(" and ") || props[0].landlord.name;
-  const phone = (props.find((p) => p.landlord.email === e && p.landlord.phone) || props[0]).landlord.phone;
-  return { reference: e, email: e, phone, name, firstName: owners.length === 1 && isPerson(owners[0]) ? owners[0].split(/\s+/)[0] : "there", properties: props.length };
+  const phone = (props.find((p) => p.landlord.email === e && p.landlord.phone) || props[0] || { landlord: {} }).landlord.phone || "";
+  return { reference: e, email: e, phone, name: owners.join(" and "), firstName: owners.length === 1 && isPerson(owners[0]) ? owners[0].split(/\s+/)[0] : "there", properties: props.length, owners };
 }
 export async function propertyById(id) {
   const rec = await getRecord("Accounts", id, PROPERTY_FIELDS);
@@ -219,6 +226,8 @@ export function mapJob(rec) {
     quote: Number(rec.Quote_To_Landlord || rec.Contractors_Quote) || 0, invoiced: Number(rec.Invoiced_Amount) || 0, invoiceNumber: rec.Invoice_Number || "", paid: rec.Invoice_Paid_Date || "",
     tenantSignedOff: rec.Date_Tenant_Signed_Off || "", staffSignedOff: rec.Date_Staff_Signed_Off || "", rating: Number(rec.Tenants_Star_Rating) || 0,
     closed: Boolean(rec.Date_Staff_Signed_Off || rec.Invoice_Paid_Date || /Invoice Received|Tenant Signed Off/.test(rec.Job_Status || "")),
+    // Certificate renewals are logged as Maintenance jobs in Zoho; they are compliance, not repairs.
+    certificate: /certificate|cp12|eicr|epc|licen[cs]e/i.test(`${rec.Maintenance_Issue1 || ""} ${rec.Name || ""}`),
   };
 }
 export async function jobsForProperty(propertyId) {

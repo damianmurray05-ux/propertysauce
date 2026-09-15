@@ -39,6 +39,7 @@ window.PSCharts = (() => {
   const STAGES = { "Reported": "Reported", "Inspection Confirmed": "Inspection booked", "Awaiting Quotation": "Awaiting quote", "Quotation Received": "Quote received", "Quotation Sent to Landlord": "Quote with landlord", "Quotation Approved by Landlord": "Quote approved", "Contractor Instructed": "Contractor booked", "Contractor Confirmed Job Complete": "Work done", "Requested Tenant to Sign Off": "Awaiting sign-off", "Tenant Signed Off": "Signed off", "Invoice Received": "Completed" };
   const stage = (s, closed) => STAGES[s] || s || (closed ? "Closed" : "Open");
   // Job titles from Zoho start with the address; drop it when the card already says where.
-  const jobTitle = (title, address) => { const t = String(title || ""); const i = t.indexOf(" - "); if (i > 0 && address && t.slice(0, i).trim().toLowerCase().startsWith(String(address).split(",")[0].trim().toLowerCase().slice(0, 6))) return t.slice(i + 3).trim() || t; return t; };
+  const cap = (s) => s ? s.charAt(0).toUpperCase() + s.slice(1) : s;
+  const jobTitle = (title, address) => { const t = String(title || "").trim(); const i = t.indexOf(" - "); if (i > 0 && address && t.slice(0, i).trim().toLowerCase().startsWith(String(address).split(",")[0].trim().toLowerCase().slice(0, 6))) return cap(t.slice(i + 3).trim() || t); return cap(t); };
   return { C, donut, bars, legend, progress, fmt, esc, stage, jobTitle };
 })();

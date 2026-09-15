@@ -56,7 +56,7 @@
   --on-dark-line: rgba(255, 255, 255, 0.14);
 
   /* type */
-  --font-display: "Cormorant", "Cormorant Garamond", Georgia, "Times New Roman", serif;
+  --font-display: "Geist", "Helvetica Neue", Helvetica, Arial, sans-serif;
   --font-body: "Geist", "Helvetica Neue", Arial, sans-serif;
   --fs-0: clamp(0.8125rem, 0.78rem + 0.15vw, 0.875rem);
   --fs-1: clamp(0.9375rem, 0.9rem + 0.2vw, 1.0625rem);

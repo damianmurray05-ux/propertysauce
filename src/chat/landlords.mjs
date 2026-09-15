@@ -59,7 +59,8 @@ export async function propertiesFor(landlordRef) {
    shape so one scorer serves both sources. Rent history month by month is not
    held in the CRM, so the rent parts are read from the tenancy's status and
    missed-payment date instead. */
-function fromZoho(p, tenant, jobs, attachments) {
+function fromZoho(p, tenant, allJobs, attachments) {
+  const jobs = allJobs.filter((j) => !j.certificate);
   const t = tenant ? tenant.raw : {};
   const status = tenant ? tenant.status : "";
   const missedDays = Number(t.Days_Since_Missed_Payment) || 0;

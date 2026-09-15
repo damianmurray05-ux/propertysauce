@@ -79,7 +79,8 @@ export function scoreTenant(row) {
    CRM holds a missed-payment date rather than a month-by-month history, so
    the history is inferred from it; noise reports and inspections are not
    recorded in the CRM and score neutrally. */
-export function tenantRowFromZoho(t, jobs = [], property = null) {
+export function tenantRowFromZoho(t, allJobs = [], property = null) {
+  const jobs = allJobs.filter((j) => !j.certificate);
   const r = t.raw || {};
   // Conduct log: five slots on the tenant record. Anything dated within the last
   // year that was not marked "Not upheld" counts against the good-neighbour score.
