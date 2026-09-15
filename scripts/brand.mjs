@@ -17,14 +17,14 @@ const INK = "#0f2a22", PAPER = "#f4f5f1", ACCENT = "#c8502a", GOLD = "#b4924a";
 const b64 = (f) => readFileSync(join(root, "assets/fonts", f)).toString("base64");
 const fontFace = `@font-face{font-family:"Cormorant";font-weight:400 700;font-style:normal;src:url(data:font/woff2;base64,${b64("cormorant-normal-latin.woff2")}) format("woff2")}@font-face{font-family:"Geist";font-weight:400 700;src:url(data:font/woff2;base64,${b64("geist-latin.woff2")}) format("woff2")}`;
 
-const serif = (text, x, y, size, fill, o = {}) => `<text x="${x}" y="${y}" text-anchor="${o.anchor || "middle"}" font-family="Cormorant, Georgia, serif" font-weight="${o.weight || 400}" font-size="${size}" letter-spacing="${o.track ? (o.track * size).toFixed(2) : 0}" fill="${fill}"${o.stroke ? ` stroke="${o.stroke}" stroke-width="${o.strokeWidth}" stroke-linejoin="round"` : ""}>${text}</text>`;
+const serif = (text, x, y, size, fill, o = {}) => `<text x="${x}" y="${y}" text-anchor="${o.anchor || "middle"}" font-family="Geist, Helvetica, Arial, sans-serif" font-weight="${o.weight || 700}" font-size="${size}" letter-spacing="${o.track ? (o.track * size).toFixed(2) : 0}" fill="${fill}"${o.stroke ? ` stroke="${o.stroke}" stroke-width="${o.strokeWidth}" stroke-linejoin="round"` : ""}>${text}</text>`;
 const caps = (text, x, y, size, fill, track = 0.26, anchor = "middle") => `<text x="${x}" y="${y}" text-anchor="${anchor}" font-family="Geist, Helvetica, Arial, sans-serif" font-weight="500" font-size="${size}" letter-spacing="${(track * size).toFixed(2)}" fill="${fill}">${text}</text>`;
 const DESCRIPTOR = "PORTFOLIOS  ·  BLOCK MANAGEMENT  ·  ACQUISITIONS";
 
 // The monogram: a gold hairline just outside both letters (a stroked copy
 // behind, the filled letter on top). Drawn around (0,0) where the P is 132px
 // tall; callers translate and scale. `w` is the hairline width in local units.
-const monogram = (p, s, x, y, sc, w = 2.2) => `<g transform="translate(${x} ${y}) scale(${sc})">${serif("P", -30, 8, 132, GOLD, { stroke: GOLD, strokeWidth: w })}${serif("S", 22, 36, 132, GOLD, { stroke: GOLD, strokeWidth: w })}${serif("P", -30, 8, 132, p)}${serif("S", 22, 36, 132, s)}</g>`;
+const monogram = (p, s, x, y, sc, w = 2.2) => `<g transform="translate(${x} ${y}) scale(${sc})">${serif("P", -40, 22, 132, GOLD, { stroke: GOLD, strokeWidth: w, weight: 600 })}${serif("S", 40, 22, 132, GOLD, { stroke: GOLD, strokeWidth: w, weight: 600 })}${serif("P", -40, 22, 132, p, { weight: 600 })}${serif("S", 40, 22, 132, s, { weight: 600 })}</g>`;
 
 const svg = (w, h, inner, bg = "none") => `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}"><style>${fontFace}</style>${bg !== "none" ? `<rect width="${w}" height="${h}" fill="${bg}"/>` : ""}${inner}</svg>`;
 
@@ -53,13 +53,13 @@ const files = {
 };
 for (const [name, body] of Object.entries(files)) writeFileSync(join(out, name), body);
 // The favicon cannot carry a 60KB font, so it falls back to the system serif.
-writeFileSync(join(root, "public", "favicon.svg"), `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="14" fill="${INK}"/>${monogram(PAPER, PAPER, 32, 34, 0.2, 5).replace(/Cormorant, /g, "")}</svg>`);
+writeFileSync(join(root, "public", "favicon.svg"), `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="14" fill="${INK}"/>${monogram(PAPER, PAPER, 32, 34, 0.2, 5).replace(/Geist, /g, "")}</svg>`);
 
 // Social image (1200 x 630).
 const og = `<!doctype html><meta charset="utf-8"><style>${fontFace}
 html,body{margin:0;width:1200px;height:630px;background:${INK};color:${PAPER};overflow:hidden;font-family:Geist,Helvetica,Arial,sans-serif}
 .wrap{height:630px;display:grid;grid-template-columns:400px 1fr;align-items:center;padding:0 80px;box-sizing:border-box;gap:48px}
-h1{margin:0 0 18px;font-family:Cormorant,Georgia,serif;font-weight:500;font-size:58px;line-height:1.05}
+h1{margin:0 0 18px;font-family:Geist,Helvetica,Arial,sans-serif;font-weight:600;font-size:56px;line-height:1.05;letter-spacing:-0.02em}
 p{margin:0;font-size:22px;line-height:1.4;color:rgba(243,245,240,.72);max-width:560px}
 .rule{width:56px;height:1px;background:${GOLD};margin-bottom:22px}
 </style><div class="wrap"><svg viewBox="0 0 300 300" width="400" height="400">${monogram(PAPER, PAPER, 150, 150, 1)}${serif("PROPERTY SAUCE", 150, 246, 23, PAPER, { weight: 500, track: 0.14 })}${caps(DESCRIPTOR, 150, 268, 7.2, PAPER)}</svg>
@@ -71,7 +71,7 @@ const chrome = "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome";
 function shot(src, dest, w, h, transparent = true) {
   const args = ["--headless=new", "--disable-gpu", "--hide-scrollbars", "--no-sandbox", `--window-size=${w},${h}`, `--screenshot=${dest}`, "--force-device-scale-factor=1"];
   if (transparent) args.push("--default-background-color=00000000");
-  execFileSync(chrome, [...args, src], { stdio: "ignore" });
+  try { execFileSync(chrome, ["--user-data-dir=" + join(tmpdir(), "ps-brand-profile"), "--no-first-run", "--disable-extensions", ...args, src], { stdio: "ignore", timeout: 25000, killSignal: "SIGKILL" }); } catch (e) { if (!existsSync(dest)) throw e; }
 }
 if (existsSync(chrome)) {
   const big = (name, w, h, scale) => {

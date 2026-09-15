@@ -70,8 +70,8 @@ h4 { font-size: var(--fs-2); }
 .header-dark .site-header:not(.is-scrolled) .brand, .header-dark .site-header:not(.is-scrolled) .nav a { color: var(--on-dark); }
 .header-dark .site-header:not(.is-scrolled) .menu-toggle span { background: var(--on-dark); }
 .brand { display: inline-flex; align-items: center; gap: 0.85rem; text-decoration: none; color: var(--ink); }
-.mono { font-family: var(--font-display); font-weight: 700; font-size: 1.9rem; line-height: 1; color: currentColor; display: inline-flex; align-items: flex-start; -webkit-text-stroke: 0.55px var(--gold); paint-order: stroke fill; letter-spacing: -0.06em; flex: none; }
-.mono span { position: relative; top: 0.22em; }
+.mono { font-family: var(--font-display); font-weight: 600; font-size: 1.75rem; line-height: 1; color: currentColor; display: inline-flex; align-items: flex-start; -webkit-text-stroke: 0.55px var(--gold); paint-order: stroke fill; letter-spacing: -0.06em; flex: none; }
+.mono span { position: relative; top: 0; }
 .brand-text { display: grid; gap: 0.15rem; border-left: 1px solid var(--gold); padding-left: 0.85rem; }
 .brand-word { font: 700 1rem/1 var(--font-display); letter-spacing: 0.2em; text-transform: uppercase; color: currentColor; white-space: nowrap; }
 .brand-tag { font: 500 0.52rem/1 var(--font-body); letter-spacing: 0.22em; text-transform: uppercase; color: var(--muted); white-space: nowrap; }
