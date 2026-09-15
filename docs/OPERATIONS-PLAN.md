@@ -69,7 +69,7 @@ Zoho Books, Property Sauce organisation 678590019, becomes the rent ledger: one 
 
 The bank feed is the one attached to Zoho Books; Wise is only used for direct Airbnb bookings at Luxe Stay. Zoho Books matches feed lines to invoices and the agent works from that. The Rent Ledger agent matches each credit to a tenancy by payment reference, then by amount and payer name, records it in Books and updates the Tenant record. Unmatched credits go to the exceptions queue. [Confirm every account that receives rent is connected to the Zoho Books bank feed.]
 
-Payments out to landlords and contractors are prepared as a batch with every line justified, and a person authorises the batch in Wise. Claude never holds a payment credential.
+Payments out to landlords and contractors are prepared as a batch with every line justified, and a person authorises the batch in the bank. Claude never holds a payment credential.
 
 ## 4. The agents
 
