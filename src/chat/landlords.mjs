@@ -197,7 +197,7 @@ export function scoreProperty(p) {
 
   return {
     property_ref: p.property_ref, address: p.address || "", tenant_ref: p.tenant_ref || "", tenantName: p.tenant_name || "", rentPcm,
-    finance,
+    finance, owner: p.owner || "",
     score, rag, parts, history, arrears, rentDue: rentDue || 0, collected: collected || 0, certificates: certs, alerts, notes: p.notes || "",
     jobs: (p.jobs || []).slice(0, 12),
     documents: (p.documents || []).map((d) => ({ type: String(d.type || "other").toLowerCase(), title: d.title || d.type || "Document", date: d.date || "", url: d.url || "", amount: num(d.amount) })).sort((a, b) => (b.date || "").localeCompare(a.date || "")),

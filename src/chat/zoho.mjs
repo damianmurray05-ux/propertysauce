@@ -160,7 +160,10 @@ export function mapProperty(rec) {
     tenantName: rec.Tenants_Name || (rec.Existing_Tenant && rec.Existing_Tenant.name) || "",
     tenantId: rec.Existing_Tenant && rec.Existing_Tenant.id,
     paymentDay: rec.Landlord_Payment_Date || "",
-    owner: (rec.Established_Vendor || "").trim(),
+    // Ownership is the Established Landlord picklist; when that is blank the
+    // landlord name held on the record stands in, so nothing is left unowned.
+    owner: (rec.Established_Vendor || "").trim() || landlordName,
+    ownerFromRecord: !(rec.Established_Vendor || "").trim() && Boolean(landlordName),
     // Value, mortgage and running costs as held on the record. Null means not known,
     // and the portal says so rather than showing a zero.
     finance: {
@@ -228,14 +231,16 @@ export async function propertiesByLandlordEmail(email) {
    before the landlord does. */
 export async function ownersList() {
   const counts = {};
-  for (const p of await allProperties()) { if (GONE.test(p.status) || p.block) continue; const k = p.owner || "(no Established Landlord)"; counts[k] = (counts[k] || 0) + 1; }
+  const fromRecord = {};
+  for (const p of await allProperties()) { if (GONE.test(p.status) || p.block) continue; const k = p.owner || NO_OWNER; counts[k] = (counts[k] || 0) + 1; if (p.ownerFromRecord) fromRecord[k] = (fromRecord[k] || 0) + 1; }
   const mapped = new Set(Object.values(landlordMap()).flat());
-  return Object.entries(counts).map(([name, properties]) => ({ name, properties, signIn: mapped.has(name) })).sort((a, b) => a.name.localeCompare(b.name, "en-GB"));
+  return Object.entries(counts).map(([name, properties]) => ({ name, properties, signIn: mapped.has(name), fromRecord: fromRecord[name] || 0 })).sort((a, b) => b.properties - a.properties || a.name.localeCompare(b.name, "en-GB"));
 }
+const NO_OWNER = "(no landlord name on the record)";
 export async function propertiesByOwner(name) {
   const want = String(name || "").trim();
   const all = await allProperties();
-  return all.filter((p) => (want === "(no Established Landlord)" ? !p.owner : p.owner === want) && !GONE.test(p.status) && !p.block);
+  return all.filter((p) => (want === NO_OWNER ? !p.owner : p.owner === want) && !GONE.test(p.status) && !p.block);
 }
 const isPerson = (name) => /^[A-Z][a-z]+ [A-Z][a-z]+$/.test(name) && !/(ltd|limited|residential|homes|property|group|co)$/i.test(name);
 export async function findLandlordByEmail(email) {

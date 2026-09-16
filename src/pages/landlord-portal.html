@@ -41,6 +41,7 @@ noindex: true
         <div class="sc-ring" id="pl-ring" role="img" aria-label="Portfolio score"></div>
         <div class="sc-stats sc-stats-4" id="pl-totals"></div>
       </div>
+      <div class="owners" id="pl-owners" hidden></div>
       <div class="dash" id="pl-dash"></div>
       <div class="equity" id="pl-equity"></div>
       <div class="tables" id="pl-tables"></div>
@@ -53,6 +54,7 @@ noindex: true
         <div class="portal-toolbar-right">
           <input id="pl-search" type="search" placeholder="Search address or tenant" aria-label="Search properties">
           <select id="pl-sort" aria-label="Sort properties">
+            <option value="owner">By landlord</option>
             <option value="score">Lowest score first</option>
             <option value="arrears">Highest arrears first</option>
             <option value="rent">Highest rent first</option>

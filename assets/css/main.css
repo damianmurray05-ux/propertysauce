@@ -788,3 +788,15 @@ table.mini .bad { color: var(--accent-ink); font-weight: 500; }
 .prop-fin strong.bad { color: var(--accent-ink); }
 @media (max-width: 900px) { .equity-stats { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
 @media (max-width: 560px) { .equity-stats { grid-template-columns: 1fr 1fr; } }
+.owners { border: 1px solid var(--line); background: var(--white); padding: 1.25rem; display: grid; gap: 1rem; }
+.owner-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr)); gap: 0.75rem; }
+.owner-card { position: relative; text-align: left; display: grid; gap: 0.25rem; padding: 1rem 3.4rem 1rem 1rem; border: 1px solid var(--line); border-radius: var(--r-ctl); background: var(--paper); color: var(--ink); font: inherit; cursor: pointer; transition: border-color var(--dur-fast), background-color var(--dur-fast); }
+.owner-card:hover { border-color: var(--gold); background: var(--white); }
+.owner-card strong { font-family: var(--font-display); font-size: var(--fs-2); font-weight: 600; }
+.owner-card span { font-size: var(--fs-0); color: var(--muted); }
+.owner-card small { font-size: 0.78rem; color: var(--muted); }
+.owner-card i { position: absolute; right: 0.9rem; top: 0.9rem; font-style: normal; font-family: var(--font-display); font-weight: 600; font-size: 1.2rem; width: 2.4rem; height: 2.4rem; border-radius: 50%; display: grid; place-items: center; border: 3px solid var(--gold); color: var(--ink); background: var(--white); }
+.owner-green i { border-color: var(--moss, #2E7D5B); } .owner-red i { border-color: var(--accent); }
+.owner-head { grid-column: 1 / -1; display: flex; align-items: baseline; gap: 0.75rem; margin: 1rem 0 0; padding-bottom: 0.5rem; border-bottom: 1px solid var(--line); font-size: var(--fs-3); }
+.owner-head span { font-family: var(--font-body); font-size: var(--fs-0); font-weight: 400; color: var(--muted); }
+.portal-viewas strong { color: var(--ink); }
