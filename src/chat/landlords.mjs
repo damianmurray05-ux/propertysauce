@@ -107,7 +107,7 @@ function fromZoho(p, tenant, allJobs, attachments) {
 }
 /* Every document of a kind gets the same title; only the date changes. The date
    comes from the file name when it carries one, otherwise from when it was filed. */
-const DOC_LABEL = { gas: "Gas safety certificate", eicr: "Electrical installation report", epc: "Energy performance certificate", tenancy: "Tenancy agreement", licence: "Property licence", inventory: "Inventory and inspection", invoice: "Invoice", statement: "Statement" };
+const DOC_LABEL = { gas: "Gas safety certificate", eicr: "Electrical installation report", electrical: "Electrical certificate", epc: "Energy performance certificate", tenancy: "Tenancy agreement", licence: "Property licence", inventory: "Inventory and inspection", invoice: "Invoice", statement: "Statement" };
 const MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 function niceDate(iso) { const d = new Date(iso); return isNaN(d) ? "" : `${d.getDate()} ${MONTHS[d.getMonth()]} ${d.getFullYear()}`; }
 function dateInName(name) {
