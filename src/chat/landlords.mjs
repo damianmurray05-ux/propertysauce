@@ -4,7 +4,7 @@
 // documents from the property's attachments. Otherwise three published sheets
 // (LANDLORD_/PROPERTY_/DOCUMENT_DIRECTORY_URL, templates in docs/) as a fallback.
 import { parseCsv, normaliseRef } from "./directory.mjs";
-import { zohoConfigured, findLandlordByEmail, propertiesByLandlordEmail, jobsForProperty, listAttachments, tenantById, normaliseEmail } from "./zoho.mjs";
+import { zohoConfigured, findLandlordByEmail, propertiesByLandlordEmail, propertiesByOwner, ownersList, jobsForProperty, listAttachments, tenantById, normaliseEmail } from "./zoho.mjs";
 
 const cache = new Map();
 const TTL = 5 * 60 * 1000;
@@ -36,10 +36,13 @@ export async function findLandlord(idOrEmail) {
   return { reference: String(row.landlord_ref).trim(), name: row.name || "", firstName: (row.name || "").split(/\s+/)[0] || "there", email: (row.email || "").trim(), phone: (row.phone || "").replace(/[\s()-]/g, "") };
 }
 
-/* Everything the dashboard needs, already normalised for scoreProperty. */
-export async function propertiesFor(landlordRef) {
+/* Everything the dashboard needs, already normalised for scoreProperty.
+   viewAs (office use only) is an Established Landlord name: that landlord's
+   properties instead of the signed-in landlord's own. */
+export const landlordNames = () => (zohoConfigured() ? ownersList() : Promise.resolve([]));
+export async function propertiesFor(landlordRef, viewAs = "") {
   if (zohoConfigured()) {
-    const props = await propertiesByLandlordEmail(landlordRef);
+    const props = viewAs ? await propertiesByOwner(viewAs) : await propertiesByLandlordEmail(landlordRef);
     return Promise.all(props.map(async (p) => {
       const [jobs, attachments, tenant] = await Promise.all([
         jobsForProperty(p.id).catch(() => []),
@@ -87,6 +90,7 @@ function fromZoho(p, tenant, allJobs, attachments) {
     licence_expiry: p.licenceRequired ? p.licence || "missing" : "", deposit_protected: tenant ? (/protected|periodical/i.test(String(t.Deposit_Statue || "")) || t.Deposit_Registered === true ? "yes" : t.Deposit_Statue ? "no" : "") : "",
     tenancy_start: p.tenancyStart || t.Tenancy_Start_Date || "", tenant_name: p.tenantName, occupied: p.occupied, status: p.status, tenancy_status: status,
     jobs, documents, notes: "", inspection: p.inspection || null, owner: p.owner || "",
+    finance: p.finance || null,
   };
 }
 /* Every document of a kind gets the same title; only the date changes. The date
@@ -175,8 +179,23 @@ export function scoreProperty(p) {
   const openJobs = (p.jobs || []).filter((j) => !j.closed);
   if (openJobs.length) alerts.push(`${openJobs.length} repair${openJobs.length === 1 ? "" : "s"} in progress`);
 
+  // Value, mortgage and what is left each month. Sheet rows may carry value,
+  // mortgage_balance and mortgage_pcm columns; Zoho supplies a finance object.
+  const f = p.finance || { value: num(p.value), mortgage: num(p.mortgage_balance), mortgagePcm: num(p.mortgage_pcm) };
+  const rentPcm = num(p.rent_pcm) || 0;
+  const value = num(f.value), mortgage = num(f.mortgage), mortgagePcm = num(f.mortgagePcm);
+  const costsPa = (num(f.serviceChargePa) || 0) + (num(f.groundRentPa) || 0);
+  const finance = {
+    value, mortgage, mortgagePcm, lender: f.lender || "", purchasePrice: num(f.purchasePrice), purchaseDate: f.purchaseDate || "", valuedDate: f.valuedDate || "",
+    rate: num(f.rate), mortgageType: f.mortgageType || "", mortgageEnd: f.mortgageEnd || "", costsPa,
+    equity: value !== null && mortgage !== null ? value - mortgage : null,
+    netPcm: Math.round(rentPcm - (mortgagePcm || 0) - costsPa / 12),
+    mortgageKnown: mortgage !== null, valueKnown: value !== null,
+  };
+
   return {
-    property_ref: p.property_ref, address: p.address || "", tenant_ref: p.tenant_ref || "", tenantName: p.tenant_name || "", rentPcm: num(p.rent_pcm) || 0,
+    property_ref: p.property_ref, address: p.address || "", tenant_ref: p.tenant_ref || "", tenantName: p.tenant_name || "", rentPcm,
+    finance,
     score, rag, parts, history, arrears, rentDue: rentDue || 0, collected: collected || 0, certificates: certs, alerts, notes: p.notes || "",
     jobs: (p.jobs || []).slice(0, 12),
     documents: (p.documents || []).map((d) => ({ type: String(d.type || "other").toLowerCase(), title: d.title || d.type || "Document", date: d.date || "", url: d.url || "", amount: num(d.amount) })).sort((a, b) => (b.date || "").localeCompare(a.date || "")),
@@ -197,6 +216,15 @@ export function scorePortfolio(props) {
       collected: scored.reduce((a, p) => a + p.collected, 0),
       arrears: scored.reduce((a, p) => a + p.arrears, 0),
       alerts: scored.reduce((a, p) => a + p.alerts.length, 0),
+      // Equity totals count only what is known; the counts say how complete the picture is.
+      value: scored.reduce((a, p) => a + (p.finance.value || 0), 0),
+      mortgage: scored.reduce((a, p) => a + (p.finance.mortgage || 0), 0),
+      equity: scored.reduce((a, p) => a + (p.finance.equity || 0), 0),
+      mortgagePcm: scored.reduce((a, p) => a + (p.finance.mortgagePcm || 0), 0),
+      costsPcm: Math.round(scored.reduce((a, p) => a + p.finance.costsPa / 12, 0)),
+      netPcm: scored.reduce((a, p) => a + p.finance.netPcm, 0),
+      valueKnown: scored.filter((p) => p.finance.valueKnown).length,
+      mortgageKnown: scored.filter((p) => p.finance.mortgageKnown).length,
     },
   };
 }

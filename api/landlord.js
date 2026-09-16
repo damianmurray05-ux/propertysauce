@@ -3,7 +3,7 @@
 //   start     { reference, channel }      -> signed challenge token, code sent
 //   check     { token, code }             -> signed landlord session
 //   portfolio { session }                 -> scored properties, certificates, documents
-import { findLandlord, propertiesFor, landlordsConfigured, scorePortfolio } from "../src/chat/landlords.mjs";
+import { findLandlord, propertiesFor, landlordsConfigured, scorePortfolio, landlordNames } from "../src/chat/landlords.mjs";
 import { maskEmail, maskPhone } from "../src/chat/directory.mjs";
 import { sign, verify, otp, hashCode } from "../src/chat/crypto.mjs";
 import { sendEmail, sendSms, emailConfigured, smsConfigured } from "../src/chat/notify.mjs";
@@ -51,15 +51,26 @@ export async function POST(request) {
     if (code.length !== 6 || hashCode(`L:${ch.ref}`, code) !== ch.h) return json(400, { error: "wrong_code" });
     const l = await findLandlord(ch.ref);
     if (!l) return json(404, { error: "not_found" });
-    const session = sign({ t: "landlord", ref: l.reference, name: l.name, exp: Date.now() + 4 * 60 * 60 * 1000 });
-    return json(200, { ok: true, session, landlord: { firstName: l.firstName, name: l.name } });
+    const session = sign({ t: "landlord", ref: l.reference, name: l.name, admin: l.admin === true, exp: Date.now() + 4 * 60 * 60 * 1000 });
+    return json(200, { ok: true, session, landlord: { firstName: l.firstName, name: l.name, admin: l.admin === true } });
+  }
+
+  // Office only: the Established Landlords on file, to pick one to view as.
+  if (body.action === "owners") {
+    const s = verify(body.session);
+    if (!s || s.t !== "landlord" || s.expired) return json(401, { error: "session_expired" });
+    if (!s.admin) return json(403, { error: "not_admin" });
+    return json(200, { owners: await landlordNames() });
   }
 
   if (body.action === "portfolio") {
     const s = verify(body.session);
     if (!s || s.t !== "landlord" || s.expired) return json(401, { error: "session_expired" });
-    const props = await propertiesFor(s.ref);
-    return json(200, { firstName: (s.name || "").split(/\s+/)[0] || "there", name: s.name, ...scorePortfolio(props) });
+    const viewAs = s.admin && body.viewAs ? String(body.viewAs).slice(0, 120) : "";
+    const props = await propertiesFor(s.ref, viewAs);
+    const name = viewAs || s.name;
+    const firstName = viewAs ? (/^[A-Z][a-z]+ [A-Z][a-z]+$/.test(viewAs) ? viewAs.split(/\s+/)[0] : "there") : (s.name || "").split(/\s+/)[0] || "there";
+    return json(200, { firstName, name, admin: s.admin === true, viewAs, ...scorePortfolio(props) });
   }
 
   return json(400, { error: "bad_action" });

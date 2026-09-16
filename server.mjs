@@ -36,7 +36,9 @@ createServer(async (req, res) => {
     const request = new Request(url, { method: req.method, headers: req.headers, body: req.method === "GET" || req.method === "HEAD" ? undefined : body });
     const handler = mod[req.method] || mod.default;
     if (!handler) { res.writeHead(405).end(); return; }
-    const response = await handler(request);
+    let response;
+    try { response = await handler(request); }
+    catch (err) { console.error(err); response = new Response(JSON.stringify({ error: "server_error", detail: String(err.message || err).slice(0, 300) }), { status: 500, headers: { "content-type": "application/json" } }); }
     res.writeHead(response.status, Object.fromEntries(response.headers));
     res.end(Buffer.from(await response.arrayBuffer()));
     return;

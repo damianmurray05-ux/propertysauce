@@ -59,17 +59,28 @@
     } catch (err) { say(err.status === 410 ? "That code has expired. Start again." : "That code does not match. Try again.", "err"); }
   });
 
-  let currentSession = "", data = null;
-  async function show(session) {
+  let currentSession = "", data = null, viewAs = "", owners = null;
+  async function show(session, scroll = true) {
     currentSession = session;
     try {
-      const d = await post({ action: "portfolio", session });
+      const d = await post({ action: "portfolio", session, viewAs });
       data = d; render(d); gate.hidden = true; portal.hidden = false;
-      portal.scrollIntoView({ behavior: "smooth", block: "start" });
+      if (d.admin) viewAsBar(session);
+      if (scroll) portal.scrollIntoView({ behavior: "smooth", block: "start" });
     } catch (err) {
       if (err.status === 401) { save({}); gate.hidden = false; portal.hidden = true; say("Your sign-in has expired. Enter your reference again.", "err"); }
       else say("We could not load your portfolio. Please try again, or ring " + PHONE + ".", "err");
     }
+  }
+
+  /* Office only: pick any Established Landlord and see their portal exactly as they will. */
+  async function viewAsBar(session) {
+    const bar = $("#pl-viewas");
+    if (!owners) { try { owners = (await post({ action: "owners", session })).owners || []; } catch { owners = []; } }
+    const opts = owners.map((o) => `<option value="${esc(o.name)}" ${o.name === viewAs ? "selected" : ""}>${esc(o.name)} (${o.properties}${o.signIn ? "" : ", no sign-in yet"})</option>`).join("");
+    bar.innerHTML = `<label for="pl-viewas-sel">Office view. See the portal as</label><select id="pl-viewas-sel"><option value="">Everything under management</option>${opts}</select>${viewAs ? `<span class="pill pill-due">Viewing as ${esc(viewAs)}</span>` : ""}`;
+    bar.hidden = false;
+    $("#pl-viewas-sel").addEventListener("change", (e) => { viewAs = e.target.value; bar.querySelector("select").disabled = true; show(session, false); });
   }
 
   const COLOUR = { green: C.moss, amber: C.gold, red: C.accent };
@@ -126,6 +137,35 @@
       <div class="table-card"><h3>Certificates needing action</h3>${dueSoon.length ? `<table class="mini"><thead><tr><th>Property</th><th>Certificate</th><th>Status</th></tr></thead><tbody>${dueSoon.map(({ p, c }) => `<tr><td>${esc(p.address.split(",")[0])}</td><td>${esc(c.label)}</td><td><span class="pill pill-${c.status}">${statusWord[c.status]}${c.extra ? `, ${esc(c.extra)}` : ""}</span></td></tr>`).join("")}</tbody></table>` : `<p class="muted">Every certificate is in date and nothing is due in the next sixty days.</p>`}</div>`;
   }
 
+  /* ---------- Value, equity and what is left each month ---------- */
+  const unknownCell = `<span class="fin-unknown">Not known</span>`;
+  function equity(d) {
+    const ps = d.properties, t = d.totals, n = ps.length;
+    if (!n) { $("#pl-equity").innerHTML = ""; return; }
+    const noMortgage = ps.filter((p) => !p.finance.mortgageKnown), noValue = ps.filter((p) => !p.finance.valueKnown);
+    const segs = [{ value: Math.max(0, t.equity), color: C.moss, label: "Your equity", text: gbp(t.equity) }, { value: t.mortgage, color: C.mist, label: "Mortgages outstanding", text: gbp(t.mortgage) }];
+    const stats = [
+      [t.value, `portfolio value${t.valueKnown < n ? `, ${t.valueKnown} of ${n} valued` : ""}`],
+      [t.mortgage, `mortgages outstanding${t.mortgageKnown < n ? `, ${t.mortgageKnown} of ${n} known` : ""}`],
+      [t.equity, "your equity, selling at value"],
+      [t.rentPcm, "rent per month"],
+      [t.mortgagePcm + t.costsPcm, "mortgage, service charge and ground rent per month"],
+      [t.netPcm, "left each month, before tax and our fee"],
+    ];
+    const rows = [...ps].sort((a, b) => (b.finance.equity || 0) - (a.finance.equity || 0)).map((p) => { const f = p.finance; return `<tr><td>${esc(p.address.split(",")[0])}</td><td class="num">${f.valueKnown ? gbp(f.value) : unknownCell}</td><td class="num">${f.mortgageKnown ? gbp(f.mortgage) : `<a href="#pl-fin-note" class="fin-ask">Tell us</a>`}</td><td class="num">${f.equity !== null ? `<strong>${gbp(f.equity)}</strong>` : unknownCell}</td><td class="num">${gbp(p.rentPcm)}</td><td class="num">${f.mortgagePcm !== null ? gbp(f.mortgagePcm) : unknownCell}</td><td class="num ${f.netPcm < 0 ? "bad" : ""}">${gbp(f.netPcm)}</td></tr>`; }).join("");
+    const gaps = [];
+    if (noMortgage.length) gaps.push(`We do not hold the outstanding mortgage for ${noMortgage.length === n ? "your properties" : `${noMortgage.length} of your ${n} properties`}, so the equity and monthly figures leave it out. Why not let us know what is outstanding, and we will show you exactly what each property makes and what you would walk away with if you sold.`);
+    if (noValue.length) gaps.push(`${noValue.length === n ? "Your properties have" : `${noValue.length} propert${noValue.length === 1 ? "y has" : "ies have"}`} no current valuation on file. Ask us for one and the equity figure will fill in.`);
+    $("#pl-equity").innerHTML = `
+      <div class="chart-card chart-wide">
+        <div class="chart-head"><h3>Value, equity and what you make</h3><span class="muted">From the valuations and mortgage balances we hold for you</span></div>
+        <div class="equity-stats">${stats.map(([v, l]) => `<div class="equity-stat"><strong>${gbp(v)}</strong><span>${esc(l)}</span></div>`).join("")}</div>
+        <div class="chart-row">${CH.donut(segs, { label: t.value ? `${Math.round(((t.equity || 0) / t.value) * 100)}%` : "0%", sub: "equity", aria: "Equity against mortgage" })}${CH.legend(segs)}</div>
+      </div>
+      <div class="table-card chart-wide"><h3>Property by property</h3><table class="mini fin-table"><thead><tr><th>Property</th><th class="num">Value</th><th class="num">Mortgage</th><th class="num">Equity</th><th class="num">Rent pcm</th><th class="num">Mortgage pcm</th><th class="num">Left pcm</th></tr></thead><tbody>${rows}</tbody></table>
+      ${gaps.length ? `<p class="fin-note" id="pl-fin-note">${gaps.map(esc).join(" ")} <a href="/contact/">Send us the figures</a> or ask the assistant.</p>` : `<p class="muted">Figures are before tax and our management fee. Values are the last valuation we hold, not a sale price.</p>`}</div>`;
+  }
+
   /* ---------- Property cards, with search, filter and sort ---------- */
   const state = { q: "", band: "all", sort: "score", shown: 24 };
   function propertyCard(p) {
@@ -138,8 +178,10 @@
     const groups = {};
     for (const doc of p.documents) (groups[TYPES[doc.type] ? doc.type : "other"] ||= []).push(doc);
     const docs = Object.keys(TYPES).filter((k) => groups[k]).map((k) => `<div class="doc-group"><h4>${TYPES[k]}</h4><ul>${groups[k].map((doc) => `<li>${doc.url ? `<a href="${esc(doc.url.startsWith("/api/file") ? doc.url + "&s=" + encodeURIComponent(currentSession) : doc.url)}" target="_blank" rel="noopener">${esc(doc.title)}</a>` : `<span class="doc-title">${esc(doc.title)}</span>`}<span>${esc(doc.date)}${doc.amount ? ` · ${gbp(doc.amount)}` : ""}</span></li>`).join("")}</ul></div>`).join("");
+    const f = p.finance || {};
+    const fin = f.valueKnown || f.mortgageKnown ? `<p class="prop-fin">${f.valueKnown ? `<span>Value <strong>${gbp(f.value)}</strong></span>` : ""}${f.mortgageKnown ? `<span>Mortgage <strong>${gbp(f.mortgage)}</strong></span>` : `<span>Mortgage <a href="#pl-fin-note">tell us</a></span>`}${f.equity !== null ? `<span>Equity <strong>${gbp(f.equity)}</strong></span>` : ""}<span>Left each month <strong class="${f.netPcm < 0 ? "bad" : ""}">${gbp(f.netPcm)}</strong></span></p>` : "";
     return `<article class="prop prop-${p.rag}">
-      <div class="prop-head"><div><h3>${esc(p.address)}</h3><p class="muted">${gbp(p.rentPcm)} pcm${p.tenantName ? ` · ${esc(p.tenantName)}` : p.tenant_ref ? ` · tenant ${esc(p.tenant_ref)}` : ""}${p.status ? ` · ${esc(p.status)}` : ""}${p.arrears ? ` · <span class="bad">arrears ${gbp(p.arrears)}</span>` : ""}</p></div>${ring(p.score, p.rag, 96)}</div>
+      <div class="prop-head"><div><h3>${esc(p.address)}</h3><p class="muted">${gbp(p.rentPcm)} pcm${p.tenantName ? ` · ${esc(p.tenantName)}` : p.tenant_ref ? ` · tenant ${esc(p.tenant_ref)}` : ""}${p.status ? ` · ${esc(p.status)}` : ""}${p.arrears ? ` · <span class="bad">arrears ${gbp(p.arrears)}</span>` : ""}</p>${fin}</div>${ring(p.score, p.rag, 96)}</div>
       <div class="prop-body">
         <div><div class="score-parts one">${bars}</div><div class="score-history"><h4>Rent, last twelve months</h4><div class="score-months">${months}</div></div></div>
         <div><h4>Certificates</h4><div class="certs">${certs}</div></div>
@@ -180,8 +222,9 @@
     requestAnimationFrame(step);
   }
   function render(d) {
-    $("#pl-title").textContent = d.firstName && d.firstName !== "there" ? `Hello ${d.firstName}.` : "Your portfolio.";
+    $("#pl-title").textContent = d.admin && !d.viewAs ? "Everything under management." : d.firstName && d.firstName !== "there" ? `Hello ${d.firstName}.` : "Your portfolio.";
     $("#pl-sub").textContent = `${d.name ? d.name + " · " : ""}${d.totals.properties} propert${d.totals.properties === 1 ? "y" : "ies"} under management · updated ${new Date().toLocaleDateString("en-GB", { day: "numeric", month: "long" })}`;
+    $("#pl-viewas").hidden = !d.admin;
     const word = d.rag === "green" ? "Healthy" : d.rag === "amber" ? "Needs a look" : "Needs attention";
     $("#pl-tier").innerHTML = `<span class="sc-pill ${d.rag === "green" ? "" : d.rag === "amber" ? "sc-pill-amber" : "sc-pill-red"}"><svg class="ic" aria-hidden="true"><use href="/assets/icons.svg#shield-check"/></svg> ${word}</span><span class="sc-tier-note">Green is 85 and above, amber 65 to 84, red below 65.</span>`;
     $("#pl-ring").innerHTML = heroRing(d.overall, d.rag);
@@ -196,6 +239,7 @@
     const fmts = [gbp, gbp, gbp, String], vals = [d.totals.rentPcm, d.totals.collected, d.totals.arrears, d.totals.alerts];
     document.querySelectorAll("#pl-totals strong").forEach((el) => countUp(el, vals[Number(el.dataset.i)], fmts[Number(el.dataset.i)]));
     dashboards(d);
+    equity(d);
     const alerts = d.properties.flatMap((p) => p.alerts.map((a) => `<li><strong>${esc(p.address.split(",")[0])}</strong> ${esc(a)}</li>`));
     $("#pl-alerts").innerHTML = alerts.length ? `<details ${alerts.length <= 6 ? "open" : ""}><summary><h3>Needs attention (${alerts.length})</h3></summary><ul class="score-list">${alerts.join("")}</ul></details>` : `<p class="notice">Nothing needs your attention. Every certificate is in date and there are no arrears.</p>`;
     state.shown = 24; renderProps();
@@ -205,7 +249,7 @@
   $("#pl-sort").addEventListener("change", (e) => { state.sort = e.target.value; renderProps(); });
   $("#pl-filters").addEventListener("click", (e) => { const b = e.target.closest("button[data-band]"); if (!b) return; state.band = b.dataset.band; state.shown = 24; [...$("#pl-filters").children].forEach((x) => x.classList.toggle("active", x === b)); renderProps(); });
   $("#pl-more").addEventListener("click", () => { state.shown += 24; renderProps(); });
-  $("#pl-signout").addEventListener("click", () => { save({}); portal.hidden = true; gate.hidden = false; refForm.hidden = false; codeForm.hidden = true; channels.hidden = true; msg.hidden = true; $("#pl-ref").value = ""; });
+  $("#pl-signout").addEventListener("click", () => { save({}); viewAs = ""; owners = null; $("#pl-viewas").hidden = true; portal.hidden = true; gate.hidden = false; refForm.hidden = false; codeForm.hidden = true; channels.hidden = true; msg.hidden = true; $("#pl-ref").value = ""; });
   const st = load();
   if (st.session) show(st.session);
 })();

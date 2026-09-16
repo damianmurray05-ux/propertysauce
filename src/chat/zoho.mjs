@@ -22,7 +22,7 @@ const API = `https://www.zohoapis.${DC}/crm/v8`;
 export const CURRENT_STATUSES = new Set(["Tenanted", "Arrears", "Possession Proceedings", "Court", "Let Agreed", "Maintenance Only"]);
 
 const TENANT_FIELDS = "id,Conduct_1_Date,Conduct_1_Type,Conduct_1_Details,Conduct_1_Status,Conduct_2_Date,Conduct_2_Type,Conduct_2_Details,Conduct_2_Status,Conduct_3_Date,Conduct_3_Type,Conduct_3_Details,Conduct_3_Status,Conduct_4_Date,Conduct_4_Type,Conduct_4_Details,Conduct_4_Status,Conduct_5_Date,Conduct_5_Type,Conduct_5_Details,Conduct_5_Status,Last_Name,Full_Name,Email,Tenant_1_Name,Tenant_1_Phone,Tenant_1_Phone1,Tenant_2_Name,Tenant_2_Email,Tenant_2_Phone,Mobile,Phone,Status,Account_Name,Rent_Payment_Reference,Property_Sauce_Reference,Homelet_Number,Rent,Rent_Due_Date,Tenancy_Start_Date,Original_Tenancy_Start_Date,Tenants_Missed_Payment_Date,Days_Since_Missed_Payment,Deposit_Statue,Deposit_Registered,Deposit_Scheme,Gas_Safe_Certificate,Rent_Received,Total_Monies_Received";
-const PROPERTY_FIELDS = "id,Pay_As_You_Go_Gas,Established_Vendor,Inspection_Area,Inspector,Inspection_Every_Months,Next_Inspection_Due,Last_Inspection_Date,Last_Inspection_Outcome,Last_Inspection_Notes,Account_Name,Property_Reference,Property_Sauce_Reference,Last_Name,First_Name,Company_Name,Vendor_Email,Vendor_Phone,Status,Occupied,Balance,Monthly_Rent,New_Rent_Amount,Gas_Safe_Certificate,Gas_Safety_Applicable,NICEIC_Certificate,EPC_Expiry,EPC_Rating,Landlords_Property_License,Landlord_License_Exempt,Insurance_Expiry_Date,Tenancy_Start_Date,Tenancy_End_Date,Tenants_Name,Existing_Tenant,Street,Town,City,Post_Code,Landlord_Payment_Date,Modified_Time";
+const PROPERTY_FIELDS = "id,Pay_As_You_Go_Gas,Established_Vendor,Inspection_Area,Inspector,Inspection_Every_Months,Next_Inspection_Due,Last_Inspection_Date,Last_Inspection_Outcome,Last_Inspection_Notes,Account_Name,Property_Reference,Property_Sauce_Reference,Last_Name,First_Name,Company_Name,Vendor_Email,Vendor_Phone,Status,Occupied,Balance,Monthly_Rent,New_Rent_Amount,Gas_Safe_Certificate,Gas_Safety_Applicable,NICEIC_Certificate,EPC_Expiry,EPC_Rating,Landlords_Property_License,Landlord_License_Exempt,Insurance_Expiry_Date,Tenancy_Start_Date,Tenancy_End_Date,Tenants_Name,Existing_Tenant,Street,Town,City,Post_Code,Landlord_Payment_Date,Modified_Time,Current_Value,Mortgage_Balance,Monthly_Mortgage_Payment1,Lender_Name,Purchase_Price,Completion_Date,Last_Valued_Date,Annual_Service_Charge_Amount,Annual_Ground_Rent_Amount"; // Zoho allows at most 50 fields per request
 const MAINTENANCE_FIELDS = "id,Name,Maintenance_Ticket_Number,Maintenance_Issue,Maintenance_Issue1,Job_Status,Appointment_Status,Agreed_Date_Time,Created_Time,Modified_Time,Tenant,Landlord,Contractor1,Quote_To_Landlord,Contractors_Quote,Invoiced_Amount,Invoice_Number,Invoice_Paid_Date,Date_Tenant_Signed_Off,Date_Staff_Signed_Off,Tenants_Star_Rating,Tenants_Comments,Contractors_Comments";
 
 let token = { value: null, exp: 0 };
@@ -140,6 +140,8 @@ export async function tenantById(id) {
 }
 
 /* ---------- landlords and properties ---------- */
+// A currency or number field: a positive number, or null when blank or zero (zero means "not entered" in this CRM).
+const money = (v) => { const n = Number(String(v ?? "").replace(/[£,\s]/g, "")); return Number.isFinite(n) && n > 0 ? n : null; };
 export function mapProperty(rec) {
   const addr = rec.Account_Name || [rec.Street, rec.Town || rec.City, rec.Post_Code].filter(Boolean).join(", ");
   const landlordName = [rec.First_Name, rec.Last_Name].filter(Boolean).join(" ").trim() || rec.Company_Name || "";
@@ -159,6 +161,14 @@ export function mapProperty(rec) {
     tenantId: rec.Existing_Tenant && rec.Existing_Tenant.id,
     paymentDay: rec.Landlord_Payment_Date || "",
     owner: (rec.Established_Vendor || "").trim(),
+    // Value, mortgage and running costs as held on the record. Null means not known,
+    // and the portal says so rather than showing a zero.
+    finance: {
+      value: money(rec.Current_Value), mortgage: money(rec.Mortgage_Balance), mortgagePcm: money(rec.Monthly_Mortgage_Payment1),
+      lender: rec.Lender_Name || "", purchasePrice: money(rec.Purchase_Price), purchaseDate: rec.Completion_Date || "", valuedDate: rec.Last_Valued_Date || "",
+      rate: money(rec.Interest_Rate), mortgageType: rec.Mortgage_Type || "", mortgageEnd: rec.Mortgage_End_Date || "",
+      serviceChargePa: money(rec.Annual_Service_Charge_Amount) ?? money(rec.Service_Charge_P_A), groundRentPa: money(rec.Annual_Ground_Rent_Amount) ?? money(rec.Ground_Rent_P_A),
+    },
     inspection: { area: rec.Inspection_Area || "", inspector: rec.Inspector || "", every: Number(rec.Inspection_Every_Months) || 3, next: rec.Next_Inspection_Due || "", last: rec.Last_Inspection_Date || "", outcome: rec.Last_Inspection_Outcome || "", notes: rec.Last_Inspection_Notes || "" },
     raw: rec,
   };
@@ -175,8 +185,21 @@ async function allProperties() {
     if (!d.info || !d.info.more_records || !d.info.next_page_token) break;
     pageToken = d.info.next_page_token;
   }
-  return out.map(mapProperty).filter((p) => p.rentPcm || LIVE_STATUSES.test(p.status) || p.tenantId);
+  const props = out.map(mapProperty).filter((p) => p.rentPcm || LIVE_STATUSES.test(p.status) || p.tenantId);
+  // A block of flats has one record per flat plus, sometimes, a record for the
+  // whole building (named "... Main" or after the owning company) carrying the
+  // block's total rent, value and mortgage. Those totals are already spread
+  // across the flats, so the building record is flagged and left out of
+  // portfolios to avoid counting everything twice.
+  const byPostcode = {};
+  for (const p of props) { const pc = postcodeOf(p.address); if (pc) (byPostcode[pc] ||= []).push(p); }
+  for (const p of props) {
+    const pc = postcodeOf(p.address);
+    p.block = Boolean(pc && byPostcode[pc].length >= 4 && /\b(main|limited|ltd|group|freehold|block|whole building)\b/i.test(p.address.split(",")[0]));
+  }
+  return props;
 }
+const postcodeOf = (addr) => { const m = String(addr || "").toUpperCase().match(/\b[A-Z]{1,2}\d[A-Z\d]?\s*\d[A-Z]{2}\b/); return m ? m[0].replace(/\s+/g, "") : ""; };
 const GONE = /^(sold|archived)$/i;
 /* Ownership is the "Established Landlord" picklist on each property
    (Established_Vendor) and nothing else. Which email address may sign in for
@@ -194,11 +217,25 @@ export async function ownersForEmail(email) {
 export async function propertiesByLandlordEmail(email) {
   const e = normaliseEmail(email);
   if (!e || !e.includes("@")) return [];
-  if (isAdminEmail(e)) return (await allProperties()).filter((p) => !GONE.test(p.status));
+  if (isAdminEmail(e)) return (await allProperties()).filter((p) => !GONE.test(p.status) && !p.block);
   const owners = new Set(await ownersForEmail(e));
   if (!owners.size) return [];
   const all = await allProperties();
-  return all.filter((p) => owners.has(p.owner) && !GONE.test(p.status));
+  return all.filter((p) => owners.has(p.owner) && !GONE.test(p.status) && !p.block);
+}
+/* For the office: every Established Landlord with a property under management,
+   and the properties of one of them, so an admin can see any landlord's portal
+   before the landlord does. */
+export async function ownersList() {
+  const counts = {};
+  for (const p of await allProperties()) { if (GONE.test(p.status) || p.block) continue; const k = p.owner || "(no Established Landlord)"; counts[k] = (counts[k] || 0) + 1; }
+  const mapped = new Set(Object.values(landlordMap()).flat());
+  return Object.entries(counts).map(([name, properties]) => ({ name, properties, signIn: mapped.has(name) })).sort((a, b) => a.name.localeCompare(b.name, "en-GB"));
+}
+export async function propertiesByOwner(name) {
+  const want = String(name || "").trim();
+  const all = await allProperties();
+  return all.filter((p) => (want === "(no Established Landlord)" ? !p.owner : p.owner === want) && !GONE.test(p.status) && !p.block);
 }
 const isPerson = (name) => /^[A-Z][a-z]+ [A-Z][a-z]+$/.test(name) && !/(ltd|limited|residential|homes|property|group|co)$/i.test(name);
 export async function findLandlordByEmail(email) {

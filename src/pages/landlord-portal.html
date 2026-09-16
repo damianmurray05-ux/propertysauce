@@ -6,7 +6,7 @@ noindex: true
 <section class="intro">
   <div class="wrap">
     <h1 data-reveal>Your portfolio, at a glance.</h1>
-    <p class="lede" data-reveal style="--d:80ms">Every property scored on rent collected, rent paid to you, and certificates in date. Every document in one place: tenancy agreements, gas and electrical certificates, EPCs, rent invoices and your statements.</p>
+    <p class="lede" data-reveal style="--d:80ms">Every property scored on rent collected, rent paid to you, and certificates in date. What each property is worth, what is owed on it, your equity, and what is left each month after the mortgage. Every document in one place: tenancy agreements, gas and electrical certificates, EPCs, rent invoices and your statements.</p>
   </div>
 </section>
 
@@ -30,6 +30,7 @@ noindex: true
     </div>
 
     <div class="portal sc" id="portal" hidden>
+      <div class="portal-viewas" id="pl-viewas" hidden></div>
       <div class="sc-hero">
         <div class="sc-hero-text">
           <span class="sc-kicker">Landlord portal</span>
@@ -41,6 +42,7 @@ noindex: true
         <div class="sc-stats sc-stats-4" id="pl-totals"></div>
       </div>
       <div class="dash" id="pl-dash"></div>
+      <div class="equity" id="pl-equity"></div>
       <div class="tables" id="pl-tables"></div>
       <div class="portal-alerts" id="pl-alerts"></div>
       <div class="portal-toolbar">
@@ -67,7 +69,7 @@ noindex: true
       </div>
       <div class="portal-props" id="pl-props"></div>
       <button type="button" class="btn btn-ghost btn-sm" id="pl-more" hidden>Show more</button>
-      <p class="calc-note">Figures are updated when we update your file, usually with the monthly statement. Documents open in Google Drive. If anything looks wrong, use the assistant or ring the office.</p>
+      <p class="calc-note">Figures are updated when we update your file, usually with the monthly statement. Values are the last valuation we hold and mortgage balances are as you have told us; what is left each month is before tax and our fee. If anything looks wrong, use the assistant or ring the office.</p>
       <div class="calc-actions">
         <a class="btn btn-primary btn-sm" href="/contact/">Talk to us <svg class="ic btn-ic" aria-hidden="true"><use href="/assets/icons.svg#arrow-up-right"/></svg></a>
         <button type="button" class="btn btn-ghost btn-sm" id="pl-signout">Sign out</button>
