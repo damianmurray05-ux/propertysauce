@@ -250,7 +250,10 @@ export async function findLandlordByEmail(email) {
   if (!owners.length) return null;
   const props = await propertiesByLandlordEmail(e);
   const phone = (props.find((p) => p.landlord.email === e && p.landlord.phone) || props[0] || { landlord: {} }).landlord.phone || "";
-  return { reference: e, email: e, phone, name: owners.join(" and "), firstName: owners.length === 1 && isPerson(owners[0]) ? owners[0].split(/\s+/)[0] : "there", properties: props.length, owners };
+  // Greet the person behind the login; companies are listed in the portal itself.
+  const person = owners.find(isPerson);
+  const name = person || owners[0];
+  return { reference: e, email: e, phone, name, firstName: person ? person.split(/\s+/)[0] : "there", properties: props.length, owners };
 }
 export async function propertyById(id) {
   const rec = await getRecord("Accounts", id, PROPERTY_FIELDS);

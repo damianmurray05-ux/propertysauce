@@ -4,7 +4,9 @@
 // documents from the property's attachments. Otherwise three published sheets
 // (LANDLORD_/PROPERTY_/DOCUMENT_DIRECTORY_URL, templates in docs/) as a fallback.
 import { parseCsv, normaliseRef } from "./directory.mjs";
-import { zohoConfigured, findLandlordByEmail, propertiesByLandlordEmail, propertiesByOwner, ownersList, jobsForProperty, listAttachments, tenantById, normaliseEmail } from "./zoho.mjs";
+// Certificates held in Google Drive, indexed per property by scripts run from the office (docs/certificates/drive-certificates.json).
+import driveCerts from "../../docs/certificates/drive-certificates.json" with { type: "json" };
+import { zohoConfigured, findLandlordByEmail, propertiesByLandlordEmail, propertiesByOwner, ownersList, isAdminEmail, jobsForProperty, listAttachments, tenantById, normaliseEmail } from "./zoho.mjs";
 
 const cache = new Map();
 const TTL = 5 * 60 * 1000;
@@ -39,7 +41,16 @@ export async function findLandlord(idOrEmail) {
 /* Everything the dashboard needs, already normalised for scoreProperty.
    viewAs (office use only) is an Established Landlord name: that landlord's
    properties instead of the signed-in landlord's own. */
-export const landlordNames = () => (zohoConfigured() ? ownersList() : Promise.resolve([]));
+/* The landlords a sign-in can see: every Established Landlord for the office,
+   or the companies and names behind one landlord's login (a landlord who owns
+   through several companies gets one entry per company). */
+export async function landlordNames(ref) {
+  if (!zohoConfigured()) return [];
+  if (isAdminEmail(ref)) return ownersList();
+  const counts = {};
+  for (const p of await propertiesByLandlordEmail(ref)) { const k = p.owner || "(no landlord name on the record)"; counts[k] = (counts[k] || 0) + 1; }
+  return Object.entries(counts).map(([name, properties]) => ({ name, properties, signIn: true, fromRecord: 0 })).sort((a, b) => b.properties - a.properties || a.name.localeCompare(b.name, "en-GB"));
+}
 export async function propertiesFor(landlordRef, viewAs = "") {
   if (zohoConfigured()) {
     const props = viewAs ? await propertiesByOwner(viewAs) : await propertiesByLandlordEmail(landlordRef);
@@ -81,7 +92,8 @@ function fromZoho(p, tenant, allJobs, attachments) {
   const rent = p.rentPcm || Number(t.Rent) || 0;
   const arrears = status === "Arrears" || status === "Possession Proceedings" || status === "Court" ? (missedDays ? Math.round((missedDays / 30) * rent) : rent) : 0;
   const invoices = jobs.filter((j) => j.invoiced).map((j) => ({ type: "invoice", title: `${j.ticket ? `Ticket ${j.ticket}: ` : ""}${j.title}`, date: j.paid || j.updated, url: "", amount: j.invoiced, job: j }));
-  const documents = attachments.map((a) => { const type = classify(a.name); return { type, title: docTitle(type, a.name, a.date), file: a.name, date: a.date, url: `/api/file/?m=${a.module}&r=${a.record}&a=${a.id}`, amount: null }; }).concat(invoices);
+  const fromDrive = (driveCerts[p.id] || []).map((d) => { const type = d.type === "eic" ? "eicr" : d.type === "fire" ? "other" : d.type || classify(d.name); return { type, title: docTitle(type, d.name, d.date), file: d.name, date: d.date || "", url: d.url || "", amount: null, drive: true }; });
+  const documents = attachments.map((a) => { const type = classify(a.name); return { type, title: docTitle(type, a.name, a.date), file: a.name, date: a.date, url: `/api/file/?m=${a.module}&r=${a.record}&a=${a.id}`, amount: null }; }).concat(fromDrive, invoices);
   return {
     property_ref: p.reference || p.id, address: p.address, tenant_ref: tenant ? tenant.reference : "", rent_pcm: rent,
     rent_history_12m: history, rent_due_12m: tenant && CURRENT.has(status) ? rent * 12 : 0, rent_collected_12m: tenant && CURRENT.has(status) ? rent * 12 - arrears : 0,

@@ -4,6 +4,7 @@
 //   check     { token, code }             -> signed landlord session
 //   portfolio { session }                 -> scored properties, certificates, documents
 import { findLandlord, propertiesFor, landlordsConfigured, scorePortfolio, landlordNames } from "../src/chat/landlords.mjs";
+import { ownersForEmail } from "../src/chat/zoho.mjs";
 import { maskEmail, maskPhone } from "../src/chat/directory.mjs";
 import { sign, verify, otp, hashCode } from "../src/chat/crypto.mjs";
 import { sendEmail, sendSms, emailConfigured, smsConfigured } from "../src/chat/notify.mjs";
@@ -55,22 +56,25 @@ export async function POST(request) {
     return json(200, { ok: true, session, landlord: { firstName: l.firstName, name: l.name, admin: l.admin === true } });
   }
 
-  // Office only: the Established Landlords on file, to pick one to view as.
+  // The landlords this sign-in can view: every Established Landlord for the
+  // office, or the companies behind one landlord's own login.
   if (body.action === "owners") {
     const s = verify(body.session);
     if (!s || s.t !== "landlord" || s.expired) return json(401, { error: "session_expired" });
-    if (!s.admin) return json(403, { error: "not_admin" });
-    return json(200, { owners: await landlordNames() });
+    return json(200, { owners: await landlordNames(s.ref) });
   }
 
   if (body.action === "portfolio") {
     const s = verify(body.session);
     if (!s || s.t !== "landlord" || s.expired) return json(401, { error: "session_expired" });
-    const viewAs = s.admin && body.viewAs ? String(body.viewAs).slice(0, 120) : "";
+    // A landlord may narrow the view to one of their own companies; the office may view anyone.
+    const mine = s.admin ? [] : await ownersForEmail(s.ref);
+    const wanted = String(body.viewAs || "").slice(0, 120);
+    const viewAs = wanted && (s.admin || mine.includes(wanted)) ? wanted : "";
     const props = await propertiesFor(s.ref, viewAs);
     const name = viewAs || s.name;
-    const firstName = viewAs ? (/^[A-Z][a-z]+ [A-Z][a-z]+$/.test(viewAs) ? viewAs.split(/\s+/)[0] : "there") : (s.name || "").split(/\s+/)[0] || "there";
-    return json(200, { firstName, name, admin: s.admin === true, viewAs, ...scorePortfolio(props) });
+    const firstName = s.admin && viewAs ? (/^[A-Z][a-z]+ [A-Z][a-z]+$/.test(viewAs) ? viewAs.split(/\s+/)[0] : "there") : (s.name || "").split(/\s+/)[0] || "there";
+    return json(200, { firstName, name, admin: s.admin === true, viewAs, ownerCount: s.admin ? 0 : mine.length, ...scorePortfolio(props) });
   }
 
   return json(400, { error: "bad_action" });

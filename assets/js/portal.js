@@ -65,7 +65,7 @@
     try {
       const d = await post({ action: "portfolio", session, viewAs });
       data = d; render(d); gate.hidden = true; portal.hidden = false;
-      if (d.admin) viewAsBar(session);
+      if (multi(d)) viewAsBar(session);
       if (scroll) portal.scrollIntoView({ behavior: "smooth", block: "start" });
     } catch (err) {
       if (err.status === 401) { save({}); gate.hidden = false; portal.hidden = true; say("Your sign-in has expired. Enter your reference again.", "err"); }
@@ -76,21 +76,25 @@
   /* Office only: pick any landlord and see their portal exactly as they will.
      The bar at the top always shows who is being viewed; the landlord list
      below the hero is the way in when looking at everything. */
+  // The office sees every landlord; a landlord who owns through several companies sees one entry per company.
+  const multi = (d) => Boolean(d && (d.admin || d.ownerCount > 1));
   function openAs(session, name) { viewAs = name; const sel = $("#pl-viewas-sel"); if (sel) sel.disabled = true; show(session, false); }
   async function viewAsBar(session) {
     const bar = $("#pl-viewas");
     if (!owners) { try { owners = (await post({ action: "owners", session })).owners || []; } catch { owners = []; } }
+    const office = data.admin;
     const opts = owners.map((o) => `<option value="${esc(o.name)}" ${o.name === viewAs ? "selected" : ""}>${esc(o.name)} (${o.properties})</option>`).join("");
-    bar.innerHTML = `<span class="pill ${viewAs ? "pill-due" : ""}">Office view</span><label for="pl-viewas-sel">${viewAs ? `Signed in as the office, viewing <strong>${esc(viewAs)}</strong>` : "Showing every landlord"}</label><select id="pl-viewas-sel"><option value="">Everything under management</option>${opts}</select>${viewAs ? `<button type="button" class="chip" id="pl-viewas-back">Back to every landlord</button>` : ""}`;
+    const allLabel = office ? "Everything under management" : "All your companies together";
+    bar.innerHTML = `<span class="pill ${viewAs ? "pill-due" : ""}">${office ? "Office view" : "Your companies"}</span><label for="pl-viewas-sel">${viewAs ? `Showing <strong>${esc(viewAs)}</strong> on its own` : office ? "Showing every landlord" : "Showing everything you own, across every company"}</label><select id="pl-viewas-sel"><option value="">${allLabel}</option>${opts}</select>${viewAs ? `<button type="button" class="chip" id="pl-viewas-back">${office ? "Back to every landlord" : "Back to all your companies"}</button>` : ""}`;
     bar.hidden = false;
     $("#pl-viewas-sel").addEventListener("change", (e) => openAs(session, e.target.value));
     const back = $("#pl-viewas-back"); if (back) back.addEventListener("click", () => openAs(session, ""));
-    // The landlord list: one row per landlord with what they hold, click to open their portal.
+    // One card per landlord or company with what it holds; click to see it on its own, scored on its own.
     const list = $("#pl-owners");
-    if (viewAs || !owners.length) { list.hidden = true; list.innerHTML = ""; return; }
+    if (viewAs || owners.length < 2) { list.hidden = true; list.innerHTML = ""; return; }
     const byOwner = {};
     for (const p of data.properties) (byOwner[p.owner || ""] ||= []).push(p);
-    list.innerHTML = `<div class="chart-head"><h3>Landlords</h3><span class="muted">${owners.length} landlords · click one to see their portal as they will</span></div><div class="owner-grid">${owners.map((o) => { const ps = byOwner[o.name] || []; const rent = ps.reduce((a, p) => a + p.rentPcm, 0); const score = ps.length ? Math.round(ps.reduce((a, p) => a + p.score, 0) / ps.length) : 0; const rag = score >= 85 ? "green" : score >= 65 ? "amber" : "red"; return `<button type="button" class="owner-card owner-${rag}" data-owner="${esc(o.name)}"><strong>${esc(o.name)}</strong><span>${o.properties} propert${o.properties === 1 ? "y" : "ies"} · ${gbp(rent)} pcm</span><small>${o.signIn ? "Sign-in set up" : "No sign-in email yet"}${o.fromRecord ? ` · ${o.fromRecord} from the record name` : ""}</small><i>${score}</i></button>`; }).join("")}</div>`;
+    list.innerHTML = `<div class="chart-head"><h3>${office ? "Landlords" : "Your companies"}</h3><span class="muted">${owners.length} ${office ? "landlords · click one to see their portal as they will" : "companies · click one to see it scored on its own"}</span></div><div class="owner-grid">${owners.map((o) => { const ps = byOwner[o.name] || []; const rent = ps.reduce((a, p) => a + p.rentPcm, 0); const arrears = ps.reduce((a, p) => a + p.arrears, 0); const score = ps.length ? Math.round(ps.reduce((a, p) => a + p.score, 0) / ps.length) : 0; const rag = score >= 85 ? "green" : score >= 65 ? "amber" : "red"; const small = office ? `${o.signIn ? "Sign-in set up" : "No sign-in email yet"}${o.fromRecord ? ` · ${o.fromRecord} from the record name` : ""}` : `${ps.filter((p) => p.alerts.length).length} need${ps.filter((p) => p.alerts.length).length === 1 ? "s" : ""} attention${arrears ? ` · arrears ${gbp(arrears)}` : ""}`; return `<button type="button" class="owner-card owner-${rag}" data-owner="${esc(o.name)}"><strong>${esc(o.name)}</strong><span>${o.properties} propert${o.properties === 1 ? "y" : "ies"} · ${gbp(rent)} pcm</span><small>${small}</small><i>${score}</i></button>`; }).join("")}</div>`;
     list.hidden = false;
     list.querySelectorAll(".owner-card").forEach((b) => b.addEventListener("click", () => openAs(session, b.dataset.owner)));
   }
@@ -193,7 +197,7 @@
     const f = p.finance || {};
     const fin = f.valueKnown || f.mortgageKnown ? `<p class="prop-fin">${f.valueKnown ? `<span>Value <strong>${gbp(f.value)}</strong></span>` : ""}${f.mortgageKnown ? `<span>Mortgage <strong>${gbp(f.mortgage)}</strong></span>` : `<span>Mortgage <a href="#pl-fin-note">tell us</a></span>`}${f.equity !== null ? `<span>Equity <strong>${gbp(f.equity)}</strong></span>` : ""}<span>Left each month <strong class="${f.netPcm < 0 ? "bad" : ""}">${gbp(f.netPcm)}</strong></span></p>` : "";
     return `<article class="prop prop-${p.rag}">
-      <div class="prop-head"><div><h3>${esc(p.address)}</h3><p class="muted">${data && data.admin && !data.viewAs && p.owner ? `<strong>${esc(p.owner)}</strong> · ` : ""}${gbp(p.rentPcm)} pcm${p.tenantName ? ` · ${esc(p.tenantName)}` : p.tenant_ref ? ` · tenant ${esc(p.tenant_ref)}` : ""}${p.status ? ` · ${esc(p.status)}` : ""}${p.arrears ? ` · <span class="bad">arrears ${gbp(p.arrears)}</span>` : ""}</p>${fin}</div>${ring(p.score, p.rag, 96)}</div>
+      <div class="prop-head"><div><h3>${esc(p.address)}</h3><p class="muted">${multi(data) && !data.viewAs && p.owner ? `<strong>${esc(p.owner)}</strong> · ` : ""}${gbp(p.rentPcm)} pcm${p.tenantName ? ` · ${esc(p.tenantName)}` : p.tenant_ref ? ` · tenant ${esc(p.tenant_ref)}` : ""}${p.status ? ` · ${esc(p.status)}` : ""}${p.arrears ? ` · <span class="bad">arrears ${gbp(p.arrears)}</span>` : ""}</p>${fin}</div>${ring(p.score, p.rag, 96)}</div>
       <div class="prop-body">
         <div><div class="score-parts one">${bars}</div><div class="score-history"><h4>Rent, last twelve months</h4><div class="score-months">${months}</div></div></div>
         <div><h4>Certificates</h4><div class="certs">${certs}</div></div>
@@ -217,7 +221,7 @@
     const shown = list.slice(0, state.shown);
     $("#pl-count").textContent = list.length === data.properties.length ? `${list.length} propert${list.length === 1 ? "y" : "ies"}` : `${list.length} of ${data.properties.length} properties`;
     // In the office's everything view the cards sit under a heading per landlord.
-    const grouped = data.admin && !data.viewAs && state.sort === "owner";
+    const grouped = multi(data) && !data.viewAs && state.sort === "owner";
     let last = null;
     $("#pl-props").innerHTML = shown.map((p) => { const head = grouped && p.owner !== last ? `<h3 class="owner-head">${esc(p.owner || "No landlord name on the record")}<span>${list.filter((x) => x.owner === p.owner).length} propert${list.filter((x) => x.owner === p.owner).length === 1 ? "y" : "ies"}</span></h3>` : ""; last = p.owner; return head + propertyCard(p); }).join("") || `<p class="notice">No properties match. Clear the search or the filter.</p>`;
     const more = $("#pl-more"); more.hidden = list.length <= state.shown;
@@ -240,8 +244,8 @@
   function render(d) {
     $("#pl-title").textContent = d.admin && !d.viewAs ? "Everything under management." : d.firstName && d.firstName !== "there" ? `Hello ${d.firstName}.` : "Your portfolio.";
     $("#pl-sub").textContent = `${d.name ? d.name + " · " : ""}${d.totals.properties} propert${d.totals.properties === 1 ? "y" : "ies"} under management · updated ${new Date().toLocaleDateString("en-GB", { day: "numeric", month: "long" })}`;
-    $("#pl-viewas").hidden = !d.admin;
-    if (d.admin && !d.viewAs) { state.sort = "owner"; $("#pl-sort").value = "owner"; } else if (state.sort === "owner") { state.sort = "score"; $("#pl-sort").value = "score"; }
+    $("#pl-viewas").hidden = !multi(d);
+    if (multi(d) && !d.viewAs) { state.sort = "owner"; $("#pl-sort").value = "owner"; } else if (state.sort === "owner") { state.sort = "score"; $("#pl-sort").value = "score"; }
     const word = d.rag === "green" ? "Healthy" : d.rag === "amber" ? "Needs a look" : "Needs attention";
     $("#pl-tier").innerHTML = `<span class="sc-pill ${d.rag === "green" ? "" : d.rag === "amber" ? "sc-pill-amber" : "sc-pill-red"}"><svg class="ic" aria-hidden="true"><use href="/assets/icons.svg#shield-check"/></svg> ${word}</span><span class="sc-tier-note">Green is 85 and above, amber 65 to 84, red below 65.</span>`;
     $("#pl-ring").innerHTML = heroRing(d.overall, d.rag);
