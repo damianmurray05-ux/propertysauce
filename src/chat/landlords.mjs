@@ -92,7 +92,7 @@ function fromZoho(p, tenant, allJobs, attachments) {
   const rent = p.rentPcm || Number(t.Rent) || 0;
   const arrears = status === "Arrears" || status === "Possession Proceedings" || status === "Court" ? (missedDays ? Math.round((missedDays / 30) * rent) : rent) : 0;
   const invoices = jobs.filter((j) => j.invoiced).map((j) => ({ type: "invoice", title: `${j.ticket ? `Ticket ${j.ticket}: ` : ""}${j.title}`, date: j.paid || j.updated, url: "", amount: j.invoiced, job: j }));
-  const fromDrive = (driveCerts[p.id] || []).map((d) => { const type = d.type === "eic" ? "eicr" : d.type === "fire" ? "other" : d.type || classify(d.name); return { type, title: docTitle(type, d.name, d.date), file: d.name, date: d.date || "", url: d.url || "", amount: null, drive: true }; });
+  const fromDrive = (driveCerts[p.id] || []).map((d) => { const type = d.type === "eic" ? "eicr" : d.type === "fire" ? "other" : d.type || classify(d.name); return { type, title: docTitle(type, "", d.date), file: d.name, date: d.date || "", url: d.url || "", amount: null, drive: true }; });
   const documents = attachments.map((a) => { const type = classify(a.name); return { type, title: docTitle(type, a.name, a.date), file: a.name, date: a.date, url: `/api/file/?m=${a.module}&r=${a.record}&a=${a.id}`, amount: null }; }).concat(fromDrive, invoices);
   return {
     property_ref: p.reference || p.id, address: p.address, tenant_ref: tenant ? tenant.reference : "", rent_pcm: rent,
