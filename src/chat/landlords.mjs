@@ -181,10 +181,12 @@ export function scoreProperty(p) {
 
   // Value, mortgage and what is left each month. Sheet rows may carry value,
   // mortgage_balance and mortgage_pcm columns; Zoho supplies a finance object.
-  const f = p.finance || { value: num(p.value), mortgage: num(p.mortgage_balance), mortgagePcm: num(p.mortgage_pcm) };
+  // Blank means not known, and a zero balance is treated the same way (the CRM leaves zeros in untouched fields).
+  const known = (v) => { const n = num(v); return n === null || n === 0 ? null : n; };
+  const f = p.finance || { value: p.value, mortgage: p.mortgage_balance, mortgagePcm: p.mortgage_pcm };
   const rentPcm = num(p.rent_pcm) || 0;
-  const value = num(f.value), mortgage = num(f.mortgage), mortgagePcm = num(f.mortgagePcm);
-  const costsPa = (num(f.serviceChargePa) || 0) + (num(f.groundRentPa) || 0);
+  const value = known(f.value), mortgage = known(f.mortgage), mortgagePcm = known(f.mortgagePcm);
+  const costsPa = (known(f.serviceChargePa) || 0) + (known(f.groundRentPa) || 0);
   const finance = {
     value, mortgage, mortgagePcm, lender: f.lender || "", purchasePrice: num(f.purchasePrice), purchaseDate: f.purchaseDate || "", valuedDate: f.valuedDate || "",
     rate: num(f.rate), mortgageType: f.mortgageType || "", mortgageEnd: f.mortgageEnd || "", costsPa,
