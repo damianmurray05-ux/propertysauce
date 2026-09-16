@@ -114,6 +114,7 @@ export function layout(meta, body) {
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>${esc(title)}</title>
 <meta name="description" content="${esc(desc)}">
+<meta name="google-site-verification" content="OnMlii3sz69PJ38B4ishaOzG153KIoOC8Dq4AlDe9H8">
 <link rel="canonical" href="${canonical}">
 ${meta.noindex === "true" ? '<meta name="robots" content="noindex">' : '<meta name="robots" content="index,follow,max-image-preview:large">'}
 <meta property="og:type" content="website">
