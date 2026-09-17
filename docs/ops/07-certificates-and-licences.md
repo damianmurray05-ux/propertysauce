@@ -91,3 +91,4 @@ Not on this register but tracked elsewhere: deposit protection certificate and t
 - The spreadsheet: Zoho is the single source of truth (README rule 1), so the sheet should be a Google Sheet generated from the Zoho Landlord records, not typed by hand. Confirm.
 - Who the usual gas and electrical engineers are for each area, and whether Claude may book them without asking.
 - Payment list for engineers: build with Ops 06 as a weekly bank bulk-upload file.
+- Compliance check of all 160 let properties, 17 September 2026, is in 03-tenant-enquiries.md appendix C and 03-compliance-check-2026-09-17.csv: 5 gas and 5 EICR expired, 15 gas checks due by 11 November, insurance and licence dates stale on most records. Use it as the starting register once Damian confirms which gaps are real.
