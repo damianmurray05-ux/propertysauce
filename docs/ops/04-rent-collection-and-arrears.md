@@ -20,6 +20,17 @@ Status: template. Nothing below is agreed until Damian has dictated it and the c
 
 [What Claude may do without asking. What needs Damian, a landlord or the team. Money limits per landlord and per property.]
 
+Agreed with Damian, 17 September 2026:
+
+- Bank feed lines are matched to a tenancy only when the match is certain: the payment reference names the tenancy or invoice, or the payer name and amount match one tenant exactly. Anything less certain is left uncategorised and listed for a person to allocate. This applies to the backlog (over 760 uncategorised lines across the Property Sauce accounts on 17 September 2026) and to every day after.
+
+## Facts established 17 September 2026
+
+- The website's Zoho key now reads Zoho Books for Property Sauce (organisation 678590019), Beaucatt Homes, Beaumont Residential, Murray & Sullivan and Gladioli House, because contact@luxestay.co.uk was invited as a user. Montrose, Luxe Stay Virgin, Lancaster Residential Group and the Damian RBS organisations are still to be invited.
+- Property Sauce bank accounts in Books: Property Sauce (Virgin Money, rent in), Property Sauce Deposit, Property Sauce Fee, and a Lloyds Business Account. The Deposit and Fee feeds last refreshed on 4 August 2026 and may need reconnecting under Banking.
+- One Books customer per tenancy (for example "Flat 18 Catterick House - Chloe Louise Bostwick"), one invoice per rent period, payments recorded against invoices. Tenants' references vary: some use the invoice number, some a flat code, some free text.
+- Read the feed with GET /books/v3/banktransactions?organization_id=...&account_id=...&status=uncategorized; record a match with POST /books/v3/customerpayments or by categorising the transaction.
+
 ## 5. The procedure, step by step
 
 [Written by the chat from section 2, in plain steps. Each step says who or what does it, what it reads, what it writes, and what it sends.]
