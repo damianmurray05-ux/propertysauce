@@ -12,6 +12,8 @@ Read first: docs/OPERATIONS-PLAN.md (principles, architecture, agents A to G, co
 6. Plain English to tenants and landlords. Always say who, how and when.
 7. Bank account numbers never go into memory, docs, Slack or chat. They live in Zoho and the Drive sheet "Bank accounts by entity".
 
+Decisions Damian has given across operations are in decisions-2026-09-20.md (and later dated files); they override the individual files where they differ.
+
 Build order: 03, 05 and 07 first (the website already does most of that work), then 04 once rent matching is wired to Zoho Books, then 01 and 02, then the rest.
 
 | File | Operation |
