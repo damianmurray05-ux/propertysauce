@@ -96,4 +96,4 @@ Not on this register but tracked elsewhere: deposit protection certificate and t
 
 ## Lead time decision, 20 September 2026
 
-Damian: renewals are booked four weeks before expiry, across the board. Claude's view, for Damian to confirm or overrule: four weeks is right for EPCs and licences; gas and EICR renewals should be triggered at six weeks, because a failed access visit or an unanswered tenant can use up three weeks, and a gas check done inside the last two months keeps the original anniversary date. Until Damian answers, the routine uses four weeks everywhere.
+Settled by Damian: gas safety and EICR renewals are triggered six weeks before expiry; EPCs, licences and everything else four weeks before expiry. The reminder fires on that day, the engineer is booked the same day, and a failed visit is rebooked within two working days.
