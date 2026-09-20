@@ -126,7 +126,21 @@ Needs a person:
 - File upload is for Faster Payments only, so each line is limited to £30,000 and arrives the same day. Bacs (three-day, 5.10pm cut-off) is a separate facility that needs a Bacs ID and is not used for this run.
 - Approval in the Virgin Money Business app shows one item for the whole file, not one per payment. If it does not appear, Accounts, the account, "Payment Status and History" shows it.
 - The bank's list of reasons a file fails: sort codes starting with zero losing the leading zero (a spreadsheet problem, so the file must be written as text, never opened and re-saved in Excel); not using the bank's template; the file too large; extra spaces, commas or unexpected characters; and "incorrect or outdated payee details, including any deleted payees". That last point means every contractor must exist as a saved payee in "Manage your payees" before their line will upload, so setting up a new contractor includes a person creating the payee in the bank.
-- The "Read instructions (PDF)" and "Download an example (XLSX)" links inside the upload section both return "Page Not Found" as of 17 September 2026, so the column layout could not be read from the bank. The Virgin Money help site that the in-app "Help" links to has a broken certificate and does not load either. The remaining routes to the exact layout are the bank's live chat from inside Business Internet Banking, a one-line test upload to read the validation message, or the bank's "File Upload" how-to video in its Business Internet Banking playlist.
+- The "Read instructions (PDF)" and "Download an example (XLSX)" links inside the upload section both return "Page Not Found" (checked 17 and 20 September 2026), and the help site the in-app Help button points to has a broken certificate. The layout was therefore established by a test upload on 20 September 2026 with Damian's permission, read from the bank's own validation screen:
+
+**The upload file layout (confirmed 20 September 2026).** Plain CSV, one payment per line, comma separated, **no header row** (a header line is treated as a payment and rejected as "Input wrong length"). Seven columns in this order:
+
+| Column | Content | Notes |
+|---|---|---|
+| 1 | From Sort Code | six digits, no hyphens (the account the run is paid from) |
+| 2 | From Account Number | eight digits |
+| 3 | Payee Name | the contractor as saved under Manage your payees |
+| 4 | Payment Reference | the invoice number and ticket, kept short; the bank rejects references that are too long |
+| 5 | Payee Sort Code | six digits, no hyphens; leading zero preserved, so never open the file in Excel |
+| 6 | Payee Account Number | eight digits |
+| 7 | Amount | pounds and pence with a dot, no £ sign, no spaces |
+
+A one-line file in this shape passed the format check, and Damian then pressed Upload and authorised it: the £1 went out and came back on the Luxe Stay account the same evening, shown by the bank as "Payment Submitted, completed successfully", with the payee name and reference from the file appearing exactly as written. That test paid an account to itself, so it did not prove whether a payee that is not saved under Manage your payees is accepted, nor how Confirmation of Payee behaves on a name mismatch; the first real run should be one small payment to one known contractor before a full week's file. The bank's own wording on failures: "amounts that have unexpected letters or spaces, or references that are too long." The payment date is chosen on the screen at upload time, not in the file. The build script writes this file with the From columns taken from the paying account and the payee columns from the Books vendor record.
 
 Two things are not routes for us: Zoho Books has no payment link to Virgin Money UK, and Virgin Money's Open Banking File Payments API (JSON, up to 150 payments a file) is for licensed third-party providers only.
 
