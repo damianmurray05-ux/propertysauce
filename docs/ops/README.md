@@ -28,5 +28,5 @@ Build order: 03, 05 and 07 first (the website already does most of that work), t
 | 10 | Landlord statements and payouts |
 | 11 | Renewals and rent increases |
 | 12 | Complaints and redress |
-| 13 | Block and freehold management |
+| 13 | Leasehold flats in other people's blocks (freeholder work is Freehold Management's own ops list) |
 | 14 | Bookkeeping and reporting |

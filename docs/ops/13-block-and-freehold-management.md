@@ -1,6 +1,8 @@
-# Ops 13: Block and freehold management
+# Ops 13: Leasehold flats in other people's blocks
 
-Scope: service charges, buildings insurance, communal repairs, fire risk assessments, leaseholder questions.
+Scope (re-scoped 19 September 2026): only what Property Sauce does as managing agent for a landlord who owns a leasehold flat: receiving and checking service charge, ground rent and major works demands from the freeholder or their agent, paying them from the landlord's funds within the landlord's limit, challenging demands that fail the checks (the `service-charge-challenge` skill), chasing the freeholder for communal repairs and insurance copies, and relaying block notices to the tenant.
+
+Not in this file: running a block as freeholder. Service charge budgets, demands, insurance, communal repairs, fire safety, Section 20 and leaseholder arrears belong to Freehold Management Limited, a separate company with its own numbered operations in ~/Projects/freeholdmanagement/docs/ops/ (README.md there lists them, 01 to 14) and its own "Freehold Management" sidebar group.
 
 Status: template. Nothing below is agreed until Damian has dictated it and the chat for this operation has written it up.
 
