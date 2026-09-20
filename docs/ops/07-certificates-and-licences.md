@@ -92,3 +92,8 @@ Not on this register but tracked elsewhere: deposit protection certificate and t
 - Who the usual gas and electrical engineers are for each area, and whether Claude may book them without asking.
 - Payment list for engineers: build with Ops 06 as a weekly bank bulk-upload file.
 - Compliance check of all 160 let properties, 17 September 2026, is in 03-tenant-enquiries.md appendix C and 03-compliance-check-2026-09-17.csv: 5 gas and 5 EICR expired, 15 gas checks due by 11 November, insurance and licence dates stale on most records. Use it as the starting register once Damian confirms which gaps are real.
+
+
+## Lead time decision, 20 September 2026
+
+Damian: renewals are booked four weeks before expiry, across the board. Claude's view, for Damian to confirm or overrule: four weeks is right for EPCs and licences; gas and EICR renewals should be triggered at six weeks, because a failed access visit or an unanswered tenant can use up three weeks, and a gas check done inside the last two months keeps the original anniversary date. Until Damian answers, the routine uses four weeks everywhere.

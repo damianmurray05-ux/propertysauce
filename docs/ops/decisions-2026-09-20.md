@@ -11,4 +11,5 @@ Answers to the cross-cutting questions in open-questions-2026-09-20.pdf. Each Op
 7. **Zoho Books feeds:** Damian regards the bank feeds as connected and complete, all under the contact@luxestay.co.uk user. No reconnection is planned. Note for Ops 14: the Property Sauce Deposit and Fee feeds last refreshed on 4 August 2026; if new lines do not appear, raise it then.
 8. **Arrears handover to Marchbank & Vale Associates on day 21** (Ops 4 stands; Ops 3's day 17 draft is withdrawn). Marchbank & Vale is an arrears recovery service, never to be described as solicitors or legal representatives.
 9. **Rocky and Dave:** Usman asked on 20 September for full names, mobiles, emails and whether they will use Slack and Google Calendar.
-10. **Certificate renewal lead time:** still to decide (3, 4 or 8 weeks before expiry). See the explanation sent to Damian on 20 September.
+10. **Certificate renewal lead time:** four weeks before expiry across the board (Damian, later on 20 September). Claude recommended six weeks for gas and EICR; Damian to confirm or overrule (Ops 7 file).
+11. **Applicants database:** the Google Sheet "Applicants database" now exists in Drive at My Drive/Claude/01 Property Sauce/Lettings. Zoho held no applicant records, so nothing needed deleting.
