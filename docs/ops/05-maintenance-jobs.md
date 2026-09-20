@@ -35,7 +35,15 @@ Damian's account, 17 September 2026:
 
 `Maintenance_Ticket_Number` is the autonumber every message quotes (currently in the 2600s). The invoice fields belong to Ops 06.
 
-**Zoho CRM, Team module.** The contractor record for `Contractor1`. Ali Hassan exists (record 2406742000027550690, mobile on record). Sky Hayat exists. Rocky and Dave have no record yet (see section 10).
+**Zoho CRM, Team module.** The contractor record for `Contractor1`, with mobile and email on each:
+
+| Person | Area | Team record |
+|---|---|---|
+| Rocky (Rukhsar Hussain, spelt "Rukshar Hussain" in Zoho) | London repairs | 2406742000008532001 |
+| Vera Fernandas | London inspections | Zoho user, no Team record needed |
+| Ali Hassan | Catterick House, Blackpool | 2406742000027550690 |
+| Dave (David Newey) | Lancaster House | 2406742000023445248 |
+| Sky Hayat | Saffron Walden | 2406742000082271001 |
 
 **Zoho CRM, Contacts (Tenant) and Accounts (Landlord = property).** Tenant email and mobile for the booking email and the sign-off request; property postcode for grouping; `Established Landlord` for who is told about a job.
 
@@ -43,7 +51,7 @@ Damian's account, 17 September 2026:
 
 **Google Workspace (admin@propertysauce.co).** Drive folder "Maintenance Pictures" (ID 1aBuLh-Dig80w8YN9yg22GqaVB-8tjLWQ) with one subfolder per ticket: `<year>/<ticket number> <address>/before-1.jpg, after-1.jpg ...`. Google Calendar "Property Sauce Maintenance" (the office diary) with one event per booking, and each contractor invited so it lands in their own calendar. Reports on letterhead are saved in the same ticket folder.
 
-**Slack.** #maintenance (C0BSQHS6P55) is the office overview: every booking and completion is posted there with the ticket number. Area channels for the contractor conversation: #london-maintenance (C0C21E4BH2Q), #catterick-maintenance (C0C1ZMSNUFK), #maintenance-lancester-house (C0C1T2RDPGV). Emergencies to #claude-urgent (C0BTPPZ3JJE) and the area urgent channel (#london-urgent C0BUVF090F9, #catterick-urgent C0C00FQ4EDA, #lancaster-house-urgent C0BVARB5N74). Contractors on Slack today: Ali Hassan (U0BUVS5KGDT), Vera Fernandas (U0C06KTJ28K). Rocky and Dave are not on Slack (section 10).
+**Slack.** #maintenance (C0BSQHS6P55) is the office overview: every booking and completion is posted there with the ticket number. Area channels for the contractor conversation: #london-maintenance (C0C21E4BH2Q), #catterick-maintenance (C0C1ZMSNUFK), #maintenance-lancester-house (C0C1T2RDPGV). Emergencies to #claude-urgent (C0BTPPZ3JJE) and the area urgent channel (#london-urgent C0BUVF090F9, #catterick-urgent C0C00FQ4EDA, #lancaster-house-urgent C0BVARB5N74). Contractors on Slack: Ali Hassan (U0BUVS5KGDT), Vera Fernandas (U0C06KTJ28K), Dave (U0BUNS8TWER). Rocky is not in the workspace as of 20 September 2026 (section 10); until he is, his jobs are messaged to him by text and email from the Team record, and the Slack post in #london-maintenance is for the office only.
 
 **Email.** Bookings, sign-off requests and reports go from contact@propertysauce.co (Resend, as the assistant does today). Replies land in the propertysauce mailbox.
 
@@ -60,7 +68,7 @@ Claude may, without asking anyone:
 
 Needs a person:
 
-- Any job that needs a third-party contractor, a part or materials over £100, or in-house labour expected to exceed £150: Ezad or Usman pick the contractor and Ops 06 handles the quote and the landlord's approval. [Damian to confirm these figures and any per-landlord limit.]
+- Any job that needs a third-party contractor, a part or materials over £100, or in-house labour expected to exceed £150: Ezad or Usman pick the contractor and Ops 06 handles the quote and the landlord's approval. Figures confirmed by Damian on 20 September 2026; no landlord has a different limit.
 - Any booking outside 9 to 5 or at a weekend: the tenant and the contractor must both agree, and Damian is told.
 - A tenant who refuses access twice, or cannot be reached for five working days: Damian.
 - A closing report where the targets were missed: not sent; Damian decides.
@@ -179,8 +187,7 @@ Week 4: everything live. Reports (step 13) stay in propose-only mode for a furth
 
 ## 10. Open questions
 
-- Rocky and Dave: full names, mobile numbers, email addresses and whether they will use Slack and Google Calendar. Neither has a Team record in Zoho or a Slack account, so they cannot be booked or messaged automatically yet.
-- Authority limits in section 4: in-house labour £150 and materials £100 without asking. Confirm or change, and say whether any landlord has a different limit.
+- Rocky needs a Slack invite (to #london-maintenance and #london-urgent) and a Google account for the calendar invites. Damian believes he is already in Slack; as of 20 September 2026 he is not in the workspace member list, and the office five are the only members of #london-maintenance.
 - Photos: Drive as the permanent store with only a quick-view copy on the Zoho ticket. Confirm.
 - Should the "How to report a repair" text go into the tenancy agreement (Ops 02) as a clause, or only as the welcome email?
 - London inspections every six months and the other areas every three: confirm, and confirm Saffron Walden and Blackpool at six.
@@ -193,7 +200,7 @@ Week 4: everything live. Reports (step 13) stay in propose-only mode for a furth
 For this chat (Zoho, Drive, Calendar, Slack):
 
 1. Google Calendar "Property Sauce Maintenance" on admin@propertysauce.co, shared with each contractor. Done 17 September 2026.
-2. Zoho: add "Routine Inspection" to the `Maintenance_Issue1` picklist; create Team records for Rocky and Dave once section 10 is answered.
+2. Zoho: add "Routine Inspection" to the `Maintenance_Issue1` picklist. Team records for Rocky and Dave already existed; Dave's email corrected on 20 September 2026.
 3. Drive: year folder under "Maintenance Pictures" and the ticket-folder naming.
 4. The "How to report a repair" email and the closing-report letterhead template.
 5. The two Cowork routines in section 8, starting in propose-only mode.
