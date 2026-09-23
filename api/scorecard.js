@@ -26,11 +26,21 @@ export async function POST(request) {
   }
   if (!row) return json(404, { error: "not_found" });
   const card = scoreTenant(row);
+  // Every document on the tenant's own file and their property, newest first, with links that work only for this session.
+  let documents = [];
+  if (zohoConfigured() && s.id) {
+    try {
+      const { tenantFile } = await import("../src/chat/tenantfile.mjs");
+      const file = await tenantFile({ id: s.id, pid: s.pid });
+      documents = file.documents.map((d) => ({ type: d.type, title: d.title, date: d.date, url: d.url.startsWith("/api/file") ? `${d.url}&s=${encodeURIComponent(body.session)}` : d.url, drive: Boolean(d.drive) }));
+    } catch (e) { console.error("tenant documents failed", e.message); }
+  }
   return json(200, {
     firstName: (row.name || "").split(/\s+/)[0] || "there",
     address: row.address || "",
     ...card,
     jobs: (row.jobs || []).slice(0, 8),
     inspection: row.inspection || null,
+    documents,
   });
 }

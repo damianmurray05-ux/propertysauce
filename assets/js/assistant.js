@@ -128,18 +128,40 @@
   }
 
   /* --- Tenant verification --- */
+  // What to do once a tenant is verified: report a repair (default) or ask about their tenancy.
+  let afterVerify = "repair";
+  function startTenancy() {
+    setStatus("Tenancy questions");
+    if (state.session && state.tenant) {
+      begin("tenancy", `Hello ${state.tenant.firstName}. Ask me anything about your tenancy at ${state.tenant.address}: rent and balance, your deposit, certificates, inspections, repairs, or a copy of any document.`);
+      return;
+    }
+    say("Are you an existing tenant with a question about your own tenancy, or asking about renting with us in general?");
+    chips([
+      ["My own tenancy (sign in)", () => { afterVerify = "tenancy"; startVerify(); }],
+      ["A general question", () => begin("tenancy", "Happy to help. Are you an existing tenant, or have we offered you a tenancy? Tell me what you would like to know.")],
+    ]);
+  }
+  function verified() {
+    if (afterVerify === "tenancy") { afterVerify = "repair"; startTenancy(); }
+    else begin("repair", `Tell me what has gone wrong at ${state.tenant.address}, where in the property it is, and when it started. You can add up to two photos. If it is dangerous, ring ${PHONE} now.`);
+  }
   function startRepair() {
+    afterVerify = "repair";
     if (state.session && state.tenant) {
       begin("repair", `Hello ${state.tenant.firstName}. Tell me what has gone wrong at ${state.tenant.address}, where in the property it is, and when it started. You can add up to two photos.`);
       return;
     }
+    startVerify();
+  }
+  function startVerify() {
     setStatus("Verifying you first");
-    say("To make sure I am talking to the right person, I need your tenancy reference. It is on your tenancy agreement and on emails from us, and looks like PS-1234.");
-    say(`If you cannot find it, ring ${PHONE} or choose "I do not have my reference".`, "sys", false);
+    say("To make sure I am talking to the right person, I need to send you a one-time code. Type the email address or mobile number we hold for you, or your tenancy reference.");
+    say(`If none of those work, ring ${PHONE} or choose "Continue without verifying".`, "sys", false);
     askReference();
   }
   function askReference(attempt = 1) {
-    ask("Tenancy reference, e.g. PS-1234", async (ref) => {
+    ask("Email, mobile or tenancy reference", async (ref) => {
       const stop = typing();
       try {
         const res = await post(API.verify, { action: "lookup", reference: ref });
@@ -153,7 +175,7 @@
       } catch (e) {
         stop();
         if (e.status === 404 && e.data && e.data.error === "not_found") {
-          if (attempt < 2) { say("I could not find that reference. Check it and try once more."); askReference(attempt + 1); }
+          if (attempt < 2) { say("I could not match that to a tenancy. Check it and try once more, or try your mobile number or email address."); askReference(attempt + 1); }
           else { say("Still no match. I can take the report without verification and the team will check it against your file, or you can ring us."); chips([["Continue without verification", () => unverified("Reference not matched.")], [`Ring ${PHONE}`, () => { window.location.href = PHONE_HREF; }]]); }
         } else if (e.status === 503) {
           unverified("Verification is not switched on yet.");
@@ -163,8 +185,8 @@
     }, { autocomplete: "off" });
     if (attempt === 1) {
       const skip = document.createElement("button");
-      skip.type = "button"; skip.className = "chip"; skip.textContent = "I do not have my reference";
-      skip.addEventListener("click", () => { say("I do not have my reference", "me"); unverified("No reference given."); });
+      skip.type = "button"; skip.className = "chip"; skip.textContent = "Continue without verifying";
+      skip.addEventListener("click", () => { say("Continue without verifying", "me"); unverified("No details matched."); });
       actions.appendChild(skip);
     }
   }
@@ -192,7 +214,7 @@
         state.session = res.session; state.tenant = res.tenant; state.verifyToken = null; save();
         setStatus(`Verified: ${res.tenant.firstName}`);
         say(`Thanks ${res.tenant.firstName}, you are verified.`, "sys");
-        begin("repair", `Tell me what has gone wrong at ${res.tenant.address}, where in the property it is, and when it started. You can add up to two photos. If it is dangerous, ring ${PHONE} now.`);
+        verified();
       } catch (e) {
         stop();
         if (e.status === 400 && attempt < 3) { say("That code does not match. Try again."); askCode(attempt + 1); }
@@ -214,7 +236,7 @@
     say("Hello. I am the Property Sauce assistant. What do you need?");
     chips([
       ["Report a repair", startRepair],
-      ["Ask about my tenancy or a new agreement", () => { setStatus("Tenancy questions"); begin("tenancy", "Happy to help. Are you an existing tenant, or have we offered you a tenancy? Tell me what you would like to know."); }],
+      ["Ask about my tenancy or a new agreement", startTenancy],
       ["I am a landlord, owner or seller", () => { setStatus("Enquiries"); begin("general", "Tell me a little about the property, block or portfolio and what you need, and I will point you to the right person."); }],
     ]);
   }
@@ -237,7 +259,7 @@
   const openWith = (which) => {
     setOpen(true);
     if (which === "repair") { say("Report a repair", "me"); startRepair(); }
-    else if (which === "tenancy") { say("Ask about my tenancy or a new agreement", "me"); setStatus("Tenancy questions"); begin("tenancy", "Happy to help. Are you an existing tenant, or have we offered you a tenancy? Tell me what you would like to know."); }
+    else if (which === "tenancy") { say("Ask about my tenancy or a new agreement", "me"); startTenancy(); }
   };
   document.querySelectorAll("[data-open-chat]").forEach((b) => b.addEventListener("click", () => openWith(b.dataset.openChat)));
   /* Deep links for emails and letters: /tenants/#repair opens the repair flow, #assistant just opens the assistant. */

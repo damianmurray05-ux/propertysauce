@@ -3,7 +3,7 @@
 // verified tenant comes from the signed session, never from the transcript.
 import Anthropic from "@anthropic-ai/sdk";
 import { systemPrompt } from "../src/chat/prompt.mjs";
-import { tools, runTool } from "../src/chat/tools.mjs";
+import { toolsFor, runTool } from "../src/chat/tools.mjs";
 import { verify } from "../src/chat/crypto.mjs";
 import { limit } from "../src/chat/ratelimit.mjs";
 
@@ -49,21 +49,23 @@ export async function POST(request) {
   const clean = sanitise(body.messages);
   if (!clean) return json(400, { error: "bad_messages" });
 
-  let tenant = null;
-  if (mode === "repair") {
-    const s = verify(body.session);
-    if (!s || s.t !== "session" || s.expired) return json(401, { error: "session_expired" });
+  // A verified tenant (signed session) is known in every mode; repair mode requires it.
+  let tenant = null, session = "";
+  const s = body.session ? verify(body.session) : null;
+  if (s && s.t === "session" && !s.expired) {
     tenant = { reference: s.ref, id: s.id || "", propertyId: s.pid || "", name: s.name, address: s.address, email: s.email, phone: s.phone };
+    session = body.session;
   }
+  if (mode === "repair" && !tenant) return json(401, { error: "session_expired" });
 
   const client = new Anthropic({ maxRetries: 2, timeout: 60_000 });
-  const ctx = { tenant, mode, photos: clean.photos, raised: [] };
+  const ctx = { tenant, session, mode, photos: clean.photos, raised: [] };
   const messages = clean.messages;
   const base = {
     model: MODEL,
     max_tokens: 1500,
     system: [{ type: "text", text: systemPrompt({ mode, tenant }), cache_control: { type: "ephemeral" } }],
-    tools,
+    tools: toolsFor(tenant),
     output_config: { effort: process.env.CHAT_EFFORT || "medium" },
   };
 

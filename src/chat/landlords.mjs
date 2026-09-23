@@ -123,7 +123,11 @@ export function docTitle(type, name, filedDate) {
   return when ? `${label}, ${when}` : label;
 }
 const CURRENT = new Set(["Tenanted", "Arrears", "Possession Proceedings", "Court", "Let Agreed", "Maintenance Only"]);
-function classify(name) {
+/* Certificates held in Drive for a property, as document rows (shared with the tenant file). */
+export function driveDocuments(propertyId) {
+  return (driveCerts[propertyId] || []).map((d) => { const type = d.type === "eic" ? "eicr" : d.type === "fire" ? "other" : d.type || classify(d.name); return { type, title: docTitle(type, "", d.date), file: d.name, date: d.date || "", url: d.url || "", amount: null, drive: true }; });
+}
+export function classify(name) {
   const n = String(name || "").toLowerCase();
   if (/tenancy|ast|agreement|lease/.test(n)) return "tenancy";
   if (/gas|cp12|landlord.?gas/.test(n)) return "gas";

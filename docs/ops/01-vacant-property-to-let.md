@@ -39,7 +39,7 @@ Damian's account, 19 September 2026, with the office spreadsheet "Moving a Tenan
 
 **Zoho Books, Property Sauce organisation 678590019.** One customer per tenancy named "<address> - <tenant name>", one recurring invoice for the rent on `Rent_Due_Date`, and a one-off invoice for the first month and the deposit so the incoming payment matches in the bank feed (Ops 04). The MCP connector can create a contact and an invoice; creating a recurring invoice goes through the website's Zoho key (Ops 04 facts) or a person until that is built.
 
-**OpenRent.** No connector. Claude writes the ad and posts it in Chrome on the office OpenRent login (Damian, 20 September). Enquiries arrive by email to the Lettings alias, lettings@propertysauce.co, in the propertysauce mailbox (Ops 08 reads it; there is no Lettings send-as yet, so replies go from the Tenant record in Zoho CRM). London: one ad per property, placed at notice and taken down at let agreed. Catterick House and Lancaster House: permanent ads.
+**OpenRent.** No connector. Account 3944818, user Usman, registered email Lettings@propertysauce.co (changed from admin@ on 31 August 2026). OpenRent's messaging is a relay: a tenant's message arrives as a "New OpenRent Viewings" email to Lettings@ with the tenant's first name and viewing availability, and the tenant's own email and phone are only on the enquiry thread on the site. A reply reaches the tenant only if it is sent from the registered address or posted on the site; on 2, 6 and 13 September 2026 replies sent from admin@propertysauce.co bounced with "that address is not registered with OpenRent". So there are two working routes and both need a one-off set-up: (1) email replies from lettings@propertysauce.co, which needs a Gmail "Send mail as" alias on admin@propertysauce.co (section 10); (2) replies on the site in Chrome, which needs Damian or Usman to sign Chrome in to OpenRent once, because the login is a password and Claude does not enter passwords. Claude writes the ad and posts it in Chrome on the office OpenRent login (Damian, 20 September). OpenRent chases after 48 hours, and if enquiries go unanswered for a week it gives three days' notice before marking the advert unavailable and cancelling viewings; it also pauses an advert at 100 enquiries (the Lancaster House 2-bed advert 2892805 passed 70 on 7 September 2026). London: one ad per property, placed at notice and taken down at let agreed. Catterick House and Lancaster House: permanent ads.
 
 **The database of potential tenants** (Damian, 20 September 2026: applicants are never stored in Zoho CRM; a person goes into Zoho only when they become a tenant with a signed agreement). It is the Google Sheet "Applicants database" in Drive, My Drive/Claude/01 Property Sauce/Lettings, one row per enquiry: date received, name, email, mobile, area wanted, property or block, source, move-in date wanted, household, gross annual income, pre-qualified, viewing date, viewer, outcome, holding deposit taken, last contacted, notes, thread link. Every enquiry from any source is added the day it arrives, whether or not it pre-qualifies. Anyone last contacted more than six months ago is sent E1 again rather than offered a viewing straight away. Emails to applicants go from lettings@propertysauce.co (the Ops 08 mailbox), not from a Zoho record, and the thread link goes in the row.
 
@@ -97,7 +97,7 @@ Needs a person:
 
 **Step 4. The database, same day.** Filter the Applicants database sheet by area or building and send E1 to each row from lettings@propertysauce.co, updating the "Last contacted" cell. E1 doubles as the pre-qualification, so nobody is booked from the database without answering it.
 
-**Step 5. Pre-qualify every enquiry.** Every OpenRent enquiry arriving at lettings@propertysauce.co is added as a row in the Applicants database sheet (name, email, mobile, area, source OpenRent, thread link) and gets E1 from lettings@ within one working hour in office hours. E1 asks:
+**Step 5. Pre-qualify every enquiry.** Every OpenRent enquiry arriving at lettings@propertysauce.co is added as a row in the Applicants database sheet (name, email, mobile, area, source OpenRent, thread link) and gets E1 from lettings@ within one working hour in office hours. **Lancaster House studios** (any flat with a letter in its number: 1a, 2a, 3a, 4a, 5a, 6a, 25a, 26a, 32a, 32b, 32c) get E1-LH instead (Damian, 21 September 2026): his studio description followed by the same questions, because those rooms are let on a house-share basis with no postal address of their own, water and Wi-Fi included, electricity on a top-up meter and no council tax banding, and the applicant needs to know that before a viewing is booked. E1 asks:
 
 1. Are you still looking, and when do you want to move?
 2. Who will live there (adults and children) and any pets?
@@ -171,6 +171,7 @@ Built on 20 September 2026: the E1 to E5 templates as Zoho CRM email templates o
 - **Holding deposit.** Resolved on 20 September 2026: the office spreadsheet's holding deposit stays, as step 7a, taken only on the signed form H1 and refunded in Ops 02. The old form in Drive ("Your Holding Deposit Explained", H&B Lettings, 2021) carries another agency's name and address and speaks of an assured shorthold tenancy and fees; H1 below replaces it. Refund confirmed by Damian on 20 September 2026, never a credit. Still open: whether Damian wants the ad taken down or left up while the holding deposit is held.
 - **Settled by Damian on 20 September 2026.** Claude posts to OpenRent and orders Homelet references in Chrome on the office logins. Vera views in London (Rocky is maintenance only; "Rauf" was a mis-hearing), Sky in Essex, and Saffron Walden is never viewed. Income test is 2.5 times the annual rent, joint tenants combined. The section 9 build list is approved; the applicant status turned out to exist already as Application Stage. Blank copies of every document are available from Damian on request.
 - **With Usman** (Slack DM, 20 September 2026): confirm the 2.5 multiple and the guarantor multiple; whether to save the three documents as DocuSign templates with the tabs fixed, landlord first; who views in Blackpool; Slack invites for Rocky and Sky; the blank documents; and a voiced-over screen video of the DocuSign envelope routine (landlord first, tenant second), which is what the envelope build in section 9 will follow.
+- **OpenRent replies, urgent (21 September 2026).** Seven or more Lancaster House enquiries were unanswered on 21 September (Sarah Ann Ibbetson, Michelle Morgan and George Danson had each chased after 48 hours; Anulakshmi, Chidiebere, Peter and Shannell had asked for viewings on 6 to 8 September; OpenRent reported five unread messages on 21 September and warned on 20 September that the advert would be treated as unavailable in three days). Two set-up steps unblock Claude, either one is enough to start: (a) Damian or Usman signs Damian's Chrome in to OpenRent once, so Claude can read each thread and reply on the site; (b) lettings@propertysauce.co is added as a Gmail "Send mail as" address on admin@propertysauce.co (Gmail settings, Accounts and Import, Send mail as, Add another email address, tick "Treat as an alias", verify with the code that arrives in the same inbox), so Claude can reply by email from the registered address through the connector. Until one is done, nothing Claude sends reaches an OpenRent applicant.
 - **With Muzammel** (Slack DM, 20 September 2026): a voiced-over screen video of creating the Zoho Books customer, the first-month-and-deposit invoice and the recurring rent invoice, which is what the Books build in section 9 will follow.
 - **Superseded template.** The old CRM template "New Let Move In Important Info - Tenant" (2019, last used 7 September 2026) talked about a fixed-term AST, rent review clauses and a 5% increase at the end of the term, none of which survive the Renters' Rights Act. Damian agreed on 20 September 2026 to retire it; it was renamed "RETIRED 20 Sep 2026 pre-RRA replaced by Ops01 E3 - New Let Move In Important Info - Tenant" the same day (kept, not deleted, so old sends stay readable). E3 replaces it and was updated to list the Renters' Rights Act Information Sheet 2026 and the block fire safety letter.
 - **Blank documents.** Usman was asked by Slack DM on 20 September 2026 (at Damian's request) to supply them as Word files (.docx), dropped into the Drive folder that holds the letting videos and spreadsheet: the Assured Periodic Tenancy Agreement (the version used for The Annexe on 19 September 2026) and the "Required Document Checklist" that each tenant signs at the start (the Lord Street version of 24 February 2025 lists EPC, gas safety, EICR, Mydeposits certificate, prescribed information, How to Rent guide, Mydeposits leaflet, inventory and landlord licence, plus the email-service authority and the alarm confirmation). Word rather than PDF so the fields can be merged. The deposit certificate comes from Mydeposits per tenancy, so no blank is needed.
@@ -205,6 +206,40 @@ Before we book a viewing we ask everyone the same short questions, so that we on
 7. Please attach a copy of your passport or driving licence, and if you are not a UK or Irish citizen, your right-to-rent share code from gov.uk.
 
 We reply within one working day. If the answers fit the property we will offer you two viewing times straight away.
+
+Kind regards,
+[name], Property Sauce
+
+### E1-LH: Lancaster House studio enquiry (Zoho template "Ops01 E1-LH - Lancaster House studio enquiry", added 21 September 2026)
+
+Subject: Brand-New Luxury Self-Contained Studio Room, Water & Wi-Fi Included, Cramlington: £[rent] pcm
+
+Dear [first name],
+
+Thank you for your enquiry about [flat] Lancaster House, Brownrigg Drive, Cramlington. Before we book a viewing, here is what the room is and what it costs, and a few questions so we only take up your time if it is the right fit.
+
+**Brand-New Luxury Self-Contained Studio Room, Water & Wi-Fi Included, Cramlington, £[rent] pcm**
+
+All the privacy of your own flat, with the simplicity of a house share.
+
+These brand-new, self-contained rooms have been finished to a genuinely high standard, and everything is yours alone:
+
+- Private en-suite shower room
+- Own fitted kitchen with integrated washing machine, dishwasher and fridge freezer
+- Brand new throughout: be the first to live here
+- Water and Wi-Fi included
+
+One bill. That's it.
+
+The rooms are let on a house-share basis and do not have their own individual postal address. As a result, the only bill you currently pay is electricity, via a simple top-up meter.
+
+The rooms are not currently banded for council tax. Should that ever change, council tax would be the tenant's responsibility. To be clear, we have no reason to expect this to change.
+
+Rooms of this quality at this price go quickly.
+
+A few quick questions. [E1 questions 1 to 7, unchanged.]
+
+We reply within one working day. If the answers fit, we will offer you two viewing times straight away.
 
 Kind regards,
 [name], Property Sauce

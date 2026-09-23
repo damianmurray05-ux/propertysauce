@@ -65,11 +65,31 @@ export const tools = [
   },
 ];
 
+/* Read-only tools for a verified tenant: their own file, nothing else. The
+   tenant identity comes from the signed session, so the model cannot ask
+   about anyone else's tenancy. */
+const noInput = { type: "object", additionalProperties: false, properties: {}, required: [] };
+export const tenantTools = [
+  { name: "my_tenancy", description: "The signed-in tenant's own tenancy: property, rent and due day, payment reference, deposit protection, tenancy start, next inspection, and whether each certificate for the property is in date. Call this for any question about their rent, balance, deposit, certificates or inspection.", strict: true, input_schema: noInput },
+  { name: "my_repairs", description: "The signed-in tenant's repair tickets with the stage each is at. Call this when they ask what is happening with a repair.", strict: true, input_schema: noInput },
+  { name: "my_documents", description: "Every document on the signed-in tenant's file with a link they can open: tenancy agreement, deposit certificate, inventory, gas safety, EICR, EPC, licence, statements. Call this when they ask for a copy of anything.", strict: true, input_schema: noInput },
+];
+export const toolsFor = (tenant) => (tenant ? [...tools, ...tenantTools] : tools);
+
 const lines = (obj) => Object.entries(obj).filter(([, v]) => v !== undefined && v !== "").map(([k, v]) => `${k.replace(/_/g, " ")}: ${v}`).join("\n");
 
 export async function runTool(name, input, ctx) {
   let ref = reference();
   const when = new Date().toLocaleString("en-GB", { timeZone: "Europe/London" });
+  if (/^my_/.test(name)) {
+    if (!ctx.tenant || !ctx.tenant.id || !zohoConfigured()) return "The tenant's file is not available in this conversation. Offer to log the question for the team.";
+    const { tenantFile, rentAccount, describeTenancy, describeRepairs, describeDocuments } = await import("./tenantfile.mjs");
+    const file = await tenantFile({ id: ctx.tenant.id, pid: ctx.tenant.propertyId });
+    if (!file.tenant) return "The tenancy record could not be read just now. Apologise and offer to log the question for the team.";
+    if (name === "my_tenancy") { const rent = await rentAccount(file.tenant).catch(() => null); return describeTenancy(file, rent); }
+    if (name === "my_repairs") return describeRepairs(file);
+    if (name === "my_documents") return describeDocuments(file, ctx.session);
+  }
   if (name === "raise_repair") {
     const verified = Boolean(ctx.tenant);
     let ticket = "";

@@ -6,3 +6,5 @@ dist/
 .DS_Store
 *.src.jpg
 scripts/zoho.env
+
+out/

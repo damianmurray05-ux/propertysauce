@@ -2,7 +2,7 @@
 
 Scope: gas, electrical, EPC, fire, selective and HMO licences, renewed before expiry, every certificate kept for the tenancy and a copy sent to the tenant.
 
-Status: dictated by Damian on 17 September 2026 and written up by the Ops 7 chat. The certificate list in section 5 is proposed and waits for Damian's confirmation. Sections 3, 4, 6 to 9 are written once the list is agreed. No HMOs in the portfolio.
+Status: dictated by Damian on 17 September 2026, register confirmed 20 September 2026. Block items (fire, alarms, extinguishers, asbestos, lifts) moved to Freehold Management FM Ops 08 the same day. Waiting on Usman for the engineer list and the selective-licence list. No HMOs in the portfolio.
 
 ## 1. What this operation covers
 
@@ -19,6 +19,13 @@ Damian's instructions, 17 September 2026:
 - Check every certificate before it is filed. The landlord section must carry the exact owner name as at Land Registry, whether that is a limited company or a person. The property address must be written in full with the full postcode. Tell the engineer this when booking, in an email that says: "Can you please ensure that you write this out to the landlord: [landlord name] at [full property address and postcode]." Then check the certificate when it arrives.
 - Email every certificate to the tenant, and send it from Zoho CRM (open the tenant's profile, Send Email) so the email is stored on the tenant's record. The same rule applies to any important document or email that may need to be relied on later, such as a final maintenance confirmation receipt. Routine back-and-forth (arranging viewings, inspection times, general conversation) goes by ordinary Gmail so the CRM does not get cluttered.
 - Later addition: a list of payments to be made to engineers, which Damian uploads in bulk to the bank once a week. To be built with Ops 06.
+
+Damian, 20 September 2026:
+
+- Block certificates (fire risk assessment, alarms and emergency lighting, extinguishers, asbestos, lifts) belong to block management, not here. Moved to FM Ops 08.
+- Once every certificate is on file, do a reconciliation: check every date in Zoho CRM under the Landlord module against the document itself and correct Zoho where they differ.
+- Claude may book the usual engineers without asking. Usman knows who they are per area.
+- Usman knows which properties do not carry a selective licence.
 
 ## 3. Systems and records touched
 
@@ -38,11 +45,22 @@ Other systems: Drive folder per property for the PDF; contact@propertysauce.co f
 
 ## 4. Decision limits
 
-[To confirm with Damian: may Claude book a renewal with the usual engineer without asking, and up to what price? Who chooses a new engineer?]
+Claude may, without asking anyone:
+
+- Book a renewal with the usual engineer for that area (list from Usman, section 10) at any time inside Monday to Friday, 9 to 5, and agree the date with the tenant.
+- Send the engineer the landlord-name and full-address instruction, the tenant the access request, the tenant's certificate copy from Zoho CRM, and the Slack posts.
+- Set the expiry date in Zoho from the document once it has been checked.
+
+Needs a person:
+
+- A new or different engineer: Usman picks.
+- A certificate that fails the checks (wrong landlord name, wrong or partial address, missing postcode, C1 or C2 faults, EPC below E): Claude sends it back to the engineer and tells Usman; Damian is told if it is not corrected within five working days.
+- Remedial work from an EICR or gas check: a Maintenance ticket under Ops 05, and Ops 06 for anything over the in-house limits.
+- Paying the engineer: Ops 06.
 
 ## 5. The procedure, step by step
 
-### 5a. Certificate and licence register (proposed, to confirm)
+### 5a. Certificate and licence register (confirmed 20 September 2026)
 
 Applies to England. "Copy to tenant" is the legal deadline for giving the tenant a copy.
 
@@ -55,18 +73,13 @@ Applies to England. "Copy to tenant" is the legal deadline for giving the tenant
 | Smoke and carbon monoxide alarm test | Every property | Tested on the first day of every new tenancy | Recorded on the check-in inventory | Not a certificate but a dated record. Smoke alarm every storey; CO alarm in every room with a fixed gas or solid-fuel appliance (not a cooker) |
 | Legionella risk assessment | Every property | Review every 2 years or when the water system changes | Not required | Written assessment; a simple one for an ordinary flat |
 | Portable appliance test (PAT) | Properties let with landlord's appliances | 12 months (best practice, not law) | Not required | Some selective-licence conditions require it |
-| Fire risk assessment (common parts) | Every block where Property Sauce is responsible for the common parts: Catterick House, Lancaster House, any London block | Review every 12 months and after any change | Not required | Regulatory Reform (Fire Safety) Order 2005. May belong in Ops 13 |
-| Fire alarm and emergency lighting service (common parts) | Same blocks | Alarm serviced every 6 months, tested weekly; emergency lighting tested monthly, 3-hour test yearly | Not required | Test logs kept in the block file |
-| Fire extinguisher service (common parts) | Same blocks | 12 months | Not required | |
-| Asbestos survey (common parts) | Same blocks if built before 2000 | Once, then reviewed yearly | Not required | Control of Asbestos Regulations 2012 |
-| Lift inspection (LOLER) | Any block with a passenger lift | 6 months | Not required | |
 | Oil boiler service (OFTEC) | Any property with oil heating | 12 months | Best practice | Only if any property has oil |
 
-Not on this register but tracked elsewhere: deposit protection certificate and the How to Rent guide (Ops 02), buildings insurance renewal (Ops 13), the private rented sector landlord database under the Renters' Rights Act once registration opens.
+Not on this register but tracked elsewhere: block common-parts items (fire risk assessment, alarm and emergency lighting servicing, extinguishers, asbestos survey, lift inspection) in Freehold Management FM Ops 08; deposit protection certificate and the How to Rent guide in Ops 02; buildings insurance renewal in Ops 13; the private rented sector landlord database under the Renters' Rights Act once registration opens.
 
 ### 5b. Steps
 
-[Written once 5a is confirmed. Outline: register check daily; three weeks out, email engineer with the landlord-name and full-address instruction and email tenant for access dates; book; receive certificate; check name, address, dates, codes; file in Drive and on the Zoho record; set the new expiry date from the document only; send tenant copy from Zoho CRM; raise the engineer's payment for Ops 06.]
+[Step 0, once: collect every current certificate into Drive, then reconcile every date in the Zoho Landlord record against the document and correct Zoho. Then the routine. Outline: register check daily; three weeks out, email engineer with the landlord-name and full-address instruction and email tenant for access dates; book; receive certificate; check name, address, dates, codes; file in Drive and on the Zoho record; set the new expiry date from the document only; send tenant copy from Zoho CRM; raise the engineer's payment for Ops 06.]
 
 ## 6. Escalation
 
@@ -86,10 +99,8 @@ Not on this register but tracked elsewhere: deposit protection certificate and t
 
 ## 10. Open questions
 
-- Confirm the register in 5a: anything to add or remove, and whether the block items (fire, lifts, asbestos) sit here or in Ops 13.
-- Which properties are in a selective-licensing area today, and which councils. Claude can check each council once the address list is confirmed.
-- The spreadsheet: Zoho is the single source of truth (README rule 1), so the sheet should be a Google Sheet generated from the Zoho Landlord records, not typed by hand. Confirm.
-- Who the usual gas and electrical engineers are for each area, and whether Claude may book them without asking.
+- Asked Usman on Slack, 20 September 2026: the usual gas and electrical engineers per area (name, email, phone), and which properties do not carry a selective licence. Waiting for his reply.
+- The spreadsheet is generated from the Zoho Landlord fields in section 3 after the reconciliation in 5b step 0. Fields to add for legionella, PAT and the alarm test date.
 - Payment list for engineers: build with Ops 06 as a weekly bank bulk-upload file.
 - Compliance check of all 160 let properties, 17 September 2026, is in 03-tenant-enquiries.md appendix C and 03-compliance-check-2026-09-17.csv: 5 gas and 5 EICR expired, 15 gas checks due by 11 November, insurance and licence dates stale on most records. Use it as the starting register once Damian confirms which gaps are real.
 

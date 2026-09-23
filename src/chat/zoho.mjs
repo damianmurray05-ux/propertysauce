@@ -125,13 +125,30 @@ export function mapRecord(rec) {
   };
 }
 
+/* A tenant may sign in with their tenancy reference, the email address on
+   their record, or the mobile number on their record. The one-time code still
+   goes only to the details we hold, so knowing an email address is never
+   enough on its own. */
 export async function findTenantInZoho(reference) {
-  const want = normaliseRef(reference);
-  if (want.length < 4) return null;
-  const crit = `((Rent_Payment_Reference:equals:${want})or(Property_Sauce_Reference:equals:${want})or(Homelet_Number:equals:${want}))`;
-  let rows = await search("Contacts", crit, TENANT_FIELDS, 20);
-  if (!rows.length) rows = (await search("Contacts", `(Rent_Payment_Reference:starts_with:${want.slice(0, 5)})`, TENANT_FIELDS, 20)).filter((r) => normaliseRef(r.Rent_Payment_Reference) === want);
+  const typed = String(reference || "").trim();
+  let rows = [];
+  if (typed.includes("@")) {
+    const e = normaliseEmail(typed);
+    rows = await search("Contacts", `((Email:equals:${e})or(Tenant_2_Email:equals:${e}))`, TENANT_FIELDS, 20);
+  } else if (/^\+?[\d\s()-]{9,16}$/.test(typed)) {
+    const p = normalisePhone(typed), local = "0" + p.replace(/^\+44/, "");
+    rows = await search("Contacts", `((Mobile:equals:${p})or(Mobile:equals:${local})or(Tenant_1_Phone:equals:${p})or(Tenant_1_Phone:equals:${local})or(Phone:equals:${p})or(Phone:equals:${local}))`, TENANT_FIELDS, 20);
+    if (!rows.length) rows = (await search("Contacts", `((Mobile:ends_with:${p.slice(-9)})or(Tenant_1_Phone:ends_with:${p.slice(-9)}))`, TENANT_FIELDS, 20)).filter((r) => normalisePhone(r.Mobile || r.Tenant_1_Phone) === p);
+  } else {
+    const want = normaliseRef(reference);
+    if (want.length < 4) return null;
+    const crit = `((Rent_Payment_Reference:equals:${want})or(Property_Sauce_Reference:equals:${want})or(Homelet_Number:equals:${want}))`;
+    rows = await search("Contacts", crit, TENANT_FIELDS, 20);
+    if (!rows.length) rows = (await search("Contacts", `(Rent_Payment_Reference:starts_with:${want.slice(0, 5)})`, TENANT_FIELDS, 20)).filter((r) => normaliseRef(r.Rent_Payment_Reference) === want);
+  }
   const mapped = rows.map(mapRecord).filter((t) => t.current);
+  // Two current tenancies on one email or number (a joint tenant, a landlord's own flat): take the most recent.
+  mapped.sort((a, b) => String(b.raw.Tenancy_Start_Date || "").localeCompare(String(a.raw.Tenancy_Start_Date || "")));
   return mapped[0] || null;
 }
 export async function tenantById(id) {

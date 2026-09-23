@@ -13,11 +13,17 @@ export async function GET(request) {
   if (!zohoConfigured()) return text(404, "Not available");
   const u = new URL(request.url);
   const s = verify(u.searchParams.get("s"));
-  if (!s || s.t !== "landlord" || s.expired) return text(401, "Your sign-in has expired. Go back to the portal and sign in again.");
+  if (!s || !(s.t === "landlord" || s.t === "session") || s.expired) return text(401, "Your sign-in has expired. Go back to the portal and sign in again.");
   const module = u.searchParams.get("m"), record = u.searchParams.get("r"), attachment = u.searchParams.get("a");
-  if (!/^(Accounts|Maintenance)$/.test(module || "") || !/^\d+$/.test(record || "") || !/^\d+$/.test(attachment || "")) return text(400, "Bad request");
-  const props = await propertiesByLandlordEmail(s.ref);
-  if (!props.some((p) => p.id === record)) return text(403, "That document is not on one of your properties.");
+  if (!/^(Accounts|Maintenance|Contacts)$/.test(module || "") || !/^\d+$/.test(record || "") || !/^\d+$/.test(attachment || "")) return text(400, "Bad request");
+  if (s.t === "session") {
+    // A tenant may open documents on their own tenant record or their own property record, nothing else.
+    const mine = (module === "Contacts" && record === String(s.id)) || (module === "Accounts" && record === String(s.pid));
+    if (!mine) return text(403, "That document is not on your tenancy file.");
+  } else {
+    const props = await propertiesByLandlordEmail(s.ref);
+    if (!props.some((p) => p.id === record)) return text(403, "That document is not on one of your properties.");
+  }
   const upstream = await fetchAttachment(module, record, attachment);
   if (!upstream.ok) return text(502, "The document could not be fetched from the file store.");
   const headers = new Headers();

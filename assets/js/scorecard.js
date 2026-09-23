@@ -174,6 +174,12 @@
     $("#sc-rewards").innerHTML = rewards.length ? rewards.join("") : `<li class="soon">${icon("clock")}<span>Rewards start at Silver. ${d.next ? `${d.next.pointsNeeded} points to go.` : ""}</span></li>`;
     $("#sc-tips").innerHTML = d.tips.map((t) => `<li>${icon("arrow-right")}<span>${esc(t)}</span></li>`).join("");
 
+    // Every document on the tenant's file, grouped by kind, newest first. Links work only for this sign-in.
+    const TYPES = { tenancy: "Tenancy agreement and deposit", gas: "Gas safety certificates", eicr: "Electrical reports", epc: "Energy performance certificates", licence: "Property licence", inventory: "Inventories and inspections", statement: "Statements", invoice: "Invoices", other: "Other documents" };
+    const docs = d.documents || [];
+    const groups = {};
+    for (const doc of docs) (groups[TYPES[doc.type] ? doc.type : "other"] ||= []).push(doc);
+    $("#sc-docs").innerHTML = docs.length ? `<section class="sc-card"><h3>Your documents <span class="sc-count">${docs.length}</span></h3>${Object.keys(TYPES).filter((k) => groups[k]).map((k) => `<h4 class="sc-doc-kind">${TYPES[k]}</h4><ul class="sc-doclist">${groups[k].map((doc) => `<li>${doc.url ? `<a href="${esc(doc.url)}" target="_blank" rel="noopener">${esc(doc.title)}</a>` : `<span>${esc(doc.title)}</span>`}<small>${esc(doc.date || "")}${doc.drive ? " · opens in Google Drive" : ""}</small></li>`).join("")}</ul>`).join("")}<p class="sc-note">Every certificate we hold for your home is kept here for the whole of your tenancy. Missing something? Ask the assistant and it will be sent to you.</p></section>` : `<section class="sc-card"><h3>Your documents</h3><p class="sc-note">Nothing is filed for your tenancy yet. Ask the assistant for any document you need and the team will send it.</p></section>`;
     $("#sc-jobs").innerHTML = jobs.length ? `<section class="sc-card"><h3>Your repairs <span class="sc-count">${open} open</span></h3><ul class="sc-joblist">${jobs.map((j) => `<li><span class="sc-status ${j.closed ? "done" : "open"}">${esc(window.PSCharts.stage(j.status, j.closed))}</span><div><strong>${esc(window.PSCharts.jobTitle(j.title, d.address))}</strong><small>${esc(j.ticket ? `Ticket ${j.ticket} · ` : "")}${esc(j.created || "")}</small></div></li>`).join("")}</ul></section>` : "";
   }
 

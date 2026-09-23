@@ -18,10 +18,12 @@ Damian's instructions, 17 September 2026:
 - There was no written chasing protocol. Damian asked for one to be devised from common practice, with a recommended point for handing the file to Marchbank & Vale. He confirmed the timetable in section 5 the same day.
 - Some tenancies have a guarantor, some do not. Where there is one, the deed of guarantee is on file and listed on the tenant's Zoho CRM record.
 - Marchbank & Vale Associates handles possession claims as well as money recovery (see section 5c for how that works within the law).
+- Marchbank & Vale phones tenants as well as writing. The calls are automated AI calls from a dedicated number (number being set up, 20 September 2026). Guardrails in 5c.
+- Damian does not mind who signs claim forms and left the choice to this chat. Decision in 5c.
 
 ## 3. Systems and records touched
 
-- **Zoho Books**, Property Sauce organisation 678590019: customers (one per tenancy), recurring invoices, customer payments, bank feed (Property Sauce Virgin Money for rent in; Deposit and Fee accounts; Lloyds Business Account).
+- **Zoho Books**, Property Sauce organisation 678590019: customers (one per tenancy), recurring invoices, customer payments, bank feed (Property Sauce Virgin Money for rent in; Deposit and Fee accounts; Lloyds Business Account). The payment reference each tenant must use is the Books customer custom field **Unique Reference Number** (`cf_unique_reference_number`, for example SSTEVEFLAT22 or NE236UNFLAT07). That field is the reference the wrong-reference rule in 5a checks against.
 - **Zoho CRM, Tenant (Contacts) record**: rent due day, payment reference, last payment date and amount, arrears balance, arrears stage, next action date, guarantor details, "Tenant 1 Mobile" (`Tenant_1_Phone`) for SMS and calls. Every reminder, call and letter is written to the record. Formal letters are sent from the record (Send Email) so they sit on the tenant's file.
 - **Zoho CRM, Landlord (Accounts) record**: who is told and when; the Established Landlord picklist decides ownership (README rule 4).
 - **Channels**: SMS and calls through Twilio or Inkbox; email from contact@propertysauce.co for routine reminders; Zoho CRM Send Email for formal letters; post for the day 14 letter and anything Marchbank & Vale sends.
@@ -107,6 +109,18 @@ Files carrying a hardship, vulnerability or dispute flag are not handed over aut
 - Where the landlord is **anyone else** (the older agreements name the owner, for example Sturge East Residential Ltd), the landlord is the claimant. They sign the claim form and the statement of truth, the claim is filed in their name, and they attend the hearing themselves or instruct a solicitor or barrister for the day. Marchbank & Vale does not sign, file or speak for them.
 - Nothing from Marchbank & Vale ever says or implies solicitor, lawyer, legal advice or legally qualified. "Recoveries and litigation support" is the description.
 
+**Who signs (decided 20 September 2026).** Where the landlord is Sure Lets and Manage Limited, Damian signs the claim form and statement of truth as director, and Marchbank & Vale puts the papers in front of him ready to sign. Where the landlord is another company or person, that landlord signs. The routine prepares the pack, sends it to the signatory with a one-page cover note saying what it is and where to sign, and records the signed date on the Landlord record. Nothing is filed until the signed copy is back.
+
+**Marchbank & Vale phone calls (agreed 20 September 2026).** Calls are automated AI calls from the Marchbank & Vale number. Rules:
+
+- The call opens by saying it is an automated call from Marchbank & Vale Associates about the account for [address], and that it is recorded. It never claims to be a person or a law firm.
+- One call attempt a day at most, between 9am and 7pm, never on Sundays or bank holidays. If the tenant asks for calls to stop, calls stop and the record says so; letters continue.
+- The call states the balance and the reference, offers a payment plan within the envelope in section 4, and gives the tenant a way to reach a person. It never threatens anything the timetable does not do.
+- Any mention of hardship, vulnerability, dispute or a repair complaint ends the call politely and flags the record for a person (5e).
+- A transcript and outcome are written to the Tenant record within the hour.
+- Frequency, tone and content stay inside section 40 of the Administration of Justice Act 1970 (harassment of debtors) and the Protection from Harassment Act 1997.
+- The tenant's number comes from the CRM field labelled "Tenant 1 Mobile" (`Tenant_1_Phone`).
+
 **Serving notices.** The new template (clause 7.2) allows notices by email to the tenant's stated address and treats post as served two working days after posting. The older Rocket Lawyer template (clause 48) allows only first-class post or leaving the notice at the property, served the next day. Before the day 14 letter and before any Section 8 notice, read the agreement and serve in the way it allows. Post is always used as well as email for the day 14 letter and the Section 8 notice.
 
 ### 5d. Payment plans
@@ -146,15 +160,18 @@ The arrears balance on the Tenant record is zero and matches Books, or a written
 
 ## 9. Test plan
 
-One property with a live arrears case, or one tenant whose due date falls in the coming week. Run the daily routine for a week with every action reported before it is sent. Check the Books match, the Tenant record note, the message wording, and the landlord update. Switch on for everyone only after Damian has read the week's log.
+Test tenancy (chosen 20 September 2026, Damian left the choice to this chat): **Flat 22 Catterick House, Cottenham Road, S65 1LD**, tenant Sarah Leanne Stevenson, landlord Sure Lets and Manage Limited, rent £600 due on the 18th, reference SSTEVEFLAT22, Books customer 1626078000012106738, tenancy on the new Renters' Rights Act template (interest at clause 2.4, email service at clause 7.2). Chosen because the whole chain from reminder to possession sits inside Damian's own company, and because it is live: on 20 September 2026 the 18 September invoice of £600 was unpaid, so the case is at day 2.
+
+Run the daily routine on this one tenancy in report-only mode: every message drafted and shown to Damian before it is sent, every Books match and record note listed. Run for one week or until the balance clears, whichever is later. Check the Books match, the Tenant record note, the message wording, the guarantor check and the landlord update. Switch on for everyone only after Damian has read the week's log.
 
 ## 10. Open questions
 
 Answered 17 September 2026: day numbers and day 21 handover confirmed; interest clause present in both templates (section 4); guarantors on some tenancies, deeds on file in Zoho CRM; Marchbank & Vale handles possession claims within the limits in 5c.
 
+Answered 20 September 2026: Damian signs as director where Sure Lets and Manage Limited is the landlord (5c); Marchbank & Vale phones tenants with automated AI calls from its own number, number being set up (5c); test tenancy is Flat 22 Catterick House (section 9).
+
 Still open:
 
-- Who signs the day 30 route decision and the claim form when the landlord is one of Damian's own companies: Damian as director, or another named director?
-- Does Marchbank & Vale phone tenants as well as write, and from which number?
 - Which arrears fields exist on the Tenant record today (arrears balance, arrears stage, next action date, guarantor lookup, interest clause number)? To check in Zoho and add what is missing before the test week.
-- Which tenancy to use for the one-week test in section 9.
+- The Marchbank & Vale phone number and the AI calling provider, once set up.
+- Templates R0 to R5, R3g, R4g, L1 to L4, MV1 and MV2 are drafted in docs/ops/04-templates.md (20 September 2026) and wait for Damian to read them before they are loaded into Zoho CRM and the SMS and calling tools.

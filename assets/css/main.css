@@ -800,3 +800,12 @@ table.mini .bad { color: var(--accent-ink); font-weight: 500; }
 .owner-head { grid-column: 1 / -1; display: flex; align-items: baseline; gap: 0.75rem; margin: 1rem 0 0; padding-bottom: 0.5rem; border-bottom: 1px solid var(--line); font-size: var(--fs-3); }
 .owner-head span { font-family: var(--font-body); font-size: var(--fs-0); font-weight: 400; color: var(--muted); }
 .portal-viewas strong { color: var(--ink); }
+
+/* Tenant scorecard: documents */
+.sc-docs .sc-card { margin-top: 1.25rem; }
+.sc-doc-kind { font-size: 0.72rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); margin: 1rem 0 0.4rem; font-weight: 600; }
+.sc-doclist { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.35rem; }
+.sc-doclist li { display: flex; justify-content: space-between; gap: 1rem; align-items: baseline; padding: 0.55rem 0; border-bottom: 1px solid var(--line); font-size: var(--fs-0); }
+.sc-doclist a { color: var(--ink); font-weight: 500; text-decoration: none; border-bottom: 1px solid var(--gold-soft); }
+.sc-doclist a:hover { border-bottom-color: var(--gold); }
+.sc-doclist small { color: var(--muted); white-space: nowrap; }

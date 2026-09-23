@@ -12,6 +12,9 @@
 //          --org <Books organisation id> (default 678590019),
 //          --from-sort 123456 --from-account 12345678 (the account the run is paid from;
 //          or PAY_FROM_SORT and PAY_FROM_ACCOUNT in .env). Without them the file is not written.
+//          PAY_FEE_SORT and PAY_FEE_ACCOUNT in .env: the Property Sauce Fee account. When set, one
+//          extra line per run moves the management fees deducted on the run's bills across to it
+//          (Damian, 21 Sep 2026: every run carries landlord, Property Sauce fee and contractor payments).
 //
 // The file holds bank account numbers. It goes to the team through Drive (folder
 // "Accounts/Payment runs"), never Slack, chat or email, and out/ is git-ignored.
@@ -100,7 +103,19 @@ if (args.write === "true") {
   const fromAccount = String(args["from-account"] || process.env.PAY_FROM_ACCOUNT || "").replace(/\D/g, "");
   if (fromSort.length !== 6 || fromAccount.length !== 8) { console.error("Paying account missing: pass --from-sort and --from-account (or PAY_FROM_SORT / PAY_FROM_ACCOUNT in .env). File not written."); process.exit(2); }
   const clean = (v) => String(v).replace(/[",\r\n]/g, " ").replace(/\s+/g, " ").trim();
-  const csv = rows.map((r) => [fromSort, fromAccount, clean(r.acct.name).slice(0, 35), clean(r.reference).slice(0, 18), r.acct.sort, r.acct.number, r.amount.toFixed(2)].join(",")).join("\r\n") + "\r\n";
+  const lines = rows.map((r) => [fromSort, fromAccount, clean(r.acct.name).slice(0, 35), clean(r.reference).slice(0, 18), r.acct.sort, r.acct.number, r.amount.toFixed(2)].join(","));
+  // The Property Sauce fee sweep: the fee lines on the bills in this run, as one transfer to the Fee account.
+  const feeSort = String(process.env.PAY_FEE_SORT || "").replace(/\D/g, ""), feeAccount = String(process.env.PAY_FEE_ACCOUNT || "").replace(/\D/g, "");
+  let feeTotal = 0;
+  if (feeSort.length === 6 && feeAccount.length === 8) {
+    for (const r of rows) {
+      const b = (await books(`/bills/${r.billId}`)).bill;
+      feeTotal += b.line_items.filter((l) => /management fee|managing agent|property sauce fee/i.test(l.name || "")).reduce((a, l) => a + Math.abs(Number(l.item_total) || 0), 0);
+    }
+    if (feeTotal > 0) lines.push([fromSort, fromAccount, "Property Sauce Fee", `PS fees ${runId.slice(4)}`.slice(0, 18), feeSort, feeAccount, feeTotal.toFixed(2)].join(","));
+    console.error(`Fee sweep: ${gbp(feeTotal)} to the Property Sauce Fee account`);
+  } else console.error("No PAY_FEE_SORT / PAY_FEE_ACCOUNT in .env: fee sweep line not added.");
+  const csv = lines.join("\r\n") + "\r\n";
   writeFileSync(join("out/payment-runs", `${runId}.csv`), csv);
   // The office copy: what each line is for, without the account numbers.
   const log = [["Run", "Bill", "Landlord", "Property", "Amount", "Bill date", "Reference on their statement"].join(","), ...rows.map((r) => [runId, r.bill, r.landlord, r.property, r.amount.toFixed(2), r.date, r.reference].map((v) => `"${String(v).replace(/"/g, '""')}"`).join(","))].join("\r\n") + "\r\n";

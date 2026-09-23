@@ -19,6 +19,26 @@ Damian's instructions, 19 September 2026:
 - Paying landlords: Virgin Money Business Internet Banking accepts a payment file upload. Damian's idea is one or two uploads a week: Claude fills the sheet in Virgin's column layout, the team asks for it, uploads it, the payments are made, and Claude starts a fresh sheet so nothing is paid twice. His preference would be for Claude to log in with the team's arrange-only login and set the payments up for him to authorise. Claude cannot do that (section 4), so the file route is the one built.
 - Two bank logins exist: the team's login can set payments up but not release them; Damian gets a text asking him to log in and authorise.
 
+Damian's instructions, 21 September 2026 (they apply to Ops 06 as well; Damian is passing the same text to that chat):
+
+- Payment runs every **Wednesday and Friday** (changed later the same day to every working day, below). Each run carries three kinds of payment: landlord payments, Property Sauce fee payments, and contractor invoice payments.
+- The order of events: rent is received; that rent is divided between the Property Sauce fee (if one applies), any contractor work carried out at the property, and the remainder, which goes to the landlord.
+- In-house maintenance staff (Rocky, Ali and the others) do not invoice us; they work for us directly on our own properties. When one of them does a job on a managed landlord's property, that landlord is invoiced by **Elite Construction and Property Maintenance** at the fixed hourly rate plus any materials bought.
+- A contractor, ours or external (a gas engineer doing a certificate, for example), is paid **only once the rent for that property has been received**. Contractors must be told this, and told to expect payment within 31 days. Because the timing depends on when the job falls against the rent date, Claude, which has every rent due date, tells the contractor the exact date their invoice will be paid, parks the invoice, and brings it into the payment run of the week that rent arrives.
+- Only once the tenant's rent is in are we, as managing agent, in a position to split it: the contractor; the Luxe maintenance management fee; the Property Sauce management fee; the remaining balance to the landlord.
+- At that point Claude creates a bill for the landlord in Zoho Books and emails it to them. The bill breaks down the money received, how it was dispersed, and the final balance paid to the landlord. Bills are already being created in Books, so previous ones are the model; Damian will record a skills video if the creation needs showing.
+- **Muzammel approves and uploads every payment sheet.** Claude never uploads. After a few weeks or a couple of months of Claude building the sheets, and once they are trusted, Claude may be given access to upload to Virgin directly.
+
+Damian's answers, 21 September 2026 (later the same day):
+
+- **Runs are daily, every working day, sheet ready in Drive by 12:00.** Any tenant rent for the day has landed by then; Muzammel checks the sheet and uploads it before lunch, so it is a fixed daily task. The Wednesday and Friday, and Tuesday and Friday, versions are superseded: the point of the system is to run efficiently and give landlords a better service.
+- First name on the statement and email: yes.
+- The old unpaid bills: Muzammel manages the reconciliation (section 5a, "The backlog").
+- Sure Lets and Manage Limited is not VAT registered (Damian: "not registered"), so no VAT appears on bills or statements.
+- No landlord lives abroad, so the Non-resident Landlord Scheme does not apply.
+- "Leonard" was an example, not a landlord.
+- Questions about this operation go to Muzammel, who runs the accounts section.
+
 What Books shows (checked live, 19 September 2026):
 
 - Every landlord property is a **vendor** in Books named `<Landlord> - <Property>` (about 200 landlord vendors among 400 vendors). Each month a **bill** is raised on that vendor, for example "Flat 7, 35 Lord Street - Sep 2026", with two lines: "Landlord Rent Payment" at the rent received (£583.00) and "Property Sauce Management Fee" as a negative line (9%, -£52.47), sometimes a third negative line for a repair recharge. The bill total is the payout (£530.53). Paying the landlord is recorded as a bill payment, "Bank Transfer", on the day it was sent.
@@ -46,27 +66,44 @@ What Books shows (checked live, 19 September 2026):
 
 Proposed, to confirm with Damian:
 
-- **Claude never moves money.** It does not log in to online banking, does not set payments up, does not hold or type bank credentials, and does not release anything. That is a fixed rule of the tools Claude runs under, not a preference, so Damian's preferred route (Claude on the arrange-only login, Damian authorising) is not available. What Claude does: prepares the payment file, hands it to a named person, records the result. The person uploads; Damian authorises; a person confirms.
+- **Claude never moves money.** It does not log in to online banking, does not set payments up, does not hold or type bank credentials, and does not release anything. That is a fixed rule of the tools Claude runs under, not a preference. What Claude does: builds the payment file, hands it to Muzammel, records the result. **Muzammel approves the sheet and uploads it; Damian authorises in the bank; Claude confirms from the feed.** Confirmed by Damian on 21 September 2026: Claude does not upload, and will not until the sheets have been trusted for some weeks and Damian says so. Muzammel is the person Claude asks when anything in this operation needs a decision below Damian's level.
 - Claude may prepare and send the monthly pack to every landlord without asking, once the template has been approved on one landlord for one month (section 9) and the payables backlog for that landlord is clean.
 - A payment enters a run only when all of these are true: the rent it comes from is matched in Books (Ops 04), the bill is unpaid, the bill carries no earlier run id, the bill is dated within 90 days, the property has a complete payout account on its Landlord record, and the bill leaves the landlord's rent account at or above zero. Anything else is listed for a person, never paid blind.
-- Deductions from rent: our fee as agreed with that landlord; a contractor cost only where Ops 05 recorded the landlord's approval and the management agreement allows deduction from rent (Ops 06 open question); nothing else. Claude never withholds rent as a float or reserve unless the agreement says so and Damian has confirmed the amount.
+- Deductions from rent, in this order (Damian, 21 September 2026): the contractor's invoice for work at that property, where Ops 05 recorded the landlord's approval; the Luxe maintenance management fee where it applies; the Property Sauce management fee at that landlord's percentage; the remainder to the landlord. Nothing else. Claude never withholds rent as a float or reserve unless the agreement says so and Damian has confirmed the amount.
+- **A contractor is paid only from rent already received** for the property the work was done at, never from other landlords' rent and never in advance. If rent is late, the contractor's payment waits with it and the contractor is told the new date the same day. If the deductions exceed the rent, the landlord is paid nothing that month, the shortfall carries to the next rent, and Damian is told (section 6).
+- Work by our own team on a managed landlord's property is invoiced to that landlord by Elite Construction and Property Maintenance at the fixed hourly rate plus materials (Ops 06 step 8, updated by Damian on 21 September 2026: the invoice comes from Elite, not Property Sauce). The invoice is deducted from rent like any contractor invoice.
 - A landlord asking a question about their statement gets a reply within one working day with the figures from Books. A landlord disputing a figure gets an acknowledgement the same day and Damian is told; no correction is made to Books without a person.
 - Nothing in the pack is written from memory or a team member's word: every number is read from Books at generation time, every event from the CRM (README rule 1).
 
 ## 5. The procedure, step by step (proposed)
 
-### 5a. Payment runs: Tuesday and Friday
+### 5a. Payment runs: every working day, sheet ready by 12:00
 
-Why twice a week and not once a month: landlords rank fast, predictable payment above almost everything else, and the money is theirs from the moment it clears. A fixed monthly payout day would hold a tenant's 1st-of-month rent for weeks. Paying the day it lands is what the office does now but it means a payment every day and no batch for Damian to authorise in one go. Two runs a week means every rent reaches the landlord within three working days of clearing, Damian authorises twice a week instead of daily, and the statement can promise a rhythm.
+Confirmed by Damian, 21 September 2026: one run every working day. Claude builds the sheet by 12:00, by which time the day's tenant rents have landed; Muzammel checks it and uploads it before lunch; Damian authorises from the bank's text. Each run carries landlord payments, the Property Sauce fee sweep and contractor payments. A landlord therefore receives their rent the working day it clears, or the next one, which is the fastest promise an agent can make and the one the statement makes.
 
-1. **Tuesday and Friday, 10:00.** Claude runs `scripts/payment-run.mjs --write --mark`. It reads every unpaid landlord bill in Books, applies the section 4 tests, looks up the payout account on the Landlord record, and writes two files: `RUN-<date>-<letter>.csv` (the upload: payee name, sort code, account number, amount, reference) and `RUN-<date>-<letter>-log.csv` (the office copy, no account numbers). It stamps each bill's reference in Books with the run id, so a bill can never enter a second file. The upload file goes to Drive "Accounts/Payment runs" and the log is posted to the accounts team on Slack with the totals per landlord and the list of bills held back and why.
-2. **The reference on the landlord's bank statement** is "PS " plus the property, cut to 18 characters (Faster Payments limit), for example "PS Flat 7 35 Lord". One payment per bill, so a landlord with nine flats sees nine lines and can tie each to the statement.
-3. **Upload.** A named team member (section 10) downloads the file from Drive, signs in to Virgin Money, Payments, Faster payments and transfers, Upload payment from file, and uploads it. The first time, they also download Virgin's own template from that screen and save it to Drive; from then on the script is run with `--template` so the columns match Virgin's header exactly.
-4. **Authorise.** Damian receives the bank's text, signs in and authorises the batch. He tells the team (or Claude) it is released, or the feed shows it.
-5. **Confirm.** The next working day Claude reads the Virgin feed in Books (Ops 04 reads the same feed) and matches each debit to its bill by amount and reference, records a bill payment dated the debit date, and posts "RUN-… released: N payments, £X" to Slack. A debit with no bill, or a bill in the run with no debit after two working days, goes to #claude-urgent.
-6. **A file that was not uploaded** (holiday, bank down): the bills keep their run id, so the next run does not pick them up. The team says which run is stale; Claude clears the stamp (`--unmark RUN-…`, to add) and they fall into the next file.
+**The split, property by property.** Nothing is paid until the tenant's rent for that property is matched in Books (Ops 04). Then, from that one rent payment and in this order:
 
-Not yet decided (section 10): the team member who uploads; whether Beaucatt, Beaumont and the other own-company landlords are paid by the same run or left as internal transfers; the cut-off (rent cleared by 09:00 on the run day is in that run).
+1. Contractor invoices for work at that property (Ops 06: approved by the landlord before the job, checked against the quote or rate card, signed off). Includes Elite Construction and Property Maintenance invoices for our own team's work on a managed landlord's property.
+2. The Luxe maintenance management fee, where it applies (rate and payee in section 10).
+3. The Property Sauce management fee at that landlord's percentage.
+4. The remainder to the landlord.
+
+The bill in Books records exactly that split: rent received as the positive line, each deduction as a negative line with what it was for, and the total as the landlord's payout. It is emailed to the landlord from Books when it is raised, and it is what the monthly bill (5b) summarises.
+
+**Parking a contractor invoice.** When an approved invoice arrives and that property's rent has already gone out for the month, the invoice waits for the next rent. Claude reads the rent due date from the Tenant record, writes the expected payment date on the ticket and the Books bill, and emails the contractor the same day: "Your invoice <number> for <property> is approved for £<amount>. Rent at that property is due on <date>, so it will be in our payment run on <the working day after that date> and with you the same day." Contractors are told at engagement that payment follows the rent and is always within 31 days; if a late rent would push a payment past 31 days, Damian decides whether to pay from the fee account (section 6). Ops 06 owns the contractor side of this; the wording here is the contract between the two operations.
+
+**The run itself.**
+
+1. **Every working day at 11:45.** Claude runs `scripts/payment-run.mjs --write --mark`. It reads every unpaid landlord bill in Books, applies the section 4 tests, looks up the payout account on the Landlord record, and writes two files: `RUN-<date>-<letter>.csv` (Virgin's seven-column layout, no header, proved by the £1 test on 20 September 2026; see Ops 06 step 10) and `RUN-<date>-<letter>-log.csv` (the office copy, no account numbers). It stamps each bill's reference in Books with the run id, so a bill can never enter a second file. Contractor lines come from Ops 06's approved bills in the same file; the Property Sauce fee lines are one transfer per run from the rent account to the Property Sauce Fee account for the fees deducted on the bills in that run (`PAY_FEE_SORT` and `PAY_FEE_ACCOUNT` in .env). The upload file goes to Drive "Accounts/Payment runs" and the log is posted to the accounts team on Slack with the totals per landlord and the list of bills held back and why.
+2. **The reference on the landlord's bank statement** is "PS " plus the property, cut to 18 characters, for example "PS Flat 7 35 Lord". One payment per bill, so a landlord with nine flats sees nine lines and can tie each to the statement.
+3. **Muzammel approves and uploads, by 12:00 every working day.** He opens the file from Drive, checks the log against it, signs in to Virgin Money Business Internet Banking (Payments, Faster payments and transfers, Upload payment from file), sets the payment date and uploads. Any line the bank rejects, he tells Claude with the bank's error text; Claude fixes the record it points to and rebuilds. Payees must already exist under Manage your payees; a new landlord or contractor is added there by Muzammel before their first run.
+4. **Damian authorises.** He receives the bank's text, signs in and authorises the batch. He tells Muzammel or Claude it is released, or the feed shows it.
+5. **Confirm.** The next working day Claude reads the Virgin feed in Books and matches each debit to its bill by amount and reference, records a bill payment dated the debit date, sends each contractor its remittance (Ops 06), and posts "RUN-… released: N payments, £X" to Slack. A debit with no bill, or a bill in the run with no debit after two working days, goes to #claude-urgent.
+6. **A file that was not uploaded** (holiday, bank down): the bills keep their run id, so the next run does not pick them up. Muzammel says which run is stale; Claude clears the stamp (`--unmark RUN-…`, to add) and they fall into the next file.
+
+Cut-off: rent cleared in the feed by 11:30 is in that day's run; anything later is in tomorrow's. A day with nothing to pay still gets a one-line note to Muzammel saying so, so silence never means the run was missed. Still to decide (section 10): whether Damian's own companies are paid by the same run or left as internal transfers.
+
+**The backlog.** Books shows 214 landlord bills as unpaid, some going back to 2021, because payments were made from the bank but never recorded against the bill. Muzammel manages clearing it (Damian, 21 September 2026). To make it quick: Claude lists every unpaid bill older than 90 days alongside the bank debits that match it by amount and date, as a sheet in Drive; Muzammel ticks each match or writes what really happened; Claude records the bill payments in Books from the ticked rows. Until a landlord's rows are cleared, that landlord's statement does not show a "held for you" figure.
 
 ### 5b. The monthly pack: first working day of the month
 
@@ -124,7 +161,7 @@ Every landlord with rent received in the month has a pack in Drive, a sent note 
 
 To write once section 10 is answered. Outline:
 
-- **Tuesday and Friday 10:00**: payment run (5a steps 1 and 2); post totals and holds to Slack; file the upload in Drive.
+- **Every working day 11:45**: payment run (5a steps 1 and 2); file the upload in Drive for Muzammel by 12:00; post totals and holds to Slack.
 - **Every working day 09:30**: match released runs to feed debits (5a step 5); flag exceptions.
 - **First working day of the month 08:00**: generate every landlord's pack; a person reads them for the first three months, then they send unattended; file and note (5b).
 - **8 July, 8 October, 8 January, 8 April**: quarterly summaries (5c).
@@ -145,16 +182,21 @@ One third-party landlord, one month, with Damian reading everything before it go
 
 For Damian:
 
-1. **Payout rhythm**: Tuesday and Friday runs, with the promise "within three working days of the rent clearing", or keep paying the day it lands, or one fixed day a month? Recommendation: Tuesday and Friday.
-2. **Who uploads**: the named team member who will download the file from Drive and upload it to Virgin, and whether Damian's own companies (Beaucatt, Beaumont, Lancaster, Murray & Sullivan, Tanc) are in the same runs.
+1. ~~Payout rhythm~~ Answered 21 September 2026: every working day, sheet ready by 12:00.
+2. ~~Who uploads~~ Answered 21 September 2026: Muzammel approves and uploads; Claude does not, until told otherwise. Still open: whether Damian's own companies (Beaucatt, Beaumont, Lancaster, Murray & Sullivan, Tanc) are in the same runs or handled as internal transfers.
 3. **Statement day**: first working day of the month, as proposed?
-4. **Greeting and address per landlord**: a first name and a statement email for each Established Landlord (Crackle: is it Aman, and which of the two addresses on the records?). Proposed: three new fields on the Landlord record, Statement_First_Name, Statement_Email, Management_Fee_Percent, set once per Established Landlord and copied to every property record.
-5. **The payables backlog**: 214 unpaid landlord bills in Books, most surely paid. Who reconciles them, and by when? The pack cannot quote "held for you" until they are clean.
-6. **VAT**: is Sure Lets and Manage Limited VAT registered? If so the bill must show VAT on the fee and the statement must show it separately. The sample assumes not.
-7. **Non-resident landlords**: does any landlord live outside the UK? If yes, the NRL scheme applies to us as agent (20% deduction unless HMRC has approved gross payment on NRL1) and section 5d changes.
+4. **Greeting and address per landlord**: first names approved 21 September 2026. Still needed from Muzammel: the first name and statement email for each Established Landlord (Crackle: is it Aman, and which of the two addresses on the records?). Proposed: three new fields on the Landlord record, Statement_First_Name, Statement_Email, Management_Fee_Percent, set once per Established Landlord and copied to every property record.
+5. ~~The payables backlog~~ Answered 21 September 2026: Muzammel manages it (5a, "The backlog").
+6. ~~VAT~~ Answered 21 September 2026: not VAT registered.
+7. ~~Non-resident landlords~~ Answered 21 September 2026: none.
 8. **Own-company landlords**: do Beaucatt, Beaumont and the rest want the same pack (useful for their accountants) or a shorter internal version?
 9. **Sign-off**: the accounts team, or Damian by name on the smaller landlords?
-10. **"Leonard"**: is there a landlord called Leonard, or was that an example? No such name appears in Books or the CRM.
+10. ~~"Leonard"~~ Answered 21 September 2026: an example, not a landlord.
+11. **The Luxe maintenance management fee** (new, 21 September 2026): which entity charges it, at what rate or amount, on which jobs, and which account it is paid to. It is not on any Books bill today.
+12. **Elite Construction and Property Maintenance**: the hourly rate and minimum call-out for recharging our own team's labour, whether Elite invoices from its own Books organisation or from Property Sauce's, and its bank account for the run (Books already has a vendor "ELITE CONSTRUCTION MAINTENANCE").
+13. **Contractor terms**: the wording to send every contractor once ("payment follows the rent, always within 31 days") and whether Damian will fund from the fee account when a late rent would breach 31 days.
+
+Damian's instruction, 21 September 2026: questions on any of the above go to Muzammel, who runs this section.
 
 For the office: download Virgin's payment file template from Business Internet Banking and save it to Drive "Accounts/Payment runs/virgin-template.csv"; confirm whether accounts@propertysauce.co exists as a mailbox or alias; confirm whether any landlord bills are raised in a Books organisation other than Property Sauce.
 

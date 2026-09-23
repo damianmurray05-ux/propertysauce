@@ -15,9 +15,9 @@ noindex: true
     <div class="score-gate" id="score-gate" data-reveal>
       <div class="score-gate-inner">
         <h2>Sign in to see your scorecard.</h2>
-        <p class="muted">Your tenancy reference is on your agreement and on our emails. We send a one-time code to the email or mobile we hold, so only you can see this.</p>
+        <p class="muted">Sign in with the email address or mobile number we hold for you, or the tenancy reference on your agreement. We send a one-time code to that email or mobile, so only you can see this.</p>
         <form class="score-form" id="score-ref-form" novalidate>
-          <div class="field"><label for="sc-ref">Tenancy reference</label><input id="sc-ref" type="text" autocomplete="off" placeholder="PS-1234" required></div>
+          <div class="field"><label for="sc-ref">Email, mobile or tenancy reference</label><input id="sc-ref" type="text" autocomplete="off" placeholder="you@example.com or 07..." required></div>
           <button class="btn btn-primary" type="submit">Continue <svg class="ic btn-ic" aria-hidden="true"><use href="/assets/icons.svg#arrow-up-right"/></svg></button>
         </form>
         <div id="score-channels" class="score-channels" hidden></div>
@@ -50,6 +50,7 @@ noindex: true
         <section class="sc-card"><h3>What would raise it</h3><ul id="sc-tips" class="sc-list"></ul></section>
       </div>
       <div class="sc-jobs" id="sc-jobs"></div>
+      <div class="sc-docs" id="sc-docs"></div>
       <p class="sc-note">Scores are recalculated when we update your file, usually at the start of each month. If something looks wrong, tell us through the assistant and we will check the record.</p>
       <div class="calc-actions">
         <button type="button" class="btn btn-primary btn-sm" data-open-chat="repair">Report a repair <svg class="ic btn-ic" aria-hidden="true"><use href="/assets/icons.svg#wrench"/></svg></button>
