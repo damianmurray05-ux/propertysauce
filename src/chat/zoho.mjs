@@ -202,6 +202,12 @@ async function allProperties() {
   }
   return props;
 }
+/* Every property under management: not Sold or Archived, and not the record for
+   a whole block. The same list an admin sees in the portal, for scripts that
+   run on the office's behalf (docs/ops). */
+export async function liveProperties() {
+  return (await allProperties()).filter((p) => !GONE.test(p.status) && !p.block);
+}
 const postcodeOf = (addr) => { const m = String(addr || "").toUpperCase().match(/\b[A-Z]{1,2}\d[A-Z\d]?\s*\d[A-Z]{2}\b/); return m ? m[0].replace(/\s+/g, "") : ""; };
 const GONE = /^(sold|archived)$/i;
 /* Ownership is the "Established Landlord" picklist on each property

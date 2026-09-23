@@ -6,7 +6,7 @@ Status: dictated by Damian on 17 September 2026 and written up by the Ops 7 chat
 
 ## 1. What this operation covers
 
-Every tenanted property holds a set of certificates and licences that expire on known dates. This operation keeps one register of all of them, books the renewal with the engineer and the tenant at least three weeks before expiry, checks the new certificate is filled in correctly (landlord name exactly as at Land Registry, full address with postcode), stores it in Drive and on the Zoho record, and sends the tenant a copy from Zoho CRM so the send is on the tenant's record. Paying the engineer is Ops 06.
+Every tenanted property holds a set of certificates and licences that expire on known dates. This operation keeps one register of all of them, books the renewal with the engineer and the tenant six weeks before expiry for gas safety and EICR and four weeks before expiry for everything else, checks the new certificate is filled in correctly (landlord name exactly as at Land Registry, full address with postcode), stores it in Drive and on the Zoho record, and sends the tenant a copy from Zoho CRM so the send is on the tenant's record. Paying the engineer is Ops 06.
 
 ## 2. How it is done today
 
@@ -14,7 +14,7 @@ Damian's instructions, 17 September 2026:
 
 - Renew every certificate before the existing one expires. Gas is mostly one year, electrical mostly five years, selective landlord licences five years. No HMOs, so no HMO licences.
 - Keep one spreadsheet of every certificate on every property with its expiry date, so at any moment the next renewal in any category on any property can be seen.
-- Contact the engineer and the tenant no less than three weeks before expiry. That leaves time to book the engineer, have the inspection done, receive the certificate and file it.
+- Contact the engineer and the tenant no less than six weeks before expiry for gas safety and EICR, and four weeks for everything else (dictated as three weeks on 17 September; revised by Damian on 20 September 2026). That leaves time to book the engineer, have the inspection done, receive the certificate and file it.
 - File every certificate in Google Drive and on the tenant or landlord profile in Zoho CRM.
 - Check every certificate before it is filed. The landlord section must carry the exact owner name as at Land Registry, whether that is a limited company or a person. The property address must be written in full with the full postcode. Tell the engineer this when booking, in an email that says: "Can you please ensure that you write this out to the landlord: [landlord name] at [full property address and postcode]." Then check the certificate when it arrives.
 - Email every certificate to the tenant, and send it from Zoho CRM (open the tenant's profile, Send Email) so the email is stored on the tenant's record. The same rule applies to any important document or email that may need to be relied on later, such as a final maintenance confirmation receipt. Routine back-and-forth (arranging viewings, inspection times, general conversation) goes by ordinary Gmail so the CRM does not get cluttered.
@@ -34,7 +34,7 @@ Damian's instructions, 17 September 2026:
 
 No fields yet for fire risk assessment, legionella, PAT or the alarm test date. To add once the register in 5a is confirmed. The register spreadsheet is generated from these fields, so Zoho stays the single source of truth.
 
-Other systems: Drive folder per property for the PDF; contact@propertysauce.co for the engineer booking and tenant access dates; Zoho CRM Send Email from the tenant (Contact) record for the tenant's copy; #claude-urgent on Slack for anything expired or unbooked inside three weeks.
+Other systems: Drive folder per property for the PDF; contact@propertysauce.co for the engineer booking and tenant access dates; Zoho CRM Send Email from the tenant (Contact) record for the tenant's copy; #claude-urgent on Slack for anything expired or unbooked inside its lead time (six weeks for gas safety and EICR, four weeks for everything else).
 
 ## 4. Decision limits
 
@@ -66,11 +66,11 @@ Not on this register but tracked elsewhere: deposit protection certificate and t
 
 ### 5b. Steps
 
-[Written once 5a is confirmed. Outline: register check daily; three weeks out, email engineer with the landlord-name and full-address instruction and email tenant for access dates; book; receive certificate; check name, address, dates, codes; file in Drive and on the Zoho record; set the new expiry date from the document only; send tenant copy from Zoho CRM; raise the engineer's payment for Ops 06.]
+[Written once 5a is confirmed. Outline: register check daily; six weeks out for gas safety and EICR, four weeks out for everything else, email engineer with the landlord-name and full-address instruction and email tenant for access dates; book; receive certificate; check name, address, dates, codes; file in Drive and on the Zoho record; set the new expiry date from the document only; send tenant copy from Zoho CRM; raise the engineer's payment for Ops 06.]
 
 ## 6. Escalation
 
-[Any certificate expired, or inside three weeks with no booking, goes to #claude-urgent on Slack the same day (README rule 3). A certificate with the wrong landlord name or address goes back to the engineer the same day and is not filed until corrected.]
+[Any certificate expired, or inside its lead time (six weeks for gas safety and EICR, four weeks for everything else) with no booking, goes to #claude-urgent on Slack the same day (README rule 3). A certificate with the wrong landlord name or address goes back to the engineer the same day and is not filed until corrected.]
 
 ## 7. Done when
 
@@ -78,7 +78,13 @@ Not on this register but tracked elsewhere: deposit protection certificate and t
 
 ## 8. Cowork routine
 
-[Daily: read the register, list everything expiring within 21 days that has no booking, and act on it. Weekly: report to Damian what is booked, what is filed, what is late.]
+**Certificate register**, every weekday at 08:00, Europe/London. It reads Zoho CRM and never writes to it: no certificate date is set or changed by the routine (README rule 3), nothing is booked, and no engineer email is sent. The routine does two things: refresh the register, and post to #claude-urgent when anything is expired or due. The scripts are `scripts/ops/certificate-register.mjs` (the register: docs/ops/certificate-register.csv and the Drive copy at My Drive > Claude > 01 Property Sauce > Compliance > Certificate register.csv) and `scripts/ops/certificate-reminders.mjs` (the preview of the Slack post, the engineer emails and the licence list, written to docs/ops/certificate-reminders-preview.md). The `--post` and `--send` flags on the reminders script are deliberately not enabled: engineer emails wait for Usman's engineer list and Damian's review of a preview.
+
+Prompt: "You are the Property Sauce compliance officer. Read ~/Projects/propertysauce/docs/ops/07-certificates-and-licences.md, then in ~/Projects/propertysauce run `node --env-file=.env scripts/ops/certificate-register.mjs`. It reads every live property from Zoho CRM, rewrites docs/ops/certificate-register.csv and the Drive copy, and ends with a line counting the expired or due items. If that count is zero, stop: post nothing. If it is not zero, run `node scripts/ops/certificate-reminders.mjs`, open docs/ops/certificate-reminders-preview.md, and post the text under section 1 to #claude-urgent (C0BTPPZ3JJE) as one message, exactly as written, starting with @channel. Do not send the engineer emails in section 2, do not book anything, do not write to Zoho CRM, and do not set or change any certificate date. Then stop."
+
+What Damian sees: on a weekday morning when anything is expired or due, one post in #claude-urgent grouped by area with the address, item, expiry date and days; on a clear day, nothing. The register file is refreshed on every run whether or not anything is posted.
+
+Where it runs: Cowork in the cloud with the repository and its .env (the Zoho self client) available. If Cowork cannot run Node against the repository, the fallback is a Claude Code scheduled task on `0 8 * * 1-5` on Damian's Mac, which only runs while the desktop app is open.
 
 ## 9. Test plan
 
