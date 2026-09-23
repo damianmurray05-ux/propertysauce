@@ -128,3 +128,14 @@ test("Zoho mapping: property, job and tenant scorecard row", async () => {
   const card = scoreTenant(row);
   assert.ok(card.score < 100 && card.score > 0, String(card.score));
 });
+
+test("a Books customer is only matched by property address, never by name alone", async () => {
+  const { matchesCustomer } = await import("../src/chat/tenantfile.mjs");
+  const t = { name: "Damian Murray", address: "Flat 3, Catterick House, Cottenham Road, S65 1LD" };
+  assert.equal(matchesCustomer(t, "4 High Street - Damian Murray SA"), false);
+  assert.equal(matchesCustomer(t, "Damian Murray"), false);
+  assert.equal(matchesCustomer(t, "Flat 03 Catterick House - Damian Murray"), true);
+  assert.equal(matchesCustomer({ name: "A B", address: "4 High Street, Hawksmead, CB1 1AA" }, "4 High Street - Damian Murray SA"), true);
+  assert.equal(matchesCustomer({ name: "K Murray", address: "Flat 9, Lancaster House, Lord Street, FY1 1AA" }, "Flat 09 Lancaster House - Keith Maxwell Murray"), true);
+  assert.equal(matchesCustomer({ name: "K Murray", address: "Flat 9, Lancaster House, Lord Street, FY1 1AA" }, "Flat 05 Lancaster House - James Patrick Murray"), false);
+});

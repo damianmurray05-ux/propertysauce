@@ -52,14 +52,28 @@ export function certificateLines(property) {
   ];
 }
 
+/* Address text as Books names it: lower case, punctuation gone, "Flat 05" and "Flat 5" the same. */
+const addrKey = (s) => String(s || "").toLowerCase().replace(/[^a-z0-9]+/g, " ").replace(/\b0+(\d)/g, "$1").trim();
+
+/* A Books customer belongs to this tenancy only when its name carries the property address
+   (first line, and the building name where there is one). A matching person's name on its own
+   is never enough: the same person can be a customer at another property. */
+export function matchesCustomer(tenant, contactName) {
+  const parts = String(tenant?.address || "").split(",").map(addrKey).filter(Boolean);
+  if (!parts.length) return false;
+  const name = addrKey(contactName);
+  const first = parts[0];
+  const building = /^(flat|apartment|unit|room)\b/.test(first) && parts[1] && !/^\d/.test(parts[1]) ? parts[1] : null;
+  return name.includes(first) && (!building || name.includes(building));
+}
+
 /* The Books side: the customer for this tenancy, open invoices, recent payments and the balance. */
 export async function rentAccount(tenant) {
   if (!tenant) return null;
   const surname = (tenant.name || "").trim().split(/\s+/).pop() || "";
-  const firstLine = (tenant.address || "").split(",")[0].trim();
   if (!surname) return null;
   const found = await books(`/contacts?contact_name_contains=${encodeURIComponent(surname)}&contact_type=customer&per_page=50`).catch(() => ({}));
-  const candidates = (found.contacts || []).filter((c) => c.contact_name.toLowerCase().includes(firstLine.toLowerCase().slice(0, 12)) || c.contact_name.toLowerCase().includes((tenant.name || "").toLowerCase()));
+  const candidates = (found.contacts || []).filter((c) => matchesCustomer(tenant, c.contact_name));
   const customer = candidates[0];
   if (!customer) return { found: false };
   const [inv, pay] = await Promise.all([
