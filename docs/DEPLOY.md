@@ -30,7 +30,8 @@ Optional:
 
 | Name | Value | Needed for |
 |---|---|---|
-| `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, `TWILIO_FROM` | From <https://twilio.com> | One-time codes by text message |
+| `INKBOX_API_KEY`, `INKBOX_PHONE_NUMBER_ID`, `INKBOX_WEBHOOK_SECRET` | See "Texts, via Inkbox" below | One-time codes by text, on our own UK number |
+| `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, `TWILIO_FROM` | From <https://twilio.com> | Fallback SMS codes, only used when Inkbox is not configured |
 | `MAINTENANCE_WEBHOOK_URL` | A Zapier or Make webhook | Pushing every job into Trello, a sheet, or anywhere else |
 | `TEAM_EMAIL` | Defaults to `contact@propertysauce.co` | Where jobs and enquiries are sent |
 | `CHAT_MODEL` | Defaults to `claude-opus-5` | Which model answers |
@@ -121,6 +122,42 @@ are in place and Resend shows the domain as verified, keep `MAIL_FROM` on
 | CNAME | `rsend` | `rsend-euw1.forge.rmta.net` |
 | CNAME | `send` | `send.forge.rmta.net` |
 | TXT | `_dmarc` | `v=DMARC1; p=none;` (optional) |
+
+## 4a. Texts, via Inkbox
+
+The site has its own UK mobile number for one-time codes and inbound
+replies: **+44 7457 410735**, agent identity `@propertysauce`,
+`propertysauce@inkboxmail.com`. Set up once:
+
+1. In the [Inkbox console](https://inkbox.ai/console/api-keys), create an
+   API key scoped to the `@propertysauce` identity (not "Admin (all)").
+   Copy the value shown — it is shown once only — into `INKBOX_API_KEY`.
+2. `INKBOX_PHONE_NUMBER_ID` is fixed: `52c81de9-a09a-4997-bd7f-56ae78380cee`.
+   It identifies the number, not a secret, and is already in `.env.example`.
+3. Create the inbound webhook subscription (one-off, via `curl` or the
+   console's Webhooks page): owner `phone_number_id` above, URL
+   `https://propertysauce.co/api/inkbox-webhook/` **with the trailing
+   slash** — this site redirects every route to one
+   (`vercel.json` → `trailingSlash: true`), and a redirect does not reliably
+   carry a POST body from an external sender — and event types
+   `text.received`, `text.sent`, `text.delivered`, `text.delivery_failed`,
+   `text.delivery_unconfirmed`. The response's one-time `signing_key` field
+   is `INKBOX_WEBHOOK_SECRET`; it is shown once and cannot be fetched again.
+4. Add all three to Vercel and redeploy.
+
+Sending is tried through Inkbox first (see `src/chat/notify.mjs`); Twilio is
+only used as a fallback when Inkbox is not configured. Inbound texts that
+are a genuine reply (`text.received`) are forwarded to `TEAM_EMAIL`;
+delivery receipts are logged, not emailed.
+
+**Known limit (24 Sep 2026):** Inkbox currently refuses to send to any
+recipient who has not first texted `START` to the number (`403
+recipient_not_opted_in`), a rule meant for US carriers. Inkbox has agreed to
+lift it for UK-to-UK numbers like ours but had not done so as of this
+writing — until then, a one-time code sent to someone who has never texted
+us will fail with that error (surfaced as `SmsNotOptedInError` from
+`sendSms`). Email codes are unaffected. Calling is not available yet either:
+Inkbox is still waiting on Anthropic for AI-call support.
 
 ## 5. Point the domain at Vercel
 

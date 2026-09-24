@@ -139,3 +139,57 @@ test("a Books customer is only matched by property address, never by name alone"
   assert.equal(matchesCustomer({ name: "K Murray", address: "Flat 9, Lancaster House, Lord Street, FY1 1AA" }, "Flat 09 Lancaster House - Keith Maxwell Murray"), true);
   assert.equal(matchesCustomer({ name: "K Murray", address: "Flat 9, Lancaster House, Lord Street, FY1 1AA" }, "Flat 05 Lancaster House - James Patrick Murray"), false);
 });
+
+test("Inkbox webhook signatures verify, reject tampering, and reject replay", async () => {
+  const { verifyWebhook, normaliseSigningKey } = await import("../src/chat/inkbox.mjs");
+  const { createHmac } = await import("node:crypto");
+  const key = "whsec_testkey123";
+  const requestId = "req_abc";
+  const timestamp = String(Math.floor(Date.now() / 1000));
+  const rawBody = JSON.stringify({ event_type: "text.received", data: { text_message: { text: "hi" } } });
+  const mac = createHmac("sha256", normaliseSigningKey(key)).update(`${requestId}.${timestamp}.${rawBody}`).digest("hex");
+  const signature = `sha256=${mac}`;
+
+  assert.equal(verifyWebhook({ signingKey: key, requestId, timestamp, signature, rawBody }), true);
+  // The whsec_ prefix is a label, not part of the key: the unprefixed form verifies identically.
+  assert.equal(verifyWebhook({ signingKey: "testkey123", requestId, timestamp, signature, rawBody }), true);
+  // Tampering with the body invalidates the signature.
+  assert.equal(verifyWebhook({ signingKey: key, requestId, timestamp, signature, rawBody: rawBody + "x" }), false);
+  // A wrong key invalidates the signature.
+  assert.equal(verifyWebhook({ signingKey: "wrong", requestId, timestamp, signature, rawBody }), false);
+  // A stale timestamp (replay) is rejected even with a correct signature for that timestamp.
+  const oldTimestamp = String(Math.floor(Date.now() / 1000) - 3600);
+  const oldMac = createHmac("sha256", normaliseSigningKey(key)).update(`${requestId}.${oldTimestamp}.${rawBody}`).digest("hex");
+  assert.equal(verifyWebhook({ signingKey: key, requestId, timestamp: oldTimestamp, signature: `sha256=${oldMac}`, rawBody }), false);
+  // No signing key configured: never trust an unsigned delivery.
+  assert.equal(verifyWebhook({ signingKey: "", requestId, timestamp, signature, rawBody }), false);
+  // Malformed signature header does not throw.
+  assert.equal(verifyWebhook({ signingKey: key, requestId, timestamp, signature: "not-a-signature", rawBody }), false);
+});
+
+test("Inkbox webhook endpoint accepts a correctly signed delivery and rejects a bad one", async () => {
+  process.env.INKBOX_WEBHOOK_SECRET = "test-inkbox-secret";
+  const { createHmac } = await import("node:crypto");
+  const inkboxWebhook = await import("../api/inkbox-webhook.js");
+
+  const requestId = "req_1";
+  const timestamp = String(Math.floor(Date.now() / 1000));
+  const rawBody = JSON.stringify({ event_type: "text.received", data: { text_message: { text: "hi", remote_phone_number: "+447700900000", local_phone_number: "+447457410735" } } });
+  const mac = createHmac("sha256", "test-inkbox-secret").update(`${requestId}.${timestamp}.${rawBody}`).digest("hex");
+
+  const good = new Request("https://propertysauce.co/api/inkbox-webhook/", {
+    method: "POST",
+    headers: { "x-inkbox-request-id": requestId, "x-inkbox-timestamp": timestamp, "x-inkbox-signature": `sha256=${mac}` },
+    body: rawBody,
+  });
+  const r1 = await inkboxWebhook.POST(good);
+  assert.equal(r1.status, 200);
+
+  const bad = new Request("https://propertysauce.co/api/inkbox-webhook/", {
+    method: "POST",
+    headers: { "x-inkbox-request-id": requestId, "x-inkbox-timestamp": timestamp, "x-inkbox-signature": "sha256=wrong" },
+    body: rawBody,
+  });
+  const r2 = await inkboxWebhook.POST(bad);
+  assert.equal(r2.status, 401);
+});
