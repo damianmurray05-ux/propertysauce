@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<title>Landlord portal — document visibility</title>
+<style>
+  body { font-family: Georgia, 'Times New Roman', serif; color: #0F2A22; max-width: 720px; margin: 40px auto; line-height: 1.5; }
+  h1 { font-size: 22px; border-bottom: 2px solid #B4924A; padding-bottom: 10px; }
+  h2 { font-size: 16px; margin-top: 32px; color: #0F2A22; }
+  p.sub { color: #555; font-size: 13px; margin-top: -8px; }
+  table { border-collapse: collapse; width: 100%; margin-top: 12px; font-size: 13px; }
+  th, td { border: 1px solid #ddd; padding: 8px 10px; text-align: left; vertical-align: top; }
+  th { background: #0F2A22; color: #fff; font-family: Arial, sans-serif; font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; }
+  tr:nth-child(even) { background: #f7f7f5; }
+  .note { font-size: 13px; color: #333; background: #f4f5f1; border-left: 3px solid #B4924A; padding: 10px 14px; margin-top: 16px; }
+  footer { margin-top: 40px; font-size: 11px; color: #888; }
+</style>
+</head>
+<body>
+
+<h1>Landlord portal — what a landlord sees</h1>
+<p class="sub">Companion to the tenant document list — 25 September 2026</p>
+<p>Unlike the tenant side, the landlord portal is unrestricted by design: a signed-in landlord sees every document on their own property, because it is their own file. Nothing is filtered out. This page lists what that means in practice, for approval alongside the tenant list.</p>
+
+<h2>Everything a landlord may see on their own property</h2>
+<table>
+<tr><th>Kind</th><th>Examples</th></tr>
+<tr><td>Tenancy agreement</td><td>The signed AST</td></tr>
+<tr><td>Gas safety certificate (CP12)</td><td>Every certificate on file, current and historic</td></tr>
+<tr><td>Electrical installation report (EICR)</td><td>Every report on file</td></tr>
+<tr><td>Energy performance certificate (EPC)</td><td>Current and historic</td></tr>
+<tr><td>Property licence</td><td>Selective licence, HMO licence</td></tr>
+<tr><td>Inventory and inspection</td><td>Check-in/out inventories, inspection reports</td></tr>
+<tr><td>Deposit protection certificate</td><td>Confirms scheme and protection</td></tr>
+<tr><td>Mortgage and loan paperwork</td><td>Mortgage statements, redemption statements, completion statements, loan offer letters</td></tr>
+<tr><td>Insurance</td><td>Buildings insurance certificate</td></tr>
+<tr><td>Purchase and valuation</td><td>Completion statements, valuation letters</td></tr>
+<tr><td>Owner / management statements</td><td>Rent remittance statements, landlord payment records</td></tr>
+<tr><td>Utility and council tax bills</td><td>The landlord's own copies</td></tr>
+<tr><td>Meter readings</td><td>Move-in/void readings</td></tr>
+<tr><td>Anything else on the property's file</td><td>Nothing is withheld from the property's own landlord</td></tr>
+</table>
+<p class="note">One landlord's portal never shows another landlord's property — that boundary is by ownership (the "Established Landlord" field on the property), not by document type. Within their own property, a landlord sees everything.</p>
+
+<h2>How it's scoped</h2>
+<p>The same code that restricts a tenant's list (<code>src/chat/tenantfile.mjs</code>) is never applied to the landlord portal (<code>src/chat/landlords.mjs</code>) — they are two separate code paths on purpose, so a change meant to protect tenant privacy can never accidentally start hiding a landlord's own documents from them.</p>
+
+<footer>Property Sauce — internal, for approval only.</footer>
+</body>
+</html>
