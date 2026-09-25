@@ -17,8 +17,13 @@ export async function GET(request) {
   const module = u.searchParams.get("m"), record = u.searchParams.get("r"), attachment = u.searchParams.get("a");
   if (!/^(Accounts|Maintenance|Contacts)$/.test(module || "") || !/^\d+$/.test(record || "") || !/^\d+$/.test(attachment || "")) return text(400, "Bad request");
   if (s.t === "session") {
-    // A tenant may open documents on their own tenant record or their own property record, nothing else.
-    const mine = (module === "Contacts" && record === String(s.id)) || (module === "Accounts" && record === String(s.pid));
+    // A tenant may only open documents on their own tenant record. Never the
+    // property's own Accounts record — that is the landlord's file (mortgage,
+    // insurance, purchase paperwork sit there too), and since 25 Sep 2026
+    // tenantfile.mjs no longer hands out an Accounts-module link to a tenant
+    // at all; refusing one here as well means a future bug elsewhere can't
+    // reopen that door by accident.
+    const mine = module === "Contacts" && record === String(s.id);
     if (!mine) return text(403, "That document is not on your tenancy file.");
   } else {
     const props = await propertiesByLandlordEmail(s.ref);

@@ -4,20 +4,34 @@
 import { tenantById, propertyById, jobsForTenant, listAttachments, accessToken } from "./zoho.mjs";
 import { docTitle, classify, driveDocuments } from "./landlords.mjs";
 
-/* A closed allow-list, not a block-list. A landlord's own property record
-   holds everything from gas certificates to mortgage statements and
-   completion paperwork in the same Attachments list as the tenancy
-   documents, with no field marking which is which — so the default for
-   anything unclassified, or classified as "invoice"/"statement" (which also
-   catches mortgage and management statements, by the same "statement"
-   keyword), must be to withhold it, never to show it. Confirmed with
-   Damian, 25 Sep 2026: these are the only types a tenant may ever see.
-   Everything else on the property record — mortgage and loan paperwork,
-   landlord's buildings insurance, purchase/completion documents, owner
-   statements, utility and council tax bills, meter readings — is the
-   landlord's own file and stays out of the tenant's list, however it was
-   attached. This list is deliberately separate from the fuller set
-   landlords.mjs shows a signed-in landlord, which is unrestricted by design. */
+/* Where a tenant's documents come from, and the closed allow-list on top of
+   it. Decided with Damian, 25 Sep 2026, as two separate layers rather than
+   relying on either alone:
+
+   1. SOURCE: only the tenant's own Zoho Contacts record, plus the Drive
+      certificate register (driveDocuments — Ops 07's deliberately
+      certs-only index, not the property's general file). The property's
+      own Zoho Accounts record is never read here, even though it is
+      readable elsewhere (the landlord portal), because that record is
+      where mortgage statements, insurance certificates, purchase and
+      completion paperwork and decades of loose correspondence all sit
+      alongside the tenancy documents with nothing marking which is which.
+      The rule for the team and for Claude, going into the team
+      instructions once this is fully built: the ONLY documents that ever
+      go on a tenant's own Contact record are documents that tenant is
+      allowed to see, and only the current, latest certificate of each
+      kind — not the expired ones sitting behind it. That is enforced by
+      practice, not by this file, which is why layer 2 exists as well.
+
+   2. TYPE FILTER: even so, defence in depth — anything on the tenant's own
+      record that still classifies as landlord-only (see classify() in
+      landlords.mjs) is withheld, and anything unclassified defaults to
+      withheld too. A human slip on layer 1 should not be the only thing
+      standing between a tenant and someone else's paperwork.
+
+   This list is deliberately separate from the fuller set landlords.mjs
+   shows a signed-in landlord, which reads the Accounts record and is
+   unrestricted by design — that is the landlord's own file. */
 export const TENANT_VISIBLE_TYPES = new Set(["tenancy", "gas", "eicr", "electrical", "epc", "licence", "inventory", "deposit"]);
 export const isTenantVisible = (type) => TENANT_VISIBLE_TYPES.has(type);
 
@@ -35,16 +49,18 @@ const MONTHS = ["January", "February", "March", "April", "May", "June", "July", 
 export const niceDate = (iso) => { const d = new Date(iso); return isNaN(d) ? "" : `${d.getDate()} ${MONTHS[d.getMonth()]} ${d.getFullYear()}`; };
 const gbp = (n) => `£${Number(n || 0).toLocaleString("en-GB", { minimumFractionDigits: 0, maximumFractionDigits: 2 })}`;
 
-/* The CRM side: tenant, property, repairs and every document on both records. */
+/* The CRM side: tenant, property, repairs and the tenant's own documents
+   (their Contact record and the Drive certificate register only — see the
+   note above; the property's Accounts record is deliberately not read
+   here). */
 export async function tenantFile(session) {
-  const [tenant, property, jobs, tenantAtt, propertyAtt] = await Promise.all([
+  const [tenant, property, jobs, tenantAtt] = await Promise.all([
     tenantById(session.id),
     session.pid ? propertyById(session.pid).catch(() => null) : null,
     jobsForTenant(session.id).catch(() => []),
     listAttachments("Contacts", session.id).catch(() => []),
-    session.pid ? listAttachments("Accounts", session.pid).catch(() => []) : [],
   ]);
-  const docs = [...tenantAtt, ...propertyAtt].map((a) => { const type = classify(a.name); return { type, title: docTitle(type, a.name, a.date), file: a.name, date: a.date, url: `/api/file/?m=${a.module}&r=${a.record}&a=${a.id}`, source: "zoho" }; })
+  const docs = tenantAtt.map((a) => { const type = classify(a.name); return { type, title: docTitle(type, a.name, a.date), file: a.name, date: a.date, url: `/api/file/?m=${a.module}&r=${a.record}&a=${a.id}`, source: "zoho" }; })
     .concat(session.pid ? driveDocuments(session.pid) : [])
     .filter((d) => isTenantVisible(d.type))
     .sort((a, b) => (b.date || "").localeCompare(a.date || ""));

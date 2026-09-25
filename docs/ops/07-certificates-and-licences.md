@@ -79,7 +79,14 @@ Not on this register but tracked elsewhere: block common-parts items (fire risk 
 
 ### 5b. Steps
 
-[Step 0, once: collect every current certificate into Drive, then reconcile every date in the Zoho Landlord record against the document and correct Zoho. Then the routine: register check daily; six weeks out for gas safety and EICR, four weeks out for everything else, email engineer with the landlord-name and full-address instruction and email tenant for access dates; book; receive certificate; check name, address, dates, codes; file in Drive and on the Zoho record; set the new expiry date from the document only; send tenant copy from Zoho CRM; raise the engineer's payment for Ops 06.]
+[Step 0, once: collect every current certificate into Drive, then reconcile every date in the Zoho Landlord record against the document and correct Zoho. Then the routine: register check daily; six weeks out for gas safety and EICR, four weeks out for everything else, email engineer with the landlord-name and full-address instruction and email tenant for access dates; book; receive certificate; check name, address, dates, codes; file in Drive and on the Zoho Landlord (Account) record; set the new expiry date from the document only; attach a copy to the tenant's own Zoho Contact record and remove the superseded one (see the hard rule below); send tenant copy from Zoho CRM; raise the engineer's payment for Ops 06.]
+
+**Hard rule, confirmed 25 September 2026, for the team and for Claude:** the tenant portal reads a tenant's documents only from that tenant's own Zoho Contact record (and the Drive certificate register), never from the property's Landlord/Account record. The Account record still holds the full history for the office and the landlord — every certificate, current and expired, mortgage paperwork, everything — exactly as it does today. Nothing changes there. What changes is the tenant's own Contact record:
+
+- Only attach a document to a tenant's Contact record if you are content for that tenant to see it. There is no second check after that — if it's on their Contact record and it's a certificate type, it shows.
+- Only the current, latest certificate of each kind goes on a tenant's Contact record. When a certificate renews, remove the superseded one from the Contact record as well as updating the Account record — do not leave the old one sitting there alongside the new one.
+- Never attach anything from the landlord-only list (mortgage or loan paperwork, insurance certificates, purchase or valuation documents, owner statements, utility or council tax bills, meter readings) to a tenant's Contact record, even by mistake, even briefly.
+- This is enforced twice: by this rule for what the team uploads, and separately in code (a closed list of document types a tenant may ever be shown, regardless of where it came from) as a second layer in case of a slip. But the rule above is the one that actually keeps the list right — the code is a backstop, not a substitute for it.
 
 ## 6. Escalation
 

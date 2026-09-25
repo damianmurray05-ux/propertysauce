@@ -334,3 +334,47 @@ test("public listings mask the exact door/flat number, keeping the street and bu
   assert.equal(maskDoorNumber("Flat 37, Catterick House, Cottenham Road, S65 1LD"), "Catterick House, Cottenham Road, S65 1LD");
   assert.equal(maskDoorNumber("52b Beedell Avenue, Southend-on-Sea, SS0 9JS"), "Beedell Avenue, Southend-on-Sea, SS0 9JS");
 });
+
+test("a tenant's documents come only from their own Contacts record, never the property's Accounts record", async () => {
+  process.env.ZOHO_CLIENT_ID = "test-id";
+  process.env.ZOHO_CLIENT_SECRET = "test-secret";
+  process.env.ZOHO_REFRESH_TOKEN = "test-refresh";
+  const { tenantFile } = await import("../src/chat/tenantfile.mjs");
+  const originalFetch = global.fetch;
+  const calledPaths = [];
+  global.fetch = async (url) => {
+    const u = String(url);
+    if (u.includes("/oauth/v2/token")) return { ok: true, status: 200, json: async () => ({ access_token: "tok", expires_in: 3600 }) };
+    calledPaths.push(u);
+    if (u.includes("/Contacts/tenant-1?")) return { ok: true, status: 200, text: async () => JSON.stringify({ data: [{ id: "tenant-1", Last_Name: "Flat 1 - Someone", Status: "Tenanted" }] }) };
+    if (u.includes("/Accounts/prop-1?")) return { ok: true, status: 200, text: async () => JSON.stringify({ data: [{ id: "prop-1", Account_Name: "Flat 1" }] }) };
+    if (u.includes("/Contacts/tenant-1/Attachments")) return { ok: true, status: 200, text: async () => JSON.stringify({ data: [{ id: "a1", File_Name: "Gas cert.pdf", Modified_Time: "2026-01-01" }] }) };
+    if (u.includes("/Maintenance/search")) return { ok: true, status: 200, text: async () => JSON.stringify({ data: [] }) };
+    return { ok: true, status: 200, text: async () => JSON.stringify({ data: [] }) };
+  };
+  try {
+    const file = await tenantFile({ id: "tenant-1", pid: "prop-1" });
+    assert.equal(file.documents.length, 1);
+    assert.equal(file.documents[0].type, "gas");
+    assert.ok(!calledPaths.some((p) => p.includes("/Accounts/prop-1/Attachments")), "the property's own Accounts attachments must never be fetched for a tenant");
+  } finally {
+    global.fetch = originalFetch;
+    delete process.env.ZOHO_CLIENT_ID; delete process.env.ZOHO_CLIENT_SECRET; delete process.env.ZOHO_REFRESH_TOKEN;
+  }
+});
+
+test("api/file rejects an Accounts-module document for a tenant session, even one on their own property", async () => {
+  process.env.ZOHO_CLIENT_ID = "test-id";
+  process.env.ZOHO_CLIENT_SECRET = "test-secret";
+  process.env.ZOHO_REFRESH_TOKEN = "test-refresh";
+  try {
+    const { sign } = await import("../src/chat/crypto.mjs");
+    const fileApi = await import("../api/file.js");
+    const session = sign({ t: "session", ref: "PS-1", id: "tenant-1", pid: "9999", name: "T", address: "A", email: "", phone: "", exp: Date.now() + 1000 });
+    const req = new Request(`http://x/api/file/?m=Accounts&r=9999&a=123&s=${encodeURIComponent(session)}`);
+    const res = await fileApi.GET(req);
+    assert.equal(res.status, 403);
+  } finally {
+    delete process.env.ZOHO_CLIENT_ID; delete process.env.ZOHO_CLIENT_SECRET; delete process.env.ZOHO_REFRESH_TOKEN;
+  }
+});
