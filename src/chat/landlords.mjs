@@ -107,7 +107,7 @@ function fromZoho(p, tenant, allJobs, attachments) {
 }
 /* Every document of a kind gets the same title; only the date changes. The date
    comes from the file name when it carries one, otherwise from when it was filed. */
-const DOC_LABEL = { gas: "Gas safety certificate", eicr: "Electrical installation report", electrical: "Electrical certificate", epc: "Energy performance certificate", tenancy: "Tenancy agreement", licence: "Property licence", inventory: "Inventory and inspection", invoice: "Invoice", statement: "Statement" };
+const DOC_LABEL = { gas: "Gas safety certificate", eicr: "Electrical installation report", electrical: "Electrical certificate", epc: "Energy performance certificate", tenancy: "Tenancy agreement", deposit: "Deposit protection certificate", licence: "Property licence", inventory: "Inventory and inspection", invoice: "Invoice", statement: "Statement", landlord_finance: "Mortgage or loan document", insurance: "Insurance certificate" };
 const MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 function niceDate(iso) { const d = new Date(iso); return isNaN(d) ? "" : `${d.getDate()} ${MONTHS[d.getMonth()]} ${d.getFullYear()}`; }
 function dateInName(name) {
@@ -130,11 +130,18 @@ export function driveDocuments(propertyId) {
 export function classify(name) {
   const n = String(name || "").toLowerCase();
   if (/tenancy|ast|agreement|lease/.test(n)) return "tenancy";
+  if (/deposit|prescribed.?information|mydeposits|\btds\b/.test(n)) return "deposit";
   if (/gas|cp12|landlord.?gas/.test(n)) return "gas";
   if (/eicr|electric|niceic/.test(n)) return "eicr";
   if (/epc|energy/.test(n)) return "epc";
   if (/licen[cs]e/.test(n)) return "licence";
   if (/inventory|check.?in|check.?out|inspection/.test(n)) return "inventory";
+  // Mortgage, loan and management-company statements use exactly the same
+  // words ("statement", "redemption", "completion") as a genuine rent
+  // statement to a tenant, so this type is never treated as tenant-visible
+  // by itself — see TENANT_VISIBLE_TYPES in tenantfile.mjs.
+  if (/mortgage|loan|redemption|completion|dealer.?request/.test(n)) return "landlord_finance";
+  if (/insurance/.test(n)) return "insurance";
   if (/invoice|receipt/.test(n)) return "invoice";
   if (/statement|remittance|payment/.test(n)) return "statement";
   return "other";

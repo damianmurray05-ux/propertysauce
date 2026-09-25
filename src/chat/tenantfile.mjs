@@ -4,6 +4,23 @@
 import { tenantById, propertyById, jobsForTenant, listAttachments, accessToken } from "./zoho.mjs";
 import { docTitle, classify, driveDocuments } from "./landlords.mjs";
 
+/* A closed allow-list, not a block-list. A landlord's own property record
+   holds everything from gas certificates to mortgage statements and
+   completion paperwork in the same Attachments list as the tenancy
+   documents, with no field marking which is which — so the default for
+   anything unclassified, or classified as "invoice"/"statement" (which also
+   catches mortgage and management statements, by the same "statement"
+   keyword), must be to withhold it, never to show it. Confirmed with
+   Damian, 25 Sep 2026: these are the only types a tenant may ever see.
+   Everything else on the property record — mortgage and loan paperwork,
+   landlord's buildings insurance, purchase/completion documents, owner
+   statements, utility and council tax bills, meter readings — is the
+   landlord's own file and stays out of the tenant's list, however it was
+   attached. This list is deliberately separate from the fuller set
+   landlords.mjs shows a signed-in landlord, which is unrestricted by design. */
+export const TENANT_VISIBLE_TYPES = new Set(["tenancy", "gas", "eicr", "electrical", "epc", "licence", "inventory", "deposit"]);
+export const isTenantVisible = (type) => TENANT_VISIBLE_TYPES.has(type);
+
 const BOOKS = process.env.ZOHO_BOOKS_ORG || "678590019";
 const BOOKS_API = `https://www.zohoapis.${(process.env.ZOHO_DC || "com").toLowerCase()}/books/v3`;
 
@@ -29,6 +46,7 @@ export async function tenantFile(session) {
   ]);
   const docs = [...tenantAtt, ...propertyAtt].map((a) => { const type = classify(a.name); return { type, title: docTitle(type, a.name, a.date), file: a.name, date: a.date, url: `/api/file/?m=${a.module}&r=${a.record}&a=${a.id}`, source: "zoho" }; })
     .concat(session.pid ? driveDocuments(session.pid) : [])
+    .filter((d) => isTenantVisible(d.type))
     .sort((a, b) => (b.date || "").localeCompare(a.date || ""));
   return { tenant, property, jobs: jobs.filter((j) => !j.certificate), documents: docs };
 }

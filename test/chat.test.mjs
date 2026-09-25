@@ -260,3 +260,34 @@ test("a mobile-number sign-in only searches Tenant_1_Phone, never Mobile or plai
     delete process.env.ZOHO_CLIENT_ID; delete process.env.ZOHO_CLIENT_SECRET; delete process.env.ZOHO_REFRESH_TOKEN;
   }
 });
+
+test("classify sorts mortgage, loan and insurance paperwork away from genuine tenancy documents", async () => {
+  const { classify } = await import("../src/chat/landlords.mjs");
+  assert.equal(classify("Statement of Mortgage Account.png"), "landlord_finance");
+  // "Mgt Statement" carries no mortgage/loan keyword, so it classifies as
+  // the more general "statement" — still fine, because "statement" is not
+  // in the tenant-visible allow-list either; see the next test.
+  assert.equal(classify("Mgt Statement 1 Apr 2024 to 31 Mar 2025.pdf"), "statement");
+  assert.equal(classify("Redemption Statement 040722.pdf"), "landlord_finance");
+  assert.equal(classify("Completion Statement Tanc Residential.pdf"), "landlord_finance");
+  assert.equal(classify("4 High Street Mortgage Dealer Request of Information.pdf"), "landlord_finance");
+  assert.equal(classify("Loan Offer Letter (1).pdf"), "landlord_finance");
+  assert.equal(classify("4 High Street Insurance Cert.pdf"), "insurance");
+  // Genuinely tenant-facing documents still classify as before.
+  assert.equal(classify("Gas Cert, 4 High Street. 15.1.27.pdf"), "gas");
+  assert.equal(classify("EICR_Ref0794448390605.4highst.pdf"), "eicr");
+  assert.equal(classify("4 High Street EPC.pdf"), "epc");
+  assert.equal(classify("Tenancy Checklist - 4 High Street.pdf"), "tenancy");
+  assert.equal(classify("Deposit certificate - Mydeposits.pdf"), "deposit");
+});
+
+test("a tenant's document list never includes a landlord-only document type", async () => {
+  const { isTenantVisible, TENANT_VISIBLE_TYPES } = await import("../src/chat/tenantfile.mjs");
+  for (const safe of ["tenancy", "gas", "eicr", "electrical", "epc", "licence", "inventory", "deposit"]) {
+    assert.ok(isTenantVisible(safe), `${safe} should be tenant-visible`);
+  }
+  for (const unsafe of ["landlord_finance", "insurance", "statement", "invoice", "other", undefined, "", "mortgage"]) {
+    assert.ok(!isTenantVisible(unsafe), `${unsafe} must never be tenant-visible`);
+  }
+  assert.equal(TENANT_VISIBLE_TYPES.size, 8);
+});

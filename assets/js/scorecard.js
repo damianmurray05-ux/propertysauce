@@ -175,7 +175,7 @@
     $("#sc-tips").innerHTML = d.tips.map((t) => `<li>${icon("arrow-right")}<span>${esc(t)}</span></li>`).join("");
 
     // Every document on the tenant's file, grouped by kind, newest first. Links work only for this sign-in.
-    const TYPES = { tenancy: "Tenancy agreement and deposit", gas: "Gas safety certificates", eicr: "Electrical reports", epc: "Energy performance certificates", licence: "Property licence", inventory: "Inventories and inspections", statement: "Statements", invoice: "Invoices", other: "Other documents" };
+    const TYPES = { tenancy: "Tenancy agreement", deposit: "Deposit protection", gas: "Gas safety certificates", eicr: "Electrical reports", electrical: "Electrical certificates", epc: "Energy performance certificates", licence: "Property licence", inventory: "Inventories and inspections", statement: "Statements", invoice: "Invoices", other: "Other documents" };
     const docs = d.documents || [];
     const groups = {};
     for (const doc of docs) (groups[TYPES[doc.type] ? doc.type : "other"] ||= []).push(doc);
