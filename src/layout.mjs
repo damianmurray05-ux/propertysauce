@@ -27,6 +27,7 @@ export const nav = [
   ["/landlords/", "Landlords"],
   ["/investors/", "Investors"],
   ["/block-management/", "Block management"],
+  ["/to-let/", "To let"],
   ["/sell/", "Sell to us"],
   ["/tenants/", "Tenants"],
   ["/tools/", "Tools"],
@@ -195,6 +196,7 @@ ${body}
     </div>
     <div class="footer-col">
       <h2>Tools</h2>
+      <a href="/to-let/">Properties to let</a>
       <a href="/landlord-portal/">Landlord portal</a>
       <a href="/my-tenancy/">My tenancy</a>
       <a href="/leasehold-calculator/">Lease extension calculator</a>

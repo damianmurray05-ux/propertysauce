@@ -249,6 +249,41 @@ async function allProperties() {
 export async function liveProperties() {
   return (await allProperties()).filter((p) => !GONE.test(p.status) && !p.block);
 }
+
+/* The public "to let" listings: everything currently marked To Let with a
+   rent figure set. A property Status is changed to "To Let" by staff in
+   Zoho — the website page reads it live on every request, so there is
+   nothing to trigger or keep in sync: the listing appears and disappears
+   the moment the status (or the rent) changes, automatically. A record with
+   no rent set is excluded deliberately — several "To Let" rows are
+   placeholder profiles created to complete a block's record set, not yet
+   ready to market (see Description on e.g. Lancaster House a-suffix units).
+   Its own small field list, separate from PROPERTY_FIELDS/allProperties(),
+   because Zoho's 50-field cap on that shared list is already full and this
+   needs different fields (Bedrooms1, Property_Type1, Garden1, Description)
+   that the portal has no use for. */
+const TO_LET_FIELDS = "id,Account_Name,Property_Reference,Street,Town,City,Post_Code,Monthly_Rent,New_Rent_Amount,Bedrooms1,Property_Type1,Garden1,Description,EPC_Rating";
+export async function toLetProperties() {
+  const rows = await search("Accounts", "(Status:equals:To Let)", TO_LET_FIELDS, 200);
+  return rows
+    .map((r) => ({
+      id: r.id,
+      reference: r.Property_Reference || "",
+      street: r.Street || "",
+      town: r.Town || "",
+      city: r.City || "",
+      postcode: r.Post_Code || "",
+      address: r.Account_Name || [r.Street, r.Town, r.Post_Code].filter(Boolean).join(", "),
+      rentPcm: Number(r.New_Rent_Amount || r.Monthly_Rent) || 0,
+      bedrooms: r.Bedrooms1 || "",
+      propertyType: r.Property_Type1 || "",
+      garden: r.Garden1 || "",
+      epcRating: r.EPC_Rating || "",
+      description: r.Description || "",
+    }))
+    .filter((p) => p.rentPcm > 0)
+    .sort((a, b) => a.rentPcm - b.rentPcm);
+}
 const postcodeOf = (addr) => { const m = String(addr || "").toUpperCase().match(/\b[A-Z]{1,2}\d[A-Z\d]?\s*\d[A-Z]{2}\b/); return m ? m[0].replace(/\s+/g, "") : ""; };
 const GONE = /^(sold|archived)$/i;
 /* Ownership is the "Established Landlord" picklist on each property

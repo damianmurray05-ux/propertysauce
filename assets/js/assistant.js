@@ -256,12 +256,24 @@
   launch.addEventListener("click", () => setOpen(chat.hidden));
   $(".chat-close", chat).addEventListener("click", () => setOpen(false));
   document.addEventListener("keydown", (e) => { if (e.key === "Escape" && !chat.hidden) setOpen(false); });
-  const openWith = (which) => {
+  /* A listing card's "Register interest" button: enquire is tenancy mode
+     with an opener naming the specific property, so the team's handoff note
+     already says which one without the person having to repeat it. */
+  function startEnquire(property) {
+    setStatus("Registering your interest");
+    say(`I'm interested in ${property}`, "me");
+    begin("tenancy", `Great — I'll note your interest in ${property}. Tell me a little about yourself (moving alone or with others, any pets) and the best email or phone number, and the team will be in touch to arrange a viewing.`);
+  }
+  const openWith = (which, property) => {
     setOpen(true);
     if (which === "repair") { say("Report a repair", "me"); startRepair(); }
+    else if (which === "tenancy" && property) { startEnquire(property); }
     else if (which === "tenancy") { say("Ask about my tenancy or a new agreement", "me"); startTenancy(); }
   };
-  document.querySelectorAll("[data-open-chat]").forEach((b) => b.addEventListener("click", () => openWith(b.dataset.openChat)));
+  // Delegated, not bound per-element at load: some [data-open-chat] buttons
+  // (the to-let listings' "Register interest" cards) are injected later by
+  // their own page script, after this one has already run.
+  document.addEventListener("click", (e) => { const b = e.target.closest("[data-open-chat]"); if (b) openWith(b.dataset.openChat, b.dataset.property); });
   /* Deep links for emails and letters: /tenants/#repair opens the repair flow, #assistant just opens the assistant. */
   const hash = location.hash.replace("#", "");
   if (hash === "repair" || hash === "tenancy") { state.transcript = []; state.history = []; save(); opened = true; openWith(hash); }

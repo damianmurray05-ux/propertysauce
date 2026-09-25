@@ -15,12 +15,19 @@ if (existsSync(envFile)) {
   }
 }
 
-const chat = await import("./api/chat.js");
-const verify = await import("./api/verify.js");
-const scorecard = await import("./api/scorecard.js");
-const landlord = await import("./api/landlord.js");
-const file = await import("./api/file.js");
-const routes = { "/api/chat": chat, "/api/chat/": chat, "/api/verify": verify, "/api/verify/": verify, "/api/scorecard": scorecard, "/api/scorecard/": scorecard, "/api/landlord": landlord, "/api/landlord/": landlord, "/api/file": file, "/api/file/": file };
+// Every api/*.js file becomes a route automatically, the same way Vercel
+// discovers them — this list used to be hand-maintained and went stale
+// every time a new endpoint was added (api/properties.js and
+// api/inkbox-webhook.js both shipped without it, and only the deployed
+// Vercel site could serve them until this was noticed locally).
+const { readdirSync } = await import("node:fs");
+const routes = {};
+for (const f of readdirSync(join(root, "api")).filter((f) => f.endsWith(".js"))) {
+  const mod = await import(`./api/${f}`);
+  const path = `/api/${f.slice(0, -3)}`;
+  routes[path] = mod;
+  routes[`${path}/`] = mod;
+}
 
 const types = { ".html": "text/html; charset=utf-8", ".css": "text/css", ".js": "text/javascript", ".mjs": "text/javascript", ".svg": "image/svg+xml", ".png": "image/png", ".jpg": "image/jpeg", ".ico": "image/x-icon", ".woff2": "font/woff2", ".json": "application/json", ".xml": "application/xml", ".txt": "text/plain", ".webmanifest": "application/manifest+json", ".pdf": "application/pdf" };
 const dist = join(root, "dist");

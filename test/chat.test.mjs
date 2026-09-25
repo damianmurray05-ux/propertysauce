@@ -291,3 +291,38 @@ test("a tenant's document list never includes a landlord-only document type", as
   }
   assert.equal(TENANT_VISIBLE_TYPES.size, 8);
 });
+
+test("the public to-let list only includes priced properties, and only public-safe fields", async () => {
+  process.env.ZOHO_CLIENT_ID = "test-id";
+  process.env.ZOHO_CLIENT_SECRET = "test-secret";
+  process.env.ZOHO_REFRESH_TOKEN = "test-refresh";
+  const { toLetProperties } = await import("../src/chat/zoho.mjs");
+  const originalFetch = global.fetch;
+  global.fetch = async (url) => {
+    const u = String(url);
+    if (u.includes("/oauth/v2/token")) return { ok: true, status: 200, json: async () => ({ access_token: "tok", expires_in: 3600 }) };
+    if (u.includes("/Accounts/search")) {
+      return {
+        ok: true, status: 200, text: async () => JSON.stringify({
+          data: [
+            { id: "1", Account_Name: "Flat 1, Test House", Street: "Test St", Town: "Testville", Post_Code: "T1 1TT", Monthly_Rent: 1200, Bedrooms1: "2", Property_Type1: "Flat", Garden1: "No", EPC_Rating: "C", Established_Vendor: "Should Never Appear Ltd", Mortgage_Balance: 999999 },
+            { id: "2", Account_Name: "Flat 2, Never Let", Street: "Test St", Town: "Testville", Post_Code: "T1 1TT", Monthly_Rent: null, New_Rent_Amount: null },
+          ],
+        }),
+      };
+    }
+    return originalFetch(url);
+  };
+  try {
+    const list = await toLetProperties();
+    assert.equal(list.length, 1, "the no-rent placeholder must be excluded");
+    assert.equal(list[0].address, "Flat 1, Test House");
+    assert.equal(list[0].rentPcm, 1200);
+    const json = JSON.stringify(list[0]);
+    assert.ok(!json.includes("Should Never Appear"), "landlord name must never reach the public list");
+    assert.ok(!json.includes("999999"), "mortgage figures must never reach the public list");
+  } finally {
+    global.fetch = originalFetch;
+    delete process.env.ZOHO_CLIENT_ID; delete process.env.ZOHO_CLIENT_SECRET; delete process.env.ZOHO_REFRESH_TOKEN;
+  }
+});
