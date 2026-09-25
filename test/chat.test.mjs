@@ -193,3 +193,42 @@ test("Inkbox webhook endpoint accepts a correctly signed delivery and rejects a 
   const r2 = await inkboxWebhook.POST(bad);
   assert.equal(r2.status, 401);
 });
+
+test("Inkbox webhook forwards a finished call to the team inbox", async () => {
+  process.env.INKBOX_WEBHOOK_SECRET = "test-inkbox-secret";
+  process.env.RESEND_API_KEY = "test-resend-key";
+  const { createHmac } = await import("node:crypto");
+  const inkboxWebhook = await import("../api/inkbox-webhook.js");
+
+  const requestId = "req_call_1";
+  const timestamp = String(Math.floor(Date.now() / 1000));
+  const rawBody = JSON.stringify({
+    event_type: "call.ended",
+    data: {
+      call: { remote_phone_number: "+447700900123", duration_seconds: 42 },
+      post_call_action_items: [{ action: "Take a message", details: "Landlord asking about selling a block" }],
+      transcript_url: "https://inkbox.ai/transcripts/abc",
+    },
+  });
+  const mac = createHmac("sha256", "test-inkbox-secret").update(`${requestId}.${timestamp}.${rawBody}`).digest("hex");
+
+  const req = new Request("https://propertysauce.co/api/inkbox-webhook/", {
+    method: "POST",
+    headers: { "x-inkbox-request-id": requestId, "x-inkbox-timestamp": timestamp, "x-inkbox-signature": `sha256=${mac}` },
+    body: rawBody,
+  });
+  const originalFetch = global.fetch;
+  let capturedBody = null;
+  global.fetch = async (url, init) => { if (String(url).includes("resend")) { capturedBody = JSON.parse(init.body); return { ok: true, json: async () => ({}) }; } return originalFetch(url, init); };
+  try {
+    const res = await inkboxWebhook.POST(req);
+    assert.equal(res.status, 200);
+    assert.ok(capturedBody, "expected an email to be sent for a call with action items");
+    assert.match(capturedBody.subject, /\+447700900123/);
+    assert.match(capturedBody.text, /Take a message/);
+    assert.match(capturedBody.text, /Landlord asking about selling a block/);
+  } finally {
+    global.fetch = originalFetch;
+    delete process.env.RESEND_API_KEY;
+  }
+});
