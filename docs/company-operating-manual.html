@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<title>Property Sauce — Company Operating Manual</title>
+<style>
+  body { font-family: Georgia, 'Times New Roman', serif; color: #0F2A22; max-width: 720px; margin: 40px auto; line-height: 1.55; }
+  h1 { font-size: 24px; border-bottom: 2px solid #B4924A; padding-bottom: 10px; }
+  h2 { font-size: 17px; margin-top: 34px; color: #0F2A22; border-bottom: 1px solid #ddd; padding-bottom: 4px; }
+  h3 { font-size: 14px; margin-top: 20px; color: #0F2A22; font-family: Arial, sans-serif; text-transform: uppercase; letter-spacing: 0.04em; }
+  p.intro { color: #444; font-size: 14px; }
+  p { margin: 8px 0; }
+  strong.label { color: #7a1f1f; }
+  .meta { font-size: 12px; color: #666; margin-top: 4px; }
+  code { background: #f0f0ed; padding: 1px 5px; border-radius: 3px; font-size: 12px; }
+  hr { border: none; border-top: 1px solid #ddd; margin: 28px 0; }
+  footer { margin-top: 40px; font-size: 11px; color: #888; font-style: italic; }
+</style>
+</head>
+<body>
+
+<h1>Property Sauce — Company Operating Manual</h1>
+<p class="intro">Started 25 September 2026. This is the main operating manual for Property Sauce: handed to the team and to any future member of staff, and treated as the standing reference for how things are done here. It grows as the business is built — every hard rule, every "how this actually works" decision, goes here as it's made, not just left in a chat.</p>
+
+<h2>Document handling</h2>
+<h3>Rule: what goes on a tenant's file</h3>
+<p>The only documents ever attached to a tenant's own Zoho Contact record are documents that tenant is allowed to see, and only the current, latest certificate of each kind — never the superseded one sitting behind it.</p>
+<p><strong class="label">Never</strong> attach to a tenant's Contact record: mortgage or loan paperwork, insurance certificates, purchase or valuation documents, owner/management statements, utility or council tax bills, meter readings, or anything else that belongs to the landlord's own file.</p>
+<p class="meta">Enforced by: the team, when filing a certificate (Ops 07), and independently in the site's code as a backstop check.</p>
+<p>The tenant-visible document kinds: tenancy agreement, gas safety certificate, electrical installation report (EICR), energy performance certificate (EPC), property licence, inventory/inspection, deposit protection certificate. Nothing else, ever.</p>
+
+<hr>
+
+<h2>Letting a vacant property (Ops 1)</h2>
+<h3>Rule: pre-qualification pass/refer, never pass/reject by machine alone</h3>
+<p>A clean pass on the written criteria (move-in window, household fit, income at least 2.5x annual rent or benefits with a guarantor, no undischarged CCJ or bankruptcy, right to rent evidenced) goes straight through to booking a viewing.</p>
+<p>Anything borderline — an undischarged CCJ, bankruptcy, income near the line — is <strong class="label">never auto-declined and never auto-accepted</strong>. It is referred to a person, with what's known summarised, so a human makes that call. The referral must happen even if it would be easier to just move on to a different applicant.</p>
+<p class="meta">This carries forward Damian's own existing rule for the manual process into the automated version. Confirmed 25 September 2026. To be built directly into the AI agent's own operating instructions once the automated flow is built — not yet built as of this entry.</p>
+
+<hr>
+
+<h2>OpenRent</h2>
+<h3>Fact: the account's registered email must be admin@propertysauce.co</h3>
+<p>OpenRent only accepts replies to applicants from the address registered on the account. It was wrongly changed to Lettings@propertysauce.co on 31 August 2026 — every reply bounced from 2 September until 25 September, when it was corrected and verified. Real cost while it was wrong: lost applicants, unanswered enquiries, and a formal cancellation warning from OpenRent.</p>
+<p><strong class="label">Never change the registered email</strong> away from admin@propertysauce.co without first confirming the new mailbox can actually send from that exact address — a wrong setting here is silent to us and can run for weeks unnoticed.</p>
+
+<footer>Sections to come as they're built: full Ops 1 automated pre-qualification and viewing booking, OpenRent listing automation, the voice pipeline, and the rest of the numbered Ops procedures as each is finished and proven.</footer>
+</body>
+</html>
