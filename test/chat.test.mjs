@@ -316,7 +316,7 @@ test("the public to-let list only includes priced properties, and only public-sa
   try {
     const list = await toLetProperties();
     assert.equal(list.length, 1, "the no-rent placeholder must be excluded");
-    assert.equal(list[0].address, "Flat 1, Test House");
+    assert.equal(list[0].address, "Test House", "the public address is masked of its flat number");
     assert.equal(list[0].rentPcm, 1200);
     const json = JSON.stringify(list[0]);
     assert.ok(!json.includes("Should Never Appear"), "landlord name must never reach the public list");
@@ -325,4 +325,12 @@ test("the public to-let list only includes priced properties, and only public-sa
     global.fetch = originalFetch;
     delete process.env.ZOHO_CLIENT_ID; delete process.env.ZOHO_CLIENT_SECRET; delete process.env.ZOHO_REFRESH_TOKEN;
   }
+});
+
+test("public listings mask the exact door/flat number, keeping the street and building", async () => {
+  const { maskDoorNumber } = await import("../src/chat/zoho.mjs");
+  assert.equal(maskDoorNumber("Flat 9, 35 Lord Street, Blackpool, FY1 2BD"), "35 Lord Street, Blackpool, FY1 2BD");
+  assert.equal(maskDoorNumber("26a Lancaster House, Brownrigg Drive, Cramlington, NE23 6UN"), "Lancaster House, Brownrigg Drive, Cramlington, NE23 6UN");
+  assert.equal(maskDoorNumber("Flat 37, Catterick House, Cottenham Road, S65 1LD"), "Catterick House, Cottenham Road, S65 1LD");
+  assert.equal(maskDoorNumber("52b Beedell Avenue, Southend-on-Sea, SS0 9JS"), "Beedell Avenue, Southend-on-Sea, SS0 9JS");
 });

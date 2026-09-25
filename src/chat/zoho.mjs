@@ -263,6 +263,22 @@ export async function liveProperties() {
    needs different fields (Bedrooms1, Property_Type1, Garden1, Description)
    that the portal has no use for. */
 const TO_LET_FIELDS = "id,Account_Name,Property_Reference,Street,Town,City,Post_Code,Monthly_Rent,New_Rent_Amount,Bedrooms1,Property_Type1,Garden1,Description,EPC_Rating";
+/* Strips the specific door/unit number so a stranger browsing the public
+   listings gets the street and building, not which exact flat to knock on —
+   the same reason Rightmove and Zoopla show "Lord Street, Blackpool" rather
+   than "Flat 9, 35 Lord Street" until you enquire. Handles both styles on
+   file: "Flat 9, 35 Lord Street, ..." and "26a Lancaster House, ...". The
+   full address is still what the team works from once someone enquires;
+   only the public-facing copy is masked. */
+export function maskDoorNumber(address) {
+  const s = String(address || "");
+  const withoutFlat = s.replace(/^Flat\s+\d+[a-z]?,\s*/i, "");
+  // Only strip a leading bare number ("26a Lancaster House") when there was
+  // no "Flat N," to remove — otherwise the street's own number ("35 Lord
+  // Street", left after the Flat prefix is gone) would be stripped too.
+  if (withoutFlat !== s) return withoutFlat;
+  return s.replace(/^\d+[a-z]?\s+(?=[A-Z])/, "");
+}
 export async function toLetProperties() {
   const rows = await search("Accounts", "(Status:equals:To Let)", TO_LET_FIELDS, 200);
   return rows
@@ -273,7 +289,7 @@ export async function toLetProperties() {
       town: r.Town || "",
       city: r.City || "",
       postcode: r.Post_Code || "",
-      address: r.Account_Name || [r.Street, r.Town, r.Post_Code].filter(Boolean).join(", "),
+      address: maskDoorNumber(r.Account_Name || [r.Street, r.Town, r.Post_Code].filter(Boolean).join(", ")),
       rentPcm: Number(r.New_Rent_Amount || r.Monthly_Rent) || 0,
       bedrooms: r.Bedrooms1 || "",
       propertyType: r.Property_Type1 || "",
