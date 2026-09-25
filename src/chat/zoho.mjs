@@ -29,8 +29,7 @@ let token = { value: null, exp: 0 };
 
 export const zohoConfigured = () => Boolean(process.env.ZOHO_CLIENT_ID && process.env.ZOHO_CLIENT_SECRET && process.env.ZOHO_REFRESH_TOKEN);
 
-export async function accessToken() {
-  if (token.value && Date.now() < token.exp - 60_000) return token.value;
+async function requestToken() {
   const r = await fetch(`${ACCOUNTS}/oauth/v2/token`, {
     method: "POST",
     headers: { "content-type": "application/x-www-form-urlencoded" },
@@ -38,6 +37,26 @@ export async function accessToken() {
   });
   const d = await r.json();
   if (!r.ok || !d.access_token) throw new Error(`zoho token: ${d.error || r.status}`);
+  return d;
+}
+
+/* Every route bundles its own copy of this module, so each one refreshes the
+   token independently on its first call after a cold start rather than
+   sharing one cache — under a burst of requests across several routes at
+   once, Zoho can reject a refresh grant with "Access Denied" even though the
+   refresh token itself is fine, because another route's grant landed a
+   moment earlier. One retry after a short pause is enough to clear it; a
+   route that is still failing after that has a real problem, not a
+   collision. */
+export async function accessToken() {
+  if (token.value && Date.now() < token.exp - 60_000) return token.value;
+  let d;
+  try {
+    d = await requestToken();
+  } catch (e) {
+    await new Promise((res) => setTimeout(res, 1500));
+    d = await requestToken();
+  }
   token = { value: d.access_token, exp: Date.now() + (d.expires_in || 3600) * 1000 };
   return token.value;
 }
