@@ -136,9 +136,14 @@ export async function findTenantInZoho(reference) {
     const e = normaliseEmail(typed);
     rows = await search("Contacts", `((Email:equals:${e})or(Tenant_2_Email:equals:${e}))`, TENANT_FIELDS, 20);
   } else if (/^\+?[\d\s()-]{9,16}$/.test(typed)) {
+    // "Mobile" and plain "Phone" are not search-enabled fields on this org's
+    // Contacts module (Zoho rejects the whole query with INVALID_QUERY if
+    // either appears in criteria, even inside an OR) — only Tenant_1_Phone
+    // is. mapRecord still reads Mobile/Phone as a fallback for display,
+    // which is harmless since reading an absent field just returns nothing.
     const p = normalisePhone(typed), local = "0" + p.replace(/^\+44/, "");
-    rows = await search("Contacts", `((Mobile:equals:${p})or(Mobile:equals:${local})or(Tenant_1_Phone:equals:${p})or(Tenant_1_Phone:equals:${local})or(Phone:equals:${p})or(Phone:equals:${local}))`, TENANT_FIELDS, 20);
-    if (!rows.length) rows = (await search("Contacts", `((Mobile:ends_with:${p.slice(-9)})or(Tenant_1_Phone:ends_with:${p.slice(-9)}))`, TENANT_FIELDS, 20)).filter((r) => normalisePhone(r.Mobile || r.Tenant_1_Phone) === p);
+    rows = await search("Contacts", `((Tenant_1_Phone:equals:${p})or(Tenant_1_Phone:equals:${local}))`, TENANT_FIELDS, 20);
+    if (!rows.length) rows = (await search("Contacts", `(Tenant_1_Phone:ends_with:${p.slice(-9)})`, TENANT_FIELDS, 20)).filter((r) => normalisePhone(r.Tenant_1_Phone) === p);
   } else {
     const want = normaliseRef(reference);
     if (want.length < 4) return null;

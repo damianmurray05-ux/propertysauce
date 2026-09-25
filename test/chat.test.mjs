@@ -232,3 +232,31 @@ test("Inkbox webhook forwards a finished call to the team inbox", async () => {
     delete process.env.RESEND_API_KEY;
   }
 });
+
+test("a mobile-number sign-in only searches Tenant_1_Phone, never Mobile or plain Phone", async () => {
+  process.env.ZOHO_CLIENT_ID = "test-id";
+  process.env.ZOHO_CLIENT_SECRET = "test-secret";
+  process.env.ZOHO_REFRESH_TOKEN = "test-refresh";
+  const { findTenantInZoho } = await import("../src/chat/zoho.mjs");
+  const originalFetch = global.fetch;
+  const searchUrls = [];
+  global.fetch = async (url, init) => {
+    const u = String(url);
+    if (u.includes("/oauth/v2/token")) return { ok: true, status: 200, json: async () => ({ access_token: "tok", expires_in: 3600 }) };
+    if (u.includes("/Contacts/search")) { searchUrls.push(u); return { ok: true, status: 200, text: async () => JSON.stringify({ data: [] }) }; }
+    return originalFetch(url, init);
+  };
+  try {
+    await findTenantInZoho("07956595959");
+    assert.ok(searchUrls.length > 0, "expected at least one search call");
+    for (const u of searchUrls) {
+      const criteria = decodeURIComponent(u.split("criteria=")[1].split("&")[0]);
+      assert.ok(!/(?<!Tenant_1_)Phone:equals/.test(criteria) || /Tenant_1_Phone:equals/.test(criteria), criteria);
+      assert.ok(!criteria.includes("Mobile:"), `criteria must not search the unsearchable Mobile field: ${criteria}`);
+      assert.ok(!criteria.includes("(Phone:"), `criteria must not search the unsearchable plain Phone field: ${criteria}`);
+    }
+  } finally {
+    global.fetch = originalFetch;
+    delete process.env.ZOHO_CLIENT_ID; delete process.env.ZOHO_CLIENT_SECRET; delete process.env.ZOHO_REFRESH_TOKEN;
+  }
+});
