@@ -1,0 +1,37 @@
+---
+title: Property details
+description: Full details, photos and how to register your interest.
+noindex: true
+---
+<section class="intro">
+  <div class="wrap">
+    <a href="/to-let/" class="tlp-back">&larr; All properties to let</a>
+    <div id="tlp-loading" class="tl-loading">Loading…</div>
+    <div id="tlp-notfound" class="tl-empty" hidden>
+      <p>We could not find that property - it may have just been let. Here is what else we have available.</p>
+      <a class="btn btn-primary btn-sm" href="/to-let/">See properties to let <svg class="ic btn-ic" aria-hidden="true"><use href="/assets/icons.svg#arrow-up-right"/></svg></a>
+    </div>
+  </div>
+</section>
+
+<section id="tlp-content" class="section-tight" hidden>
+  <div class="wrap">
+    <div id="tlp-gallery" class="tlp-gallery"></div>
+
+    <div class="tlp-body">
+      <div class="tlp-main">
+        <h1 id="tlp-address"></h1>
+        <p class="tlp-rent"><span id="tlp-rent"></span> <span class="tlp-rent-unit">pcm</span></p>
+        <ul id="tlp-facts" class="tl-facts"></ul>
+        <p id="tlp-desc" class="tlp-desc"></p>
+        <button type="button" class="btn btn-primary" id="tlp-register">Register interest <svg class="ic btn-ic" aria-hidden="true"><use href="/assets/icons.svg#arrow-up-right"/></svg></button>
+      </div>
+    </div>
+
+    <nav class="tlp-nav">
+      <a id="tlp-prev" class="tlp-nav-link" href="#" hidden>&larr; Previous property</a>
+      <a id="tlp-next" class="tlp-nav-link" href="#" hidden>Next property &rarr;</a>
+    </nav>
+  </div>
+</section>
+<script src="/assets/js/to-let-property.js" defer></script>

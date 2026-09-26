@@ -14,7 +14,7 @@
 //   ZohoCRM.modules.custom.ALL (Maintenance), ZohoCRM.modules.attachments.ALL,
 //   ZohoCRM.settings.modules.READ, ZohoCRM.settings.fields.READ
 
-import { photoForAddress } from "./property-photos.mjs";
+import { photoForAddress, galleryForAddress } from "./property-photos.mjs";
 
 const DC = (process.env.ZOHO_DC || "com").toLowerCase();
 const ACCOUNTS = `https://accounts.zoho.${DC}`;
@@ -86,6 +86,12 @@ export async function createRecord(module, record) {
   const d = await call(`/${module}`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ data: [record] }) });
   const first = (d.data || [])[0];
   if (!first || first.status !== "success") throw new Error(`zoho create ${module}: ${JSON.stringify(first || d).slice(0, 200)}`);
+  return first.details;
+}
+export async function updateRecord(module, id, fields) {
+  const d = await call(`/${module}/${id}`, { method: "PUT", headers: { "content-type": "application/json" }, body: JSON.stringify({ data: [{ id, ...fields }] }) });
+  const first = (d.data || [])[0];
+  if (!first || first.status !== "success") throw new Error(`zoho update ${module}: ${JSON.stringify(first || d).slice(0, 200)}`);
   return first.details;
 }
 export async function addNote(module, id, title, content) {
@@ -324,6 +330,7 @@ export async function toLetProperties() {
       city: r.City || "",
       postcode: r.Post_Code || "",
       photo: photoForAddress(r.Account_Name || ""),
+      gallery: galleryForAddress(r.Account_Name || ""),
       address: maskDoorNumber(r.Account_Name || [r.Street, r.Town, r.Post_Code].filter(Boolean).join(", ")),
       rentPcm: Number(r.New_Rent_Amount || r.Monthly_Rent) || 0,
       bedrooms: r.Bedrooms1 || "",

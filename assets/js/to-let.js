@@ -22,11 +22,13 @@
       if (!properties.length) { empty.hidden = false; return; }
       grid.innerHTML = properties.map((p) => `
         <article class="tl-card">
-          ${p.photo ? `<img class="tl-photo" src="${esc(p.photo)}" alt="${esc(p.address)}" loading="lazy">` : ""}
-          <div class="tl-card-top">
-            <h3>${esc(p.address)}</h3>
-            <p class="tl-rent">${gbp(p.rentPcm)} <span>pcm</span></p>
-          </div>
+          <a class="tl-card-link" href="/to-let-property/?id=${encodeURIComponent(p.id)}">
+            ${p.photo ? `<img class="tl-photo" src="${esc(p.photo)}" alt="${esc(p.address)}" loading="lazy">` : ""}
+            <div class="tl-card-top">
+              <h3>${esc(p.address)}</h3>
+              <p class="tl-rent">${gbp(p.rentPcm)} <span>pcm</span></p>
+            </div>
+          </a>
           <ul class="tl-facts">
             ${p.bedrooms ? `<li>${esc(bedroomLabel(p.bedrooms))}</li>` : ""}
             ${p.propertyType ? `<li>${esc(p.propertyType)}</li>` : ""}
@@ -34,7 +36,10 @@
             ${p.epcRating ? `<li>EPC ${esc(p.epcRating)}</li>` : ""}
           </ul>
           ${p.description ? `<p class="tl-desc">${esc(p.description)}</p>` : ""}
-          <button type="button" class="btn btn-primary btn-sm" data-open-chat="tenancy" data-property="${esc(p.address)}">Register interest <svg class="ic btn-ic" aria-hidden="true"><use href="/assets/icons.svg#arrow-up-right"/></svg></button>
+          <div class="tl-card-actions">
+            <a class="btn btn-ghost btn-sm" href="/to-let-property/?id=${encodeURIComponent(p.id)}">Full details &amp; photos</a>
+            <button type="button" class="btn btn-primary btn-sm" data-open-chat="tenancy" data-property="${esc(p.address)}">Register interest <svg class="ic btn-ic" aria-hidden="true"><use href="/assets/icons.svg#arrow-up-right"/></svg></button>
+          </div>
         </article>
       `).join("");
     } catch (e) {
