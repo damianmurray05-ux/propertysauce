@@ -22,6 +22,7 @@
       if (!properties.length) { empty.hidden = false; return; }
       grid.innerHTML = properties.map((p) => `
         <article class="tl-card">
+          ${p.photo ? `<img class="tl-photo" src="${esc(p.photo)}" alt="${esc(p.address)}" loading="lazy">` : ""}
           <div class="tl-card-top">
             <h3>${esc(p.address)}</h3>
             <p class="tl-rent">${gbp(p.rentPcm)} <span>pcm</span></p>

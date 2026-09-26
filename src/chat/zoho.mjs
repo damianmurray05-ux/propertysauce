@@ -14,6 +14,8 @@
 //   ZohoCRM.modules.custom.ALL (Maintenance), ZohoCRM.modules.attachments.ALL,
 //   ZohoCRM.settings.modules.READ, ZohoCRM.settings.fields.READ
 
+import { photoForAddress } from "./property-photos.mjs";
+
 const DC = (process.env.ZOHO_DC || "com").toLowerCase();
 const ACCOUNTS = `https://accounts.zoho.${DC}`;
 const API = `https://www.zohoapis.${DC}/crm/v8`;
@@ -317,6 +319,7 @@ export async function toLetProperties() {
       town: r.Town || "",
       city: r.City || "",
       postcode: r.Post_Code || "",
+      photo: photoForAddress(r.Account_Name || ""),
       address: maskDoorNumber(r.Account_Name || [r.Street, r.Town, r.Post_Code].filter(Boolean).join(", ")),
       rentPcm: Number(r.New_Rent_Amount || r.Monthly_Rent) || 0,
       bedrooms: r.Bedrooms1 || "",
