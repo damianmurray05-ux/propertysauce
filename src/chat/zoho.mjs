@@ -103,6 +103,10 @@ export async function addNote(module, id, title, content) {
    someone who is not yet either. Deduplicated on phone number, because that
    is the one detail every OpenRent enquiry reliably carries. */
 export async function addToWaitlist({ name, phone, email, building, flat, source, notes }) {
+  // A name with no way to reach them is not a waitlist entry, it's noise -
+  // confirmed 26 September 2026 after a historical backfill found most old
+  // enquiries carry no contact details at all.
+  if (!phone && !email) return { skipped: "no phone or email" };
   const digits = String(phone || "").replace(/\D/g, "");
   const existing = digits ? await search("Leads", `(Phone:equals:${digits})`, "id,Description", 1).catch(() => []) : [];
   const nameParts = String(name || "").trim().split(/\s+/);
