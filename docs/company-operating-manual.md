@@ -44,6 +44,57 @@ OpenRent only accepts replies to applicants from the address registered on the a
 
 **Never change the registered email away from admin@propertysauce.co** without confirming first that whichever mailbox is being registered can actually send from that exact address — the bounce is silent to us and only visible to the applicant, so a wrong setting here can run for weeks before anyone notices from this side.
 
+### Standard replies once a property is gone or still available
+
+Once the messaging bug above was fixed, replies no longer need to apologise for a delay - that apology was only for the backlog caused by the bug. The standing default wording, to use every time from now on:
+
+**When a property has gone (default, used for a block with no vacancy right now):**
+> Hi, thank you for your interest. This one has since gone, I'm afraid. We do believe we'll have another one becoming available in the coming weeks, and we'll be in touch as soon as it is. Kind regards, Property Sauce
+
+**When a property is still available (default pre-qualification reply):**
+> Hi, thank you for your interest. The property is still available. Before we book a viewing, could you answer a few quick questions:
+> 1. Are you still looking, and when would you want to move?
+> 2. Who would be living there, and any pets?
+> 3. Your employer, role, how long you've been there, and gross annual income? (Same for anyone else whose income counts towards the rent.)
+> 4. Any CCJs, IVAs, bankruptcy or rent arrears in the last six years?
+> 5. Do you hold a UK or Irish passport - if not, what right-to-rent document do you have?
+> 6. Will you need a guarantor?
+> Once we have this we can get a viewing booked in. Kind regards, Property Sauce
+
+**Enforced by:** to be wired into whatever sends automated OpenRent/website replies once that's built. Until then, the team sends these by hand. Confirmed 26 September 2026.
+
+---
+
+## Evergreen adverts and the property waitlist
+
+### Rule: blocks of flats are advertised constantly, not just when a unit is vacant
+
+Catterick House (42 flats) and Lancaster House (55 flats) each turn over roughly one flat every couple of months. Rather than taking the advert down between vacancies and starting from zero each time, **one advert per block runs permanently**, even when nothing is currently available. Lord Street may follow the same approach but is not decided yet. This does not apply to one-off single properties.
+
+Every applicant who enquires while nothing is available is told the block "gone" reply above, and is added to a waiting list (name, phone, email, which building, which flat if known). When a flat in that block next becomes available, the whole waiting list for that building is emailed with a link to the listing. Nobody has to still be looking at the exact moment a flat comes up for this to work - a message to someone who registered a year ago and has since fallen out with their landlord can fill a flat with no fresh marketing at all.
+
+**Where the list lives:** Zoho CRM's standard **Leads** module, used only for this. Not a new custom module (no extra Zoho module-creation permission needed, no extra cost) and not Excel. Reasons: it stays completely separate from Accounts (Landlord) and Contacts (Tenant) - a waitlist entry is someone who is neither yet; and Zoho's own mailing tool, **Zoho Campaigns**, syncs natively from Leads, so "email everyone on the list" does not need Mailchimp or any other third party wired in separately. Deduplicated by phone number when adding a new entry, so a repeat enquirer updates their existing entry rather than creating a second one.
+
+**Enforced by:** `addToWaitlist()` in `src/chat/zoho.mjs`. Not yet wired into anything that calls it automatically (OpenRent enquiries, the phone agent, the website) - that's the next step. Historical applicants from past Lancaster House and Catterick House adverts are being backfilled from OpenRent's enquiry history separately. Confirmed 26 September 2026.
+
+---
+
+## Lancaster House - which room-let disclosure applies to which flat
+
+Lancaster House rooms are let on a house-share basis (no separate postal address, electricity on a top-up meter, not currently banded for council tax). Two versions of the wording exist depending on whether water and Wi-Fi are included in the room's price - **always check the flat number below before replying**, since sending the wrong one misdescribes the room to an applicant.
+
+**Draft A - water & Wi-Fi included:** flats 26a, 32c, 25a, 5a
+
+**Draft B - one-bedroom, water & Wi-Fi extra (not included):** flats 32a, 32b, 6a, 1a, 2a, 3a, 4a
+
+Both drafts also carry the standard six pre-qualification questions (see above). The exact wording for each is saved as a Note on that flat's own record in the Zoho CRM Landlord (Accounts) module, so it travels with the property even if this manual is out of date. Confirmed 26 September 2026 - more flats will be added to this list as Damian confirms them; treat any flat not listed here as undecided and check with him rather than guessing which draft applies.
+
+---
+
+## Phone agent (Inkbox) - open question on emergency guidance
+
+The current call-agent instructions (`docs/inkbox-voice-instructions.md`) tell a caller to dial 999 for a fire. Flagging rather than changing silently: in the UK, 999 covers police, fire, ambulance and coastguard, so it is the correct number for a fire as well as police/ambulance - this may be worth double-checking before any wording change, since telling a caller in a genuine fire not to call 999 would be a real safety risk. Holding this instruction as-is until Damian confirms.
+
 ---
 
 *Sections to come as they're built: full Ops 1 automated pre-qualification and viewing booking, OpenRent listing automation, the voice pipeline, and the rest of the numbered Ops procedures as each is finished and proven.*

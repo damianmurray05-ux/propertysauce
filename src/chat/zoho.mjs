@@ -92,6 +92,34 @@ export async function addNote(module, id, title, content) {
   if (!first || first.status !== "success") throw new Error(`zoho note ${module}: ${JSON.stringify(first || d).slice(0, 200)}`);
   return first.details;
 }
+/* The property waitlist. Reuses the standard Leads module rather than a new
+   custom module: no extra Zoho module-creation privilege needed, no extra
+   cost, and Leads is what Zoho's own mailing tool (Campaigns) is built to
+   sync from - so "email everyone on the list when a flat comes up" is a
+   native feature, not something we have to build. Kept strictly separate
+   from Accounts (Landlord) and Contacts (Tenant): a waitlist entry is
+   someone who is not yet either. Deduplicated on phone number, because that
+   is the one detail every OpenRent enquiry reliably carries. */
+export async function addToWaitlist({ name, phone, email, building, flat, source, notes }) {
+  const digits = String(phone || "").replace(/\D/g, "");
+  const existing = digits ? await search("Leads", `(Phone:equals:${digits})`, "id,Description", 1).catch(() => []) : [];
+  const nameParts = String(name || "").trim().split(/\s+/);
+  const record = {
+    Last_Name: nameParts.slice(1).join(" ") || nameParts[0] || "Unknown",
+    First_Name: nameParts.length > 1 ? nameParts[0] : undefined,
+    Phone: phone || undefined,
+    Email: email || undefined,
+    Company: building || "Property Sauce waitlist",
+    Lead_Source: source || "Website",
+    Description: [`Waiting list entry - ${building || ""}${flat ? ` (flat ${flat})` : ""}`, `Registered: ${new Date().toISOString().slice(0, 10)}`, notes || ""].filter(Boolean).join("\n"),
+  };
+  if (existing[0]) {
+    await call(`/Leads/${existing[0].id}`, { method: "PUT", headers: { "content-type": "application/json" }, body: JSON.stringify({ data: [{ id: existing[0].id, Description: `${existing[0].Description || ""}\n\n${record.Description}`.slice(0, 32000) }] }) });
+    return { id: existing[0].id, updated: true };
+  }
+  const details = await createRecord("Leads", record);
+  return { id: details.id, updated: false };
+}
 export async function listAttachments(module, id) {
   const d = await call(`/${module}/${id}/Attachments?fields=id,File_Name,Size,Created_Time,Modified_Time,$file_id`);
   return (d.data || []).map((a) => ({ id: a.id, name: a.File_Name, size: Number(a.Size) || 0, date: (a.Modified_Time || a.Created_Time || "").slice(0, 10), module, record: id }));
