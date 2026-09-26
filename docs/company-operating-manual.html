@@ -44,6 +44,36 @@
 <p>OpenRent only accepts replies to applicants from the address registered on the account. It was wrongly changed to Lettings@propertysauce.co on 31 August 2026 — every reply bounced from 2 September until 25 September, when it was corrected and verified. Real cost while it was wrong: lost applicants, unanswered enquiries, and a formal cancellation warning from OpenRent.</p>
 <p><strong class="label">Never change the registered email</strong> away from admin@propertysauce.co without first confirming the new mailbox can actually send from that exact address — a wrong setting here is silent to us and can run for weeks unnoticed.</p>
 
+<hr>
+
+<h2>Standard replies once a property is gone or still available</h2>
+<p>Once the messaging bug above was fixed, replies no longer need to apologise for a delay — that apology was only for the backlog it caused. Standing default wording, from now on:</p>
+<p><strong>When a property has gone:</strong> "Hi, thank you for your interest. This one has since gone, I'm afraid. We do believe we'll have another one becoming available in the coming weeks, and we'll be in touch as soon as it is. Kind regards, Property Sauce"</p>
+<p><strong>When a property is still available:</strong> "Hi, thank you for your interest. The property is still available. Before we book a viewing, could you answer a few quick questions: 1) Are you still looking, and when would you want to move? 2) Who would be living there, and any pets? 3) Your employer, role, how long you've been there, and gross annual income (same for anyone else whose income counts towards the rent)? 4) Any CCJs, IVAs, bankruptcy or rent arrears in the last six years? 5) Do you hold a UK or Irish passport — if not, what right-to-rent document do you have? 6) Will you need a guarantor? Once we have this we can get a viewing booked in. Kind regards, Property Sauce"</p>
+<p class="meta">Confirmed 26 September 2026.</p>
+
+<hr>
+
+<h2>Evergreen adverts and the property waitlist</h2>
+<h3>Rule: blocks of flats are advertised constantly, not just when a unit is vacant</h3>
+<p>Catterick House (42 flats) and Lancaster House (55 flats) each turn over roughly one flat every couple of months. Rather than taking the advert down between vacancies, <strong class="label">one advert per block runs permanently</strong>, even with nothing currently available. Lord Street may follow later, not decided yet.</p>
+<p>Every applicant who enquires while nothing is available gets the "gone" reply above and is added to a waiting list (name, phone, email, building, flat if known). When a flat in that block becomes available, the whole list for that building is emailed a link to the listing.</p>
+<p><strong>Where the list lives:</strong> Zoho CRM's standard Leads module, used only for this — not a new custom module, not Excel. Kept separate from Accounts (Landlord) and Contacts (Tenant). Zoho's own mailing tool, Zoho Campaigns, syncs natively from Leads, so no Mailchimp or other third party is needed. Deduplicated by phone number.</p>
+<p class="meta">Enforced by: <code>addToWaitlist()</code> in <code>src/chat/zoho.mjs</code>. Not yet wired into anything automatic — that's next. Confirmed 26 September 2026.</p>
+
+<hr>
+
+<h2>Lancaster House — which room-let disclosure applies to which flat</h2>
+<p>Two versions of the room-let wording exist depending on whether water and Wi-Fi are included. <strong class="label">Always check the flat number before replying.</strong></p>
+<p><strong>Draft A — water &amp; Wi-Fi included:</strong> flats 26a, 32c, 25a, 5a</p>
+<p><strong>Draft B — one-bedroom, water &amp; Wi-Fi extra:</strong> flats 32a, 32b, 6a, 1a, 2a, 3a, 4a</p>
+<p>Saved as a Note on each flat's own Zoho Landlord record. More flats to be added as confirmed — treat anything not listed as undecided.</p>
+
+<hr>
+
+<h2>Phone agent — open question on emergency guidance</h2>
+<p>The current call-agent instructions tell a caller to dial 999 for a fire. Flagging rather than changing silently: in the UK, 999 covers police, fire, ambulance and coastguard, so it is correct for fire too — worth double-checking before any change, since the wrong guidance in a real fire would be a genuine safety risk. Held as-is pending Damian's confirmation.</p>
+
 <footer>Sections to come as they're built: full Ops 1 automated pre-qualification and viewing booking, OpenRent listing automation, the voice pipeline, and the rest of the numbered Ops procedures as each is finished and proven.</footer>
 </body>
 </html>
