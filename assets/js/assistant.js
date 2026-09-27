@@ -232,8 +232,8 @@
 
   /* --- Entry points --- */
   function start() {
-    setStatus("Repairs, tenancies and enquiries");
-    say("Hello. I am the Property Sauce assistant. What do you need?");
+    setStatus(window.CHAT_STATUS || "Repairs, tenancies and enquiries");
+    say(window.CHAT_GREETING || "Hello. I am the Property Sauce assistant. What do you need?");
     chips([
       ["Report a repair", startRepair],
       ["Ask about my tenancy or a new agreement", startTenancy],
