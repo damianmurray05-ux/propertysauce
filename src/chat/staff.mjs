@@ -1,10 +1,10 @@
 // The office staff directory: who can sign in to the shift clock, and with
 // what code. Same convention as src/chat/directory.mjs (the tenant
 // directory) — never committed, provided as JSON in an environment
-// variable. Columns: name, username, code, role.
+// variable. Columns: name, username, code. No titles — just names.
 //
 //   STAFF_DIRECTORY_JSON   JSON array, e.g.
-//     [{"name":"Usman Tufail","username":"usman","code":"4821","role":"Director"}]
+//     [{"name":"Usman Tufail","username":"usman","code":"4821"}]
 
 const normaliseName = (n) => String(n || "").trim().toLowerCase().replace(/\s+/g, " ");
 
@@ -48,11 +48,11 @@ export function findStaff(name, code) {
     return nameLooksLike(r.name, r.username, typed);
   });
   return hits.length === 1
-    ? { name: hits[0].name.trim(), role: hits[0].role || "Staff", username: hits[0].username || null }
+    ? { name: hits[0].name.trim(), username: hits[0].username || null }
     : null;
 }
 
 /** The full roster, for the admin view. Codes are never returned here. */
 export function roster() {
-  return loadRows().map((r) => ({ name: (r.name || "").trim(), role: r.role || "Staff" })).filter((r) => r.name);
+  return loadRows().map((r) => ({ name: (r.name || "").trim() })).filter((r) => r.name);
 }

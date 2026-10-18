@@ -34,7 +34,7 @@ export async function GET(request) {
   const staff = staffFrom(request);
   if (!staff) return json(401, { error: "Please sign in again." });
   const open = await openShift(staff.slug).catch(() => null);
-  return json(200, { staff: { name: staff.name, role: staff.role }, open, office: { name: OFFICE.name, address: OFFICE.address } });
+  return json(200, { staff: { name: staff.name }, open, office: { name: OFFICE.name, address: OFFICE.address } });
 }
 
 export async function POST(request) {
@@ -85,7 +85,7 @@ export async function POST(request) {
     return json(403, { ok: false, status: verdict.status, message: verdict.reasons.join(" "), fix: verdict.fix });
   }
 
-  const who = { name: staff.name, role: staff.role, slug: staff.slug };
+  const who = { name: staff.name, slug: staff.slug };
   let result;
   if (action === "in") result = await clockIn({ staff: who, verdict, ip, coords });
   else if (action === "out") result = await clockOut({ staff: who, verdict, ip, coords });

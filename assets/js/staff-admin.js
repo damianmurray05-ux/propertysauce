@@ -84,7 +84,7 @@
       ${d.register.length ? `<ul>${d.register.map((r) => `<li><code>${esc(r.ip)}</code>${r.confirmedAt ? " — confirmed" : " — unconfirmed"}</li>`).join("")}</ul>` : `<p class="muted">None recorded yet. The first clean sign-in on the office Wi-Fi will add one.</p>`}
 
       <h3 style="margin-top:2rem">Staff with a code</h3>
-      <ul>${d.staff.map((s) => `<li>${esc(s.name)} — ${esc(s.role)}</li>`).join("")}</ul>`;
+      <ul>${d.staff.map((s) => `<li>${esc(s.name)}</li>`).join("")}</ul>`;
   }
 
   async function reload() {

@@ -184,7 +184,7 @@ export async function clockIn({ staff, verdict, ip, coords }) {
   if (existing) return { ok: false, error: `You are already signed in since ${existing.startedAt.slice(11, 16)}. Sign out first.` };
 
   const start = new Date();
-  const meta = { staffName: staff.name, role: staff.role, startStatus: verdict.status, startIp: ip, startDistance: verdict.distance, breaks: [], onBreak: false };
+  const meta = { staffName: staff.name, startStatus: verdict.status, startIp: ip, startDistance: verdict.distance, breaks: [], onBreak: false };
   const details = await createRecord("Events", {
     Event_Title: openTitle(slug),
     Start_DateTime: zohoDateTime(start),
