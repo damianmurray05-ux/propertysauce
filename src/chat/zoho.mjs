@@ -94,6 +94,12 @@ export async function updateRecord(module, id, fields) {
   if (!first || first.status !== "success") throw new Error(`zoho update ${module}: ${JSON.stringify(first || d).slice(0, 200)}`);
   return first.details;
 }
+export async function deleteRecord(module, id) {
+  const d = await call(`/${module}/${id}`, { method: "DELETE" });
+  const first = (d.data || [])[0];
+  if (!first || first.status !== "success") throw new Error(`zoho delete ${module}: ${JSON.stringify(first || d).slice(0, 200)}`);
+  return first.details;
+}
 export async function addNote(module, id, title, content) {
   const d = await call(`/${module}/${id}/Notes`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ data: [{ Note_Title: title.slice(0, 120), Note_Content: content.slice(0, 30000) }] }) });
   const first = (d.data || [])[0];
