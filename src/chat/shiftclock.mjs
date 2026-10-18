@@ -167,14 +167,14 @@ export async function openShift(slug) {
   return { id: rows[0].id, startedAt: rows[0].Start_DateTime, ...meta };
 }
 
-export async function logAttempt({ slug, staffName, status, ip, distance, accuracy, reasons }) {
+export async function logAttempt({ slug, staffName, status, ip, distance, accuracy, reasons, action }) {
   const at = new Date();
   const date = at.toISOString().slice(0, 10);
   await createRecord("Events", {
     Event_Title: refusedTitle(date, slug, Math.random().toString(36).slice(2, 8)),
     Start_DateTime: zohoDateTime(at),
     End_DateTime: zohoDateTime(new Date(at.getTime() + 60_000)),
-    Description: JSON.stringify({ staffName, status, ip, distance, accuracy, reasons }),
+    Description: JSON.stringify({ staffName, status, ip, distance, accuracy, reasons, action }),
   }).catch(() => {});
 }
 
@@ -184,7 +184,7 @@ export async function clockIn({ staff, verdict, ip, coords }) {
   if (existing) return { ok: false, error: `You are already signed in since ${existing.startedAt.slice(11, 16)}. Sign out first.` };
 
   const start = new Date();
-  const meta = { staffName: staff.name, role: staff.role, startStatus: verdict.status, startIp: ip, startDistance: verdict.distance };
+  const meta = { staffName: staff.name, role: staff.role, startStatus: verdict.status, startIp: ip, startDistance: verdict.distance, breaks: [], onBreak: false };
   const details = await createRecord("Events", {
     Event_Title: openTitle(slug),
     Start_DateTime: zohoDateTime(start),
@@ -200,18 +200,56 @@ export async function clockOut({ staff, verdict, ip, coords }) {
   if (!open) return { ok: false, error: "You are not signed in to a shift." };
 
   const end = new Date();
+  const breaks = Array.isArray(open.breaks) ? [...open.breaks] : [];
+  if (open.onBreak && open.breakStartedAt) {
+    const started = new Date(open.breakStartedAt);
+    breaks.push({ start: open.breakStartedAt, end: end.toISOString(), minutes: Math.max(0, Math.round((end - started) / 60_000)) });
+  }
+  const breakMinutes = breaks.reduce((sum, b) => sum + (b.minutes || 0), 0);
+
   const minutes = Math.round((end - new Date(open.startedAt)) / 60_000);
   const overrun = minutes > MAX_SHIFT_HOURS * 60;
   const date = open.startedAt.slice(0, 10);
 
-  const meta = { ...open, endStatus: verdict.status, endIp: ip, endDistance: verdict.distance, minutes, overrun };
+  const meta = { ...open, breaks, breakMinutes, onBreak: false, breakStartedAt: null, endStatus: verdict.status, endIp: ip, endDistance: verdict.distance, minutes, overrun };
   delete meta.id;
   await updateRecord("Events", open.id, {
     Event_Title: shiftTitle(date, slug, open.id.slice(-6)),
     End_DateTime: zohoDateTime(end),
     Description: JSON.stringify(meta),
   });
-  return { ok: true, minutes, overrun, shift: { ...open, endedAt: end.toISOString() } };
+  return { ok: true, minutes, overrun, breakMinutes, shift: { ...open, endedAt: end.toISOString() } };
+}
+
+export async function startBreak({ staff, verdict, ip }) {
+  const slug = staff.slug;
+  const open = await openShift(slug);
+  if (!open) return { ok: false, error: "You are not signed in to a shift." };
+  if (open.onBreak) return { ok: false, error: `You are already on a break since ${(open.breakStartedAt || "").slice(11, 16)}.` };
+
+  const start = new Date();
+  const meta = { ...open, onBreak: true, breakStartedAt: start.toISOString(), breakStartIp: ip, breakStartStatus: verdict.status };
+  delete meta.id;
+  await updateRecord("Events", open.id, { Description: JSON.stringify(meta) });
+  return { ok: true, breakStartedAt: start.toISOString() };
+}
+
+export async function endBreak({ staff, verdict, ip }) {
+  const slug = staff.slug;
+  const open = await openShift(slug);
+  if (!open) return { ok: false, error: "You are not signed in to a shift." };
+  if (!open.onBreak) return { ok: false, error: "You are not on a break." };
+
+  const end = new Date();
+  const started = new Date(open.breakStartedAt);
+  const minutes = Math.max(0, Math.round((end - started) / 60_000));
+  const breaks = Array.isArray(open.breaks) ? [...open.breaks] : [];
+  breaks.push({ start: open.breakStartedAt, end: end.toISOString(), minutes });
+
+  const meta = { ...open, breaks, onBreak: false, breakStartedAt: null, breakEndIp: ip, breakEndStatus: verdict.status };
+  delete meta.id;
+  await updateRecord("Events", open.id, { Description: JSON.stringify(meta) });
+  return { ok: true, breakMinutes: minutes, totalBreakMinutes: breaks.reduce((sum, b) => sum + (b.minutes || 0), 0) };
 }
 
 /** Every shift (closed) and refused attempt for one day, newest first. */

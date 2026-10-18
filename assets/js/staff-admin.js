@@ -42,15 +42,16 @@
   }
 
   function render(d) {
+    const ACTION_LABEL = { in: "sign-in", out: "sign-out", break: "going on break", return: "back from break", help: "asked the office" };
     const row = (e) => {
       const [colour, plain] = TONE[e.status] || ["var(--muted)", e.status || ""];
       const refused = e.kind === "refused";
-      const action = e.status === "help" ? "asked the office" : e.endedAt ? "shift" : "sign-in";
+      const action = ACTION_LABEL[e.action] || (e.status === "help" ? "asked the office" : e.endedAt ? "shift" : "sign-in");
       return `<tr style="border-bottom:1px solid var(--line)">
         <td style="padding:.5rem">${hhmm(e.at)}</td>
         <td style="padding:.5rem">${esc(e.staffName || "")}</td>
         <td style="padding:.5rem">${esc(action)}${refused ? ' <strong style="color:var(--danger)">(refused)</strong>' : ""}</td>
-        <td style="padding:.5rem">${e.minutes != null ? `${Math.floor(e.minutes / 60)}h ${e.minutes % 60}m${e.overrun ? ' <strong style="color:var(--gold)">— left open?</strong>' : ""}` : ""}</td>
+        <td style="padding:.5rem">${e.minutes != null ? `${Math.floor(e.minutes / 60)}h ${e.minutes % 60}m${e.breakMinutes ? ` <span class="muted">(incl. ${e.breakMinutes}m break)</span>` : ""}${e.overrun ? ' <strong style="color:var(--gold)">— left open?</strong>' : ""}` : ""}</td>
         <td style="padding:.5rem;color:${colour}">${esc(plain)}${e.distance != null ? ` · ${e.distance} m away` : ""}</td>
         <td style="padding:.5rem;font-size:var(--fs-0);color:var(--muted)">${esc(e.ip || "")}</td>
       </tr>`;

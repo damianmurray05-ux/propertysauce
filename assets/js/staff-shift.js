@@ -54,12 +54,16 @@
 
   function renderClock(data) {
     const open = data.open;
+    const onBreak = Boolean(open?.onBreak);
     root.innerHTML = `
       <h2>Hello ${esc(data.staff.name.split(" ")[0])}.</h2>
       <p class="muted">${esc(data.office.name)}</p>
       ${open ? `
-        <p style="margin:1rem 0">You started at <strong>${hhmm(open.startedAt)}</strong>.</p>
-        <button class="btn btn-primary" type="button" data-out style="width:100%;padding:1.1rem">Finish my shift</button>
+        <p style="margin:1rem 0">You started at <strong>${hhmm(open.startedAt)}</strong>.${onBreak ? ` On a break since <strong>${hhmm(open.breakStartedAt)}</strong>.` : ""}</p>
+        ${onBreak
+          ? `<button class="btn btn-primary" type="button" data-return style="width:100%;padding:1.1rem">I've returned</button>`
+          : `<button class="btn btn-primary" type="button" data-break style="width:100%;padding:1.1rem">Going on break</button>`}
+        <button class="btn btn-ghost" type="button" data-out style="width:100%;padding:1.1rem;margin-top:.75rem">Finish my shift</button>
       ` : `
         <button class="btn btn-primary" type="button" data-in style="width:100%;padding:1.1rem;margin-top:1rem">I am here — start my shift</button>
       `}
@@ -89,7 +93,13 @@
     if (!ok) { say(`${d.message || d.error || "That did not work."} ${d.fix || ""}`.trim(), "bad"); return; }
     if (d.raised) { say(d.message, "good"); return; }
     await load();
-    say(action === "in" ? "Signed in. Have a good shift." : `Signed out. That was ${Math.floor(d.minutes / 60)}h ${d.minutes % 60}m.`, "good");
+    const DONE = {
+      in: "Signed in. Have a good shift.",
+      out: `Signed out. That was ${Math.floor(d.minutes / 60)}h ${d.minutes % 60}m${d.breakMinutes ? ` (incl. ${d.breakMinutes}m break)` : ""}.`,
+      break: "Enjoy your break.",
+      return: `Welcome back.${d.breakMinutes ? ` That break was ${d.breakMinutes}m.` : ""}`,
+    };
+    say(DONE[action] || "Done.", "good");
   }
 
   root.addEventListener("submit", async (e) => {
@@ -111,6 +121,8 @@
   root.addEventListener("click", async (e) => {
     if (e.target.closest("[data-in]")) return clock("in");
     if (e.target.closest("[data-out]")) return clock("out");
+    if (e.target.closest("[data-break]")) return clock("break");
+    if (e.target.closest("[data-return]")) return clock("return");
     if (e.target.closest("[data-signout]")) {
       try { localStorage.removeItem(TOKEN); } catch { /* ignore */ }
       token = null;

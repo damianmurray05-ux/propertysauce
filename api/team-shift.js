@@ -7,7 +7,7 @@
 // checked against the office's own, and the time is the server's.
 import { verify, sign } from "../src/chat/crypto.mjs";
 import { staffSlug } from "../src/chat/staff.mjs";
-import { assess, clockIn, clockOut, openShift, logAttempt, OFFICE } from "../src/chat/shiftclock.mjs";
+import { assess, clockIn, clockOut, startBreak, endBreak, openShift, logAttempt, OFFICE } from "../src/chat/shiftclock.mjs";
 import { sendEmail, TEAM_EMAIL } from "../src/chat/notify.mjs";
 import { limit } from "../src/chat/ratelimit.mjs";
 
@@ -54,7 +54,7 @@ export async function POST(request) {
   // in; it tells Damian the whole picture and leaves him to decide.
   if (action === "help") {
     const open = await openShift(staff.slug).catch(() => null);
-    await logAttempt({ slug: staff.slug, staffName: staff.name, status: "help", ip, distance: null, accuracy: coords?.accuracy ?? null, reasons: [String(body.note || "").slice(0, 300)] });
+    await logAttempt({ slug: staff.slug, staffName: staff.name, status: "help", ip, distance: null, accuracy: coords?.accuracy ?? null, reasons: [String(body.note || "").slice(0, 300)], action: "help" });
     await sendEmail({
       to: TEAM_EMAIL,
       subject: `Shift clock — ${staff.name} cannot sign ${open ? "out" : "in"}`,
@@ -71,21 +71,26 @@ export async function POST(request) {
     return json(200, { ok: true, raised: true, message: "The office has been told. Ring them if it is urgent." });
   }
 
-  if (action !== "in" && action !== "out") return json(400, { error: "action must be in, out or help." });
+  if (!["in", "out", "break", "return"].includes(action)) return json(400, { error: "action must be in, out, break, return or help." });
 
   const open = await openShift(staff.slug).catch(() => null);
-  if (action === "out" && !open) return json(409, { error: "You are not signed in to a shift." });
+  if ((action === "out" || action === "break" || action === "return") && !open) return json(409, { error: "You are not signed in to a shift." });
+  if (action === "break" && open.onBreak) return json(409, { error: `You are already on a break since ${(open.breakStartedAt || "").slice(11, 16)}.` });
+  if (action === "return" && !open.onBreak) return json(409, { error: "You are not on a break." });
 
   const verdict = await assess({ ip, coords });
 
   if (!verdict.allow) {
-    await logAttempt({ slug: staff.slug, staffName: staff.name, status: verdict.status, ip, distance: verdict.distance, accuracy: coords?.accuracy ?? null, reasons: verdict.reasons });
+    await logAttempt({ slug: staff.slug, staffName: staff.name, status: verdict.status, ip, distance: verdict.distance, accuracy: coords?.accuracy ?? null, reasons: verdict.reasons, action });
     return json(403, { ok: false, status: verdict.status, message: verdict.reasons.join(" "), fix: verdict.fix });
   }
 
-  const result = action === "in"
-    ? await clockIn({ staff: { name: staff.name, role: staff.role, slug: staff.slug }, verdict, ip, coords })
-    : await clockOut({ staff: { name: staff.name, role: staff.role, slug: staff.slug }, verdict, ip, coords });
+  const who = { name: staff.name, role: staff.role, slug: staff.slug };
+  let result;
+  if (action === "in") result = await clockIn({ staff: who, verdict, ip, coords });
+  else if (action === "out") result = await clockOut({ staff: who, verdict, ip, coords });
+  else if (action === "break") result = await startBreak({ staff: who, verdict, ip });
+  else result = await endBreak({ staff: who, verdict, ip });
 
   if (!result.ok) return json(409, { error: result.error });
 
@@ -108,7 +113,10 @@ export async function POST(request) {
   return json(200, {
     ok: true,
     status: verdict.status,
-    ...(action === "in" ? { signedInAt: result.shift.startedAt } : { minutes: result.minutes }),
+    ...(action === "in" ? { signedInAt: result.shift.startedAt } : {}),
+    ...(action === "out" ? { minutes: result.minutes, breakMinutes: result.breakMinutes } : {}),
+    ...(action === "break" ? { onBreakSince: result.breakStartedAt } : {}),
+    ...(action === "return" ? { breakMinutes: result.breakMinutes } : {}),
     note: verdict.status === "verified" ? null : verdict.reasons.join(" "),
   });
 }
