@@ -69,8 +69,9 @@
       `}
       <p class="notice" data-staff-status hidden style="margin-top:1rem"></p>
       <p class="muted" style="margin-top:1.5rem;font-size:var(--fs-0)">
-        You need to be on the office Wi-Fi for this to work. If it will not let you in and you are
-        definitely at the office, <a href="#" data-help>tell the office</a> — do not just carry on.
+        You need to be on the office Wi-Fi for this to work. First time today, or it won't let you
+        in even though you're definitely at the office? <a href="#" data-register>Register this office Wi-Fi</a>,
+        then try again. Still stuck — <a href="#" data-help>tell the office</a>, don't just carry on.
       </p>
       <button class="btn btn-ghost btn-sm" type="button" data-signout style="margin-top:1rem">Not you? Sign out</button>`;
   }
@@ -98,6 +99,7 @@
       out: `Signed out. That was ${Math.floor(d.minutes / 60)}h ${d.minutes % 60}m${d.breakMinutes ? ` (incl. ${d.breakMinutes}m break)` : ""}.`,
       break: "Enjoy your break.",
       return: `Welcome back.${d.breakMinutes ? ` That break was ${d.breakMinutes}m.` : ""}`,
+      "register-network": "Thanks — this office Wi-Fi is now recognised. Tap below to try again.",
     };
     say(DONE[action] || "Done.", "good");
   }

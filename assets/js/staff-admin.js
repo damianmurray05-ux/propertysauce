@@ -8,11 +8,14 @@
   const statusEl = document.getElementById("sa-status");
   const keyField = document.getElementById("sa-key");
   const dateField = document.getElementById("sa-date");
+  const monthField = document.getElementById("sa-month");
+  const tsOut = document.getElementById("sa-timesheet-out");
 
   const STORE = "ps.staffadmin.key";
   let key = null;
   try { key = localStorage.getItem(STORE); } catch { /* ignore */ }
   dateField.value = new Date().toISOString().slice(0, 10);
+  if (monthField) monthField.value = new Date().toISOString().slice(0, 7);
 
   const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
   const say = (m, bad) => { statusEl.hidden = !m; statusEl.textContent = m || ""; statusEl.className = `notice${bad ? " err" : ""}`; };
@@ -39,6 +42,36 @@
     const d = await r.json().catch(() => ({}));
     if (!r.ok) throw new Error(d.error || "That did not work.");
     return d;
+  }
+
+  async function getTimesheet() {
+    const r = await fetch(`/api/team-timesheet?key=${encodeURIComponent(key)}&month=${encodeURIComponent(monthField.value)}`);
+    if (!r.ok) throw new Error(r.status === 404 ? "That key was not recognised." : "Could not load the timesheet.");
+    return r.json();
+  }
+
+  function renderTimesheet(d) {
+    if (!d.staff.length) { tsOut.innerHTML = `<p class="muted">No completed shifts for ${esc(d.month)} yet.</p>`; return; }
+    tsOut.innerHTML = d.staff.map((s) => `
+      <div style="margin-bottom:1.5rem">
+        <h4 style="margin:0 0 .5rem">${esc(s.name)} — <strong>${Math.floor(s.totalMinutes / 60)}h ${s.totalMinutes % 60}m</strong>${s.totalBreakMinutes ? ` <span class="muted" style="font-size:var(--fs-0)">(${Math.floor(s.totalBreakMinutes / 60)}h ${s.totalBreakMinutes % 60}m break, not paid)</span>` : ""}</h4>
+        <table style="width:100%;border-collapse:collapse;font-size:var(--fs-0)">
+          <thead><tr style="text-align:left;border-bottom:1px solid var(--line-strong)">
+            <th style="padding:.35rem">Date</th><th style="padding:.35rem">Start</th><th style="padding:.35rem">End</th><th style="padding:.35rem">Hours</th>
+          </tr></thead>
+          <tbody>${s.days.map((day) => `<tr style="border-bottom:1px solid var(--line)">
+            <td style="padding:.35rem">${esc(day.date)}</td>
+            <td style="padding:.35rem">${hhmm(day.startedAt)}</td>
+            <td style="padding:.35rem">${hhmm(day.endedAt)}</td>
+            <td style="padding:.35rem">${Math.floor(day.minutes / 60)}h ${day.minutes % 60}m${day.overrun ? ' <strong style="color:var(--gold)">— left open?</strong>' : ""}</td>
+          </tr>`).join("")}</tbody>
+        </table>
+      </div>`).join("");
+  }
+
+  async function reloadTimesheet() {
+    try { renderTimesheet(await getTimesheet()); }
+    catch (e) { tsOut.innerHTML = `<p class="notice err">${esc(e.message)}</p>`; }
   }
 
   function render(d) {
@@ -102,10 +135,12 @@
       authBox.hidden = true;
       view.hidden = false;
       await reload();
+      await reloadTimesheet();
     } catch (err) { say(err.message, true); }
   });
 
   document.getElementById("sa-reload").addEventListener("click", reload);
+  document.getElementById("sa-timesheet-reload").addEventListener("click", reloadTimesheet);
 
   out.addEventListener("click", async (e) => {
     const confirmBtn = e.target.closest("[data-confirm]");
@@ -121,5 +156,6 @@
 
   if (key) {
     get().then((d) => { authBox.hidden = true; view.hidden = false; render(d); }).catch(() => {});
+    reloadTimesheet();
   }
 })();

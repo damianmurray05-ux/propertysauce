@@ -7,7 +7,7 @@
 // checked against the office's own, and the time is the server's.
 import { verify, sign } from "../src/chat/crypto.mjs";
 import { staffSlug } from "../src/chat/staff.mjs";
-import { assess, clockIn, clockOut, startBreak, endBreak, openShift, logAttempt, OFFICE } from "../src/chat/shiftclock.mjs";
+import { assess, clockIn, clockOut, startBreak, endBreak, registerNetwork, openShift, logAttempt, OFFICE } from "../src/chat/shiftclock.mjs";
 import { sendEmail, TEAM_EMAIL } from "../src/chat/notify.mjs";
 import { limit } from "../src/chat/ratelimit.mjs";
 
@@ -71,7 +71,18 @@ export async function POST(request) {
     return json(200, { ok: true, raised: true, message: "The office has been told. Ring them if it is urgent." });
   }
 
-  if (!["in", "out", "break", "return"].includes(action)) return json(400, { error: "action must be in, out, break, return or help." });
+  // Register this network — the fix for the chicken-and-egg problem: the
+  // clock won't trust an unknown address, and it only learns one
+  // automatically when GPS also lines up, which is useless on a device with
+  // no location fix. A signed-in member of staff can just say so while
+  // standing on the Wi-Fi. No location check here on purpose — see
+  // registerNetwork()'s own comment for why that's still safe.
+  if (action === "register-network") {
+    await registerNetwork({ staffName: staff.name, ip });
+    return json(200, { ok: true, status: "registered", message: `This office Wi-Fi (${ip}) is now recognised.` });
+  }
+
+  if (!["in", "out", "break", "return"].includes(action)) return json(400, { error: "action must be in, out, break, return, register-network or help." });
 
   const open = await openShift(staff.slug).catch(() => null);
   if ((action === "out" || action === "break" || action === "return") && !open) return json(409, { error: "You are not signed in to a shift." });

@@ -110,6 +110,21 @@ export async function forgetIp(ip) {
   if (existing) await deleteRecord("Events", existing.id);
 }
 
+// --- registering a network by standing in the building ----------------------
+// The chicken-and-egg problem: assess() only trusts an IP once it is known,
+// and it only learns a new one automatically when GPS also lines up — useless
+// on a device with no location fix. The fix, same as Luxe Stay's /team/here:
+// a signed-in member of staff, physically on the Wi-Fi, can just say so. No
+// GPS needed for this one action, because there is nothing to contradict —
+// either they are lying about being signed in to a real code, or the office
+// wifi now resolves to this address. Immediately confirmed, not left pending,
+// because a deliberate tap from an authenticated person is stronger evidence
+// than the passive GPS-match that normally leaves an address "learned".
+export async function registerNetwork({ staffName, ip }) {
+  await rememberIp(ip, { confirmed: true, by: staffName, note: "registered by tapping \"Register this office Wi-Fi\"" });
+  return { ok: true };
+}
+
 // --- deciding whether to believe them ---------------------------------------
 // Same matrix as Luxe Stay, one office instead of many properties.
 
@@ -270,6 +285,47 @@ export async function dayLog(date) {
     parsed.push({ kind: "refused", at: r.Start_DateTime, ...meta });
   }
   return parsed.sort((a, b) => (b.at || "").localeCompare(a.at || ""));
+}
+
+// --- the monthly timesheet, for payroll --------------------------------------
+// Every closed shift ("SHIFT: ...") carries its own worked minutes and break
+// minutes already, computed once at clock-out — this just finds the ones
+// inside a date range and groups them by who worked them. REFUSED attempts
+// are deliberately excluded: they're for diagnosing the clock, not for pay.
+
+export async function rangeLog(from, to) {
+  const rows = await search("Events", `(Event_Title:starts_with:SHIFT:)`, "id,Event_Title,Start_DateTime,End_DateTime,Description", 1000).catch(() => []);
+  const out = [];
+  for (const r of rows) {
+    const date = (r.Start_DateTime || "").slice(0, 10);
+    if (date < from || date > to) continue;
+    let meta = {};
+    try { meta = JSON.parse(r.Description || "{}"); } catch { /* ignore */ }
+    out.push({
+      date,
+      staffName: meta.staffName || "Unknown",
+      startedAt: r.Start_DateTime,
+      endedAt: r.End_DateTime,
+      minutes: meta.minutes || 0,
+      breakMinutes: meta.breakMinutes || 0,
+      overrun: Boolean(meta.overrun),
+    });
+  }
+  return out.sort((a, b) => a.date.localeCompare(b.date) || a.startedAt.localeCompare(b.startedAt));
+}
+
+/** Shifts in [from, to] (YYYY-MM-DD, inclusive), grouped by staff member. */
+export async function timesheet(from, to) {
+  const rows = await rangeLog(from, to);
+  const byStaff = new Map();
+  for (const r of rows) {
+    if (!byStaff.has(r.staffName)) byStaff.set(r.staffName, { name: r.staffName, totalMinutes: 0, totalBreakMinutes: 0, days: [] });
+    const s = byStaff.get(r.staffName);
+    s.days.push(r);
+    s.totalMinutes += r.minutes;
+    s.totalBreakMinutes += r.breakMinutes;
+  }
+  return Array.from(byStaff.values()).sort((a, b) => a.name.localeCompare(b.name));
 }
 
 export const config = { FENCE_METRES, MAX_ACCURACY_METRES, MAX_SHIFT_HOURS, OFFICE };
