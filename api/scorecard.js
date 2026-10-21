@@ -32,7 +32,10 @@ export async function POST(request) {
     try {
       const { tenantFile } = await import("../src/chat/tenantfile.mjs");
       const file = await tenantFile({ id: s.id, pid: s.pid });
-      documents = file.documents.map((d) => ({ type: d.type, title: d.title, date: d.date, url: d.url.startsWith("/api/file") ? `${d.url}&s=${encodeURIComponent(body.session)}` : d.url, drive: Boolean(d.drive) }));
+      // Held back on Damian's instruction, 20 Oct 2026: while the tenant
+      // portal is being tested, only rent statements show here — not
+      // tenancy agreements, certificates or anything else on file.
+      documents = file.documents.filter((d) => d.type === "statement").map((d) => ({ type: d.type, title: d.title, date: d.date, url: d.url.startsWith("/api/file") ? `${d.url}&s=${encodeURIComponent(body.session)}` : d.url, drive: Boolean(d.drive) }));
     } catch (e) { console.error("tenant documents failed", e.message); }
   }
   return json(200, {
