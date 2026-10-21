@@ -34,7 +34,7 @@ export async function GET(request) {
   const staff = staffFrom(request);
   if (!staff) return json(401, { error: "Please sign in again." });
   const open = await openShift(staff.slug).catch(() => null);
-  return json(200, { staff: { name: staff.name }, open, office: { name: OFFICE.name, address: OFFICE.address } });
+  return json(200, { staff: { name: staff.name, remote: Boolean(staff.remote) }, open, office: { name: OFFICE.name, address: OFFICE.address } });
 }
 
 export async function POST(request) {
@@ -89,7 +89,13 @@ export async function POST(request) {
   if (action === "break" && open.onBreak) return json(409, { error: `You are already on a break since ${(open.breakStartedAt || "").slice(11, 16)}.` });
   if (action === "return" && !open.onBreak) return json(409, { error: "You are not on a break." });
 
-  const verdict = await assess({ ip, coords });
+  // Syra and anyone else working from home have no office to be checked
+  // against — the Wi-Fi/GPS fence is meaningless for a job that's deliberately
+  // remote. Their personal code is the whole control, same as it is for
+  // everyone signing in to /staff/ in the first place.
+  const verdict = staff.remote
+    ? { allow: true, status: "remote", reasons: [], ipMatch: null, gps: null, distance: null, fix: null }
+    : await assess({ ip, coords });
 
   if (!verdict.allow) {
     await logAttempt({ slug: staff.slug, staffName: staff.name, status: verdict.status, ip, distance: verdict.distance, accuracy: coords?.accuracy ?? null, reasons: verdict.reasons, action });

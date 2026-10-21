@@ -5,6 +5,10 @@
 //
 //   STAFF_DIRECTORY_JSON   JSON array, e.g.
 //     [{"name":"Usman Tufail","username":"usman","code":"4821"}]
+//
+// "remote": true on a row (e.g. Syra, who works from home out of office
+// hours) means the office Wi-Fi/GPS check never applies to that person —
+// there is no building for them to be "at". See assess() in shiftclock.mjs.
 
 const normaliseName = (n) => String(n || "").trim().toLowerCase().replace(/\s+/g, " ");
 
@@ -48,7 +52,7 @@ export function findStaff(name, code) {
     return nameLooksLike(r.name, r.username, typed);
   });
   return hits.length === 1
-    ? { name: hits[0].name.trim(), username: hits[0].username || null }
+    ? { name: hits[0].name.trim(), username: hits[0].username || null, remote: Boolean(hits[0].remote) }
     : null;
 }
 

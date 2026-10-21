@@ -55,9 +55,10 @@
   function renderClock(data) {
     const open = data.open;
     const onBreak = Boolean(open?.onBreak);
+    const remote = Boolean(data.staff.remote);
     root.innerHTML = `
       <h2>Hello ${esc(data.staff.name.split(" ")[0])}.</h2>
-      <p class="muted">${esc(data.office.name)}</p>
+      <p class="muted">${remote ? "Working from home" : esc(data.office.name)}</p>
       ${open ? `
         <p style="margin:1rem 0">You started at <strong>${hhmm(open.startedAt)}</strong>.${onBreak ? ` On a break since <strong>${hhmm(open.breakStartedAt)}</strong>.` : ""}</p>
         ${onBreak
@@ -69,9 +70,11 @@
       `}
       <p class="notice" data-staff-status hidden style="margin-top:1rem"></p>
       <p class="muted" style="margin-top:1.5rem;font-size:var(--fs-0)">
-        You need to be on the office Wi-Fi for this to work. First time today, or it won't let you
-        in even though you're definitely at the office? <a href="#" data-register>Register this office Wi-Fi</a>,
-        then try again. Still stuck — <a href="#" data-help>tell the office</a>, don't just carry on.
+        ${remote
+          ? `Working from home, so there's no Wi-Fi check — your code is all that's needed. Something not working? <a href="#" data-help>tell the office</a>.`
+          : `You need to be on the office Wi-Fi for this to work. First time today, or it won't let you
+             in even though you're definitely at the office? <a href="#" data-register>Register this office Wi-Fi</a>,
+             then try again. Still stuck — <a href="#" data-help>tell the office</a>, don't just carry on.`}
       </p>
       <button class="btn btn-ghost btn-sm" type="button" data-signout style="margin-top:1rem">Not you? Sign out</button>`;
   }

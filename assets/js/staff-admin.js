@@ -29,6 +29,7 @@
     "off-site": ["var(--danger)", "Refused — not on the Wi-Fi, device said elsewhere"],
     unproven: ["var(--danger)", "Refused — nothing placed them at the office"],
     help: ["var(--gold)", "Asked the office"],
+    remote: ["var(--success)", "Works from home — no Wi-Fi check applies"],
   };
 
   async function get() {

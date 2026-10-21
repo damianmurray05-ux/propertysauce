@@ -19,6 +19,6 @@ export async function POST(request) {
   const staff = findStaff(body.name, body.code);
   if (!staff) return json(401, { error: "Name or code not recognised." });
 
-  const token = sign({ t: "staff", name: staff.name, slug: staffSlug(staff.name), exp: Date.now() + 14 * 24 * 60 * 60 * 1000 });
-  return json(200, { token, staff: { name: staff.name } });
+  const token = sign({ t: "staff", name: staff.name, slug: staffSlug(staff.name), remote: staff.remote, exp: Date.now() + 14 * 24 * 60 * 60 * 1000 });
+  return json(200, { token, staff: { name: staff.name, remote: staff.remote } });
 }
