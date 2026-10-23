@@ -39,3 +39,12 @@ export async function getCall(callId) {
   if (!r.ok) throw new Error(`inkbox get-call ${r.status}: ${JSON.stringify(d).slice(0, 300)}`);
   return d;
 }
+
+export async function getTranscript(callId) {
+  const r = await fetch(`https://inkbox.ai/api/v1/phone/calls/${callId}/transcripts`, {
+    headers: { "X-API-Key": process.env.INKBOX_API_KEY },
+  });
+  const d = await r.json().catch(() => ([]));
+  if (!r.ok) throw new Error(`inkbox transcripts ${r.status}: ${JSON.stringify(d).slice(0, 300)}`);
+  return d;
+}

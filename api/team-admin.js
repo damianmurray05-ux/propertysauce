@@ -16,7 +16,7 @@ import { timingSafeEqual } from "node:crypto";
 import { dayLog, knownIps, rememberIp, forgetIp, config } from "../src/chat/shiftclock.mjs";
 import { roster } from "../src/chat/staff.mjs";
 import { allowanceFor, leaveSummary } from "../src/chat/holidays.mjs";
-import { placeCall, getCall, outboundCallConfigured } from "../src/chat/outbound-call.mjs";
+import { placeCall, getCall, getTranscript, outboundCallConfigured } from "../src/chat/outbound-call.mjs";
 import { limit } from "../src/chat/ratelimit.mjs";
 
 const json = (status, body) => new Response(JSON.stringify(body), { status, headers: { "content-type": "application/json", "cache-control": "no-store" } });
@@ -38,7 +38,11 @@ export async function GET(request) {
   if (!authorised(url.searchParams.get("key"))) return json(404, { error: "not_found" });
 
   const callId = url.searchParams.get("callId");
-  if (callId) return json(200, await getCall(callId));
+  if (callId) {
+    const call = await getCall(callId);
+    if (url.searchParams.get("transcript")) call.transcript = await getTranscript(callId).catch(() => []);
+    return json(200, call);
+  }
 
   const date = url.searchParams.get("date");
   const day = isDate(date) ? date : new Date().toISOString().slice(0, 10);
