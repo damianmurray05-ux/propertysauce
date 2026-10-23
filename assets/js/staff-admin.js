@@ -117,6 +117,20 @@
       <h3 style="margin-top:2rem">Known office addresses</h3>
       ${d.register.length ? `<ul>${d.register.map((r) => `<li><code>${esc(r.ip)}</code>${r.confirmedAt ? " — confirmed" : " — unconfirmed"}</li>`).join("")}</ul>` : `<p class="muted">None recorded yet. The first clean sign-in on the office Wi-Fi will add one.</p>`}
 
+      <h3 style="margin-top:2rem">Holidays this year</h3>
+      ${d.holidays && d.holidays.length ? `<table style="width:100%;border-collapse:collapse;font-size:var(--fs-1)">
+        <thead><tr style="text-align:left;border-bottom:2px solid var(--line-strong)">
+          <th style="padding:.5rem">Who</th><th style="padding:.5rem">Allowed</th><th style="padding:.5rem">Public holidays</th><th style="padding:.5rem">Taken</th><th style="padding:.5rem">Left</th>
+        </tr></thead>
+        <tbody>${d.holidays.map((h) => `<tr style="border-bottom:1px solid var(--line)">
+          <td style="padding:.5rem">${esc(h.name)}</td>
+          <td style="padding:.5rem">${h.allowance}</td>
+          <td style="padding:.5rem">${h.publicHolidaysDeducted}</td>
+          <td style="padding:.5rem">${h.takenDays}</td>
+          <td style="padding:.5rem;${h.remaining < 0 ? "color:var(--danger)" : ""}">${h.remaining}</td>
+        </tr>`).join("")}</tbody>
+      </table>` : `<p class="muted">Nothing to show.</p>`}
+
       <h3 style="margin-top:2rem">Staff with a code</h3>
       <ul>${d.staff.map((s) => `<li>${esc(s.name)}</li>`).join("")}</ul>`;
   }

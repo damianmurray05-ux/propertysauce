@@ -6,7 +6,7 @@
 //   STAFF_DIRECTORY_JSON   JSON array, e.g.
 //     [{"name":"Usman Tufail","username":"usman","code":"4821"}]
 //
-// "remote": true on a row (e.g. Syra, who works from home out of office
+// "remote": true on a row (e.g. Serat, who works from home out of office
 // hours) means the office Wi-Fi/GPS check never applies to that person —
 // there is no building for them to be "at". See assess() in shiftclock.mjs.
 

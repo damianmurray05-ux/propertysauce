@@ -89,7 +89,7 @@ export async function POST(request) {
   if (action === "break" && open.onBreak) return json(409, { error: `You are already on a break since ${(open.breakStartedAt || "").slice(11, 16)}.` });
   if (action === "return" && !open.onBreak) return json(409, { error: "You are not on a break." });
 
-  // Syra and anyone else working from home have no office to be checked
+  // Serat and anyone else working from home have no office to be checked
   // against — the Wi-Fi/GPS fence is meaningless for a job that's deliberately
   // remote. Their personal code is the whole control, same as it is for
   // everyone signing in to /staff/ in the first place.

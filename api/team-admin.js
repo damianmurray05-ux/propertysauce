@@ -10,6 +10,7 @@
 import { timingSafeEqual } from "node:crypto";
 import { dayLog, knownIps, rememberIp, forgetIp, config } from "../src/chat/shiftclock.mjs";
 import { roster } from "../src/chat/staff.mjs";
+import { allowanceFor, holidaysSummary } from "../src/chat/holidays.mjs";
 import { limit } from "../src/chat/ratelimit.mjs";
 
 const json = (status, body) => new Response(JSON.stringify(body), { status, headers: { "content-type": "application/json", "cache-control": "no-store" } });
@@ -36,12 +37,21 @@ export async function GET(request) {
   const ips = await knownIps();
   const pending = ips.filter((r) => !r.confirmedAt);
 
+  const taken = await holidaysSummary().catch(() => []);
+  const takenByName = new Map(taken.map((t) => [t.name, t.takenDays]));
+  const holidays = roster().map((s) => {
+    const { allowance, publicHolidaysDeducted, adjustedAllowance } = allowanceFor(s.name);
+    const takenDays = takenByName.get(s.name) || 0;
+    return { name: s.name, allowance, publicHolidaysDeducted, adjustedAllowance, takenDays, remaining: adjustedAllowance - takenDays };
+  });
+
   return json(200, {
     date: day,
     events: await dayLog(day),
     register: ips,
     pending,
     staff: roster(),
+    holidays,
     config,
   });
 }

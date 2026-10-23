@@ -52,7 +52,7 @@
     if (message) say(message, "bad");
   }
 
-  function renderClock(data) {
+  function renderClock(data, holidays) {
     const open = data.open;
     const onBreak = Boolean(open?.onBreak);
     const remote = Boolean(data.staff.remote);
@@ -76,14 +76,54 @@
              in even though you're definitely at the office? <a href="#" data-register>Register this office Wi-Fi</a>,
              then try again. Still stuck — <a href="#" data-help>tell the office</a>, don't just carry on.`}
       </p>
-      <button class="btn btn-ghost btn-sm" type="button" data-signout style="margin-top:1rem">Not you? Sign out</button>`;
+      <button class="btn btn-ghost btn-sm" type="button" data-signout style="margin-top:1rem">Not you? Sign out</button>
+      ${renderHolidays(holidays)}`;
+  }
+
+  function renderHolidays(h) {
+    if (!h) return "";
+    const over = h.remaining < 0;
+    return `
+      <div style="margin-top:1.5rem;padding-top:1.25rem;border-top:1px solid var(--line)">
+        <p style="margin:0 0 .75rem">
+          <strong style="${over ? "color:var(--danger)" : ""}">${h.remaining} day${h.remaining === 1 ? "" : "s"}</strong> of holiday left this year
+          <span class="muted" style="font-size:var(--fs-0)">(${h.allowance} allowed − ${h.publicHolidaysDeducted} public holidays, ${h.takenDays} taken${over ? " — over allowance" : ""})</span>
+        </p>
+        <button class="btn btn-ghost btn-sm" type="button" data-book-holiday>Book a holiday</button>
+        <div id="holiday-form" hidden style="margin-top:1rem"></div>
+        ${h.requests.length ? `<ul style="margin-top:1rem;padding-left:0;list-style:none;font-size:var(--fs-0)">${h.requests.slice(0, 6).map((r) => `<li style="padding:.4rem 0;border-top:1px solid var(--line)">
+          ${esc(r.startDate)}${r.endDate !== r.startDate ? ` – ${esc(r.endDate)}` : ""}
+          — ${r.chargedDays} day${r.chargedDays === 1 ? "" : "s"}${r.shortNotice && !r.isEmergency ? ' <span class="muted">(doubled — short notice)</span>' : ""}${r.isEmergency ? ' <span class="muted">(emergency, proof on file)</span>' : ""}
+        </li>`).join("")}</ul>` : ""}
+      </div>`;
+  }
+
+  function holidayFormHtml() {
+    return `
+      <form class="score-form" id="holiday-request-form" style="grid-template-columns:1fr" novalidate>
+        <div class="field"><label for="h-start">First day</label><input id="h-start" type="date" required></div>
+        <div class="field"><label for="h-end">Last day</label><input id="h-end" type="date" required></div>
+        <div class="field"><label for="h-reason">Reason (optional)</label><input id="h-reason" type="text"></div>
+        <label style="display:flex;gap:.5rem;align-items:center;font-size:var(--fs-0)">
+          <input id="h-emergency" type="checkbox"> This is a medical emergency (upload proof to avoid the short-notice penalty)
+        </label>
+        <div class="field" id="h-proof-field" hidden><label for="h-proof">Proof (PDF)</label><input id="h-proof" type="file" accept="application/pdf"></div>
+        <button class="btn btn-primary btn-sm" type="submit">Request holiday</button>
+      </form>
+      <p class="notice" data-holiday-status hidden style="margin-top:.75rem"></p>`;
+  }
+
+  async function loadHolidays() {
+    const { ok, d } = await api("/api/team-holiday", { headers: { authorization: `Bearer ${token}` } });
+    return ok ? d : null;
   }
 
   async function load() {
     const { status, d } = await api("/api/team-shift", { headers: { authorization: `Bearer ${token}` } });
     if (status === 401) { try { localStorage.removeItem(TOKEN); } catch { /* ignore */ } token = null; return renderSignIn("Please sign in again."); }
     if (status !== 200) return renderSignIn(d.error || "Something went wrong. Ring the office.");
-    renderClock(d);
+    const holidays = await loadHolidays();
+    renderClock(d, holidays);
   }
 
   async function clock(action, extra = {}) {
@@ -107,20 +147,67 @@
     say(DONE[action] || "Done.", "good");
   }
 
+  /** A File to base64, no compression — needed intact for a PDF. */
+  const readAsBase64 = (file) => new Promise((resolve, reject) => {
+    const r = new FileReader();
+    r.onload = () => resolve(r.result.split(",")[1]);
+    r.onerror = reject;
+    r.readAsDataURL(file);
+  });
+
   root.addEventListener("submit", async (e) => {
-    const form = e.target.closest("#staff-login");
-    if (!form) return;
-    e.preventDefault();
-    say("Checking…");
-    const { ok, d } = await api("/api/team-signin", {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify({ name: form.name.value, code: form.code.value }),
-    });
-    if (!ok) return say(d.error || "That did not work.", "bad");
-    token = d.token;
-    try { localStorage.setItem(TOKEN, token); } catch { /* ignore */ }
-    await load();
+    const loginForm = e.target.closest("#staff-login");
+    if (loginForm) {
+      e.preventDefault();
+      say("Checking…");
+      const { ok, d } = await api("/api/team-signin", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ name: loginForm.name.value, code: loginForm.code.value }),
+      });
+      if (!ok) return say(d.error || "That did not work.", "bad");
+      token = d.token;
+      try { localStorage.setItem(TOKEN, token); } catch { /* ignore */ }
+      await load();
+      return;
+    }
+
+    const holidayForm = e.target.closest("#holiday-request-form");
+    if (holidayForm) {
+      e.preventDefault();
+      const statusEl = root.querySelector("[data-holiday-status]");
+      const say2 = (m, bad) => { if (!statusEl) return; statusEl.hidden = !m; statusEl.textContent = m || ""; statusEl.className = `notice${bad ? " err" : ""}`; };
+      say2("Checking…");
+      const emergency = root.querySelector("#h-emergency").checked;
+      const fileInput = root.querySelector("#h-proof");
+      let proof = null;
+      if (emergency) {
+        const file = fileInput?.files?.[0];
+        if (!file) return say2("Add the PDF proof, or untick the emergency box.", true);
+        proof = await readAsBase64(file);
+      }
+      const { ok, d } = await api("/api/team-holiday", {
+        method: "POST",
+        headers: { authorization: `Bearer ${token}`, "content-type": "application/json" },
+        body: JSON.stringify({
+          startDate: root.querySelector("#h-start").value,
+          endDate: root.querySelector("#h-end").value,
+          reason: root.querySelector("#h-reason").value,
+          isEmergency: emergency,
+          proof,
+        }),
+      });
+      if (!ok) return say2(d.error || "That did not work.", true);
+      await load();
+      say(`Booked — ${d.chargedDays} day${d.chargedDays === 1 ? "" : "s"}${d.shortNotice && !d.isEmergency ? " (doubled for short notice)" : ""}.`, "good");
+    }
+  });
+
+  root.addEventListener("change", (e) => {
+    if (e.target.id === "h-emergency") {
+      const field = root.querySelector("#h-proof-field");
+      if (field) field.hidden = !e.target.checked;
+    }
   });
 
   root.addEventListener("click", async (e) => {
@@ -128,6 +215,13 @@
     if (e.target.closest("[data-out]")) return clock("out");
     if (e.target.closest("[data-break]")) return clock("break");
     if (e.target.closest("[data-return]")) return clock("return");
+    if (e.target.closest("[data-book-holiday]")) {
+      const el = root.querySelector("#holiday-form");
+      if (!el) return;
+      el.hidden = !el.hidden;
+      if (!el.hidden) el.innerHTML = holidayFormHtml();
+      return;
+    }
     if (e.target.closest("[data-signout]")) {
       try { localStorage.removeItem(TOKEN); } catch { /* ignore */ }
       token = null;

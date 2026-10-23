@@ -130,7 +130,21 @@
   /* --- Tenant verification --- */
   // What to do once a tenant is verified: report a repair (default) or ask about their tenancy.
   let afterVerify = "repair";
+  // The portal (scorecard.js) writes to this same sessionStorage key when a
+  // tenant signs in there. This widget's own `state` was captured once at
+  // page load, so a sign-in that happens afterwards on the portal never
+  // reaches it without re-reading storage here — otherwise a tenant who just
+  // signed in to see their scorecard gets asked to verify all over again the
+  // moment they open the chat.
+  function syncSession() {
+    if (state.session && state.tenant) return;
+    try {
+      const stored = JSON.parse(sessionStorage.getItem("ps-assistant"));
+      if (stored && stored.session && stored.tenant) { state.session = stored.session; state.tenant = stored.tenant; }
+    } catch { /* ignore */ }
+  }
   function startTenancy() {
+    syncSession();
     setStatus("Tenancy questions");
     if (state.session && state.tenant) {
       begin("tenancy", `Hello ${state.tenant.firstName}. Ask me anything about your tenancy at ${state.tenant.address}: rent and balance, your deposit, certificates, inspections, repairs, or a copy of any document.`);
@@ -147,6 +161,7 @@
     else begin("repair", `Tell me what has gone wrong at ${state.tenant.address}, where in the property it is, and when it started. You can add up to two photos. If it is dangerous, ring ${PHONE} now.`);
   }
   function startRepair() {
+    syncSession();
     afterVerify = "repair";
     if (state.session && state.tenant) {
       begin("repair", `Hello ${state.tenant.firstName}. Tell me what has gone wrong at ${state.tenant.address}, where in the property it is, and when it started. You can add up to two photos.`);
