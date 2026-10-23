@@ -2,15 +2,21 @@
 //        The day's clock events — accepted and refused — plus the register
 //        of known office broadband addresses and anything awaiting
 //        confirmation.
+// GET  /api/team-admin?key=...&callId=...
+//        Read back one outbound call's status/result.
 // POST /api/team-admin   { key, action: 'confirm' | 'forget', ip }
+// POST /api/team-admin   { key, action: 'call', to, reason, onVoicemail?, voicemailMessage? }
+//        Places a real outbound call via Inkbox Voice AI.
 //
 // Key-protected with STAFF_ADMIN_KEY rather than a full sign-in: this is a
 // one-person admin view, not a portal, and matches how Luxe Stay's
-// equivalent page works.
+// equivalent page works. Outbound calling lives here too, not its own
+// route file, to stay under Vercel Hobby's 12-serverless-function cap.
 import { timingSafeEqual } from "node:crypto";
 import { dayLog, knownIps, rememberIp, forgetIp, config } from "../src/chat/shiftclock.mjs";
 import { roster } from "../src/chat/staff.mjs";
 import { allowanceFor, leaveSummary } from "../src/chat/holidays.mjs";
+import { placeCall, getCall, outboundCallConfigured } from "../src/chat/outbound-call.mjs";
 import { limit } from "../src/chat/ratelimit.mjs";
 
 const json = (status, body) => new Response(JSON.stringify(body), { status, headers: { "content-type": "application/json", "cache-control": "no-store" } });
@@ -30,6 +36,9 @@ export async function GET(request) {
   // 404 rather than 401: an unauthenticated caller learns nothing about
   // whether this address is a real endpoint.
   if (!authorised(url.searchParams.get("key"))) return json(404, { error: "not_found" });
+
+  const callId = url.searchParams.get("callId");
+  if (callId) return json(200, await getCall(callId));
 
   const date = url.searchParams.get("date");
   const day = isDate(date) ? date : new Date().toISOString().slice(0, 10);
@@ -68,11 +77,21 @@ export async function POST(request) {
   try { body = await request.json(); } catch { return json(400, { error: "bad_json" }); }
   if (!authorised(body.key)) return json(404, { error: "not_found" });
 
-  const target = String(body.ip || "").trim();
   const action = String(body.action || "");
+
+  if (action === "call") {
+    if (!outboundCallConfigured()) return json(503, { error: "not_configured" });
+    const to = String(body.to || "").trim();
+    const reason = String(body.reason || "").trim();
+    if (!to || !reason) return json(400, { error: "to and reason are required" });
+    const call = await placeCall({ to, reason, onVoicemail: body.onVoicemail, voicemailMessage: body.voicemailMessage });
+    return json(200, call);
+  }
+
+  const target = String(body.ip || "").trim();
   if (!target) return json(400, { error: "Which address?" });
 
   if (action === "confirm") { await rememberIp(target, { confirmed: true, by: "office" }); return json(200, { ok: true, message: `${target} confirmed.` }); }
   if (action === "forget") { await forgetIp(target); return json(200, { ok: true, message: `${target} removed. Sign-ins from it will be refused.` }); }
-  return json(400, { error: "action must be confirm or forget." });
+  return json(400, { error: "action must be confirm, forget or call." });
 }
