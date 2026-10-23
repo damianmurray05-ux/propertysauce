@@ -82,33 +82,41 @@
 
   function renderHolidays(h) {
     if (!h) return "";
-    const over = h.remaining < 0;
+    const hOver = h.holidayRemaining < 0, sOver = h.sickRemaining < 0;
+    const row = (r) => `<li style="padding:.4rem 0;border-top:1px solid var(--line)">
+      ${r.type === "sick" ? "Sick" : "Holiday"}: ${esc(r.startDate)}${r.endDate !== r.startDate ? ` – ${esc(r.endDate)}` : ""}
+      — ${r.chargedDays} day${r.chargedDays === 1 ? "" : "s"}${r.shortNotice && !r.isEmergency ? ' <span class="muted">(doubled — short notice)</span>' : ""}${r.isEmergency ? ' <span class="muted">(emergency, proof on file)</span>' : ""}
+    </li>`;
     return `
       <div style="margin-top:1.5rem;padding-top:1.25rem;border-top:1px solid var(--line)">
-        <p style="margin:0 0 .75rem">
-          <strong style="${over ? "color:var(--danger)" : ""}">${h.remaining} day${h.remaining === 1 ? "" : "s"}</strong> of holiday left this year
-          <span class="muted" style="font-size:var(--fs-0)">(${h.allowance} allowed − ${h.publicHolidaysDeducted} public holidays, ${h.takenDays} taken${over ? " — over allowance" : ""})</span>
+        <p style="margin:0 0 .5rem">${h.publicHolidays} fixed public holiday${h.publicHolidays === 1 ? "" : "s"} a year — nothing to book, the office is simply closed.</p>
+        <p style="margin:0 0 .5rem">
+          <strong style="${hOver ? "color:var(--danger)" : ""}">${h.holidayRemaining} holiday day${h.holidayRemaining === 1 ? "" : "s"}</strong> left this year
+          <span class="muted" style="font-size:var(--fs-0)">(${h.holidayAllowance} allowed, ${h.holidayTakenDays} taken${hOver ? " — over allowance" : ""})</span>
         </p>
-        <button class="btn btn-ghost btn-sm" type="button" data-book-holiday>Book a holiday</button>
+        <p style="margin:0 0 .75rem">
+          <strong style="${sOver ? "color:var(--danger)" : ""}">${h.sickRemaining} sick day${h.sickRemaining === 1 ? "" : "s"}</strong> left this year
+          <span class="muted" style="font-size:var(--fs-0)">(${h.sickAllowance} allowed, ${h.sickTakenDays} taken${sOver ? " — over allowance" : ""})</span>
+        </p>
+        <button class="btn btn-ghost btn-sm" type="button" data-book-holiday="holiday">Book a holiday</button>
+        <button class="btn btn-ghost btn-sm" type="button" data-book-holiday="sick" style="margin-left:.5rem">Take a sick day</button>
         <div id="holiday-form" hidden style="margin-top:1rem"></div>
-        ${h.requests.length ? `<ul style="margin-top:1rem;padding-left:0;list-style:none;font-size:var(--fs-0)">${h.requests.slice(0, 6).map((r) => `<li style="padding:.4rem 0;border-top:1px solid var(--line)">
-          ${esc(r.startDate)}${r.endDate !== r.startDate ? ` – ${esc(r.endDate)}` : ""}
-          — ${r.chargedDays} day${r.chargedDays === 1 ? "" : "s"}${r.shortNotice && !r.isEmergency ? ' <span class="muted">(doubled — short notice)</span>' : ""}${r.isEmergency ? ' <span class="muted">(emergency, proof on file)</span>' : ""}
-        </li>`).join("")}</ul>` : ""}
+        ${h.requests.length ? `<ul style="margin-top:1rem;padding-left:0;list-style:none;font-size:var(--fs-0)">${h.requests.slice(0, 8).map(row).join("")}</ul>` : ""}
       </div>`;
   }
 
-  function holidayFormHtml() {
+  function holidayFormHtml(type) {
+    const sick = type === "sick";
     return `
-      <form class="score-form" id="holiday-request-form" style="grid-template-columns:1fr" novalidate>
+      <form class="score-form" id="holiday-request-form" data-leave-type="${type}" style="grid-template-columns:1fr" novalidate>
         <div class="field"><label for="h-start">First day</label><input id="h-start" type="date" required></div>
         <div class="field"><label for="h-end">Last day</label><input id="h-end" type="date" required></div>
         <div class="field"><label for="h-reason">Reason (optional)</label><input id="h-reason" type="text"></div>
-        <label style="display:flex;gap:.5rem;align-items:center;font-size:var(--fs-0)">
+        ${sick ? "" : `<label style="display:flex;gap:.5rem;align-items:center;font-size:var(--fs-0)">
           <input id="h-emergency" type="checkbox"> This is a medical emergency (upload proof to avoid the short-notice penalty)
         </label>
-        <div class="field" id="h-proof-field" hidden><label for="h-proof">Proof (PDF)</label><input id="h-proof" type="file" accept="application/pdf"></div>
-        <button class="btn btn-primary btn-sm" type="submit">Request holiday</button>
+        <div class="field" id="h-proof-field" hidden><label for="h-proof">Proof (PDF)</label><input id="h-proof" type="file" accept="application/pdf"></div>`}
+        <button class="btn btn-primary btn-sm" type="submit">${sick ? "Log sick day" : "Request holiday"}</button>
       </form>
       <p class="notice" data-holiday-status hidden style="margin-top:.75rem"></p>`;
   }
@@ -175,10 +183,12 @@
     const holidayForm = e.target.closest("#holiday-request-form");
     if (holidayForm) {
       e.preventDefault();
+      const type = holidayForm.dataset.leaveType === "sick" ? "sick" : "holiday";
       const statusEl = root.querySelector("[data-holiday-status]");
       const say2 = (m, bad) => { if (!statusEl) return; statusEl.hidden = !m; statusEl.textContent = m || ""; statusEl.className = `notice${bad ? " err" : ""}`; };
       say2("Checking…");
-      const emergency = root.querySelector("#h-emergency").checked;
+      const emergencyBox = root.querySelector("#h-emergency");
+      const emergency = Boolean(emergencyBox && emergencyBox.checked);
       const fileInput = root.querySelector("#h-proof");
       let proof = null;
       if (emergency) {
@@ -190,6 +200,7 @@
         method: "POST",
         headers: { authorization: `Bearer ${token}`, "content-type": "application/json" },
         body: JSON.stringify({
+          type,
           startDate: root.querySelector("#h-start").value,
           endDate: root.querySelector("#h-end").value,
           reason: root.querySelector("#h-reason").value,
@@ -199,7 +210,7 @@
       });
       if (!ok) return say2(d.error || "That did not work.", true);
       await load();
-      say(`Booked — ${d.chargedDays} day${d.chargedDays === 1 ? "" : "s"}${d.shortNotice && !d.isEmergency ? " (doubled for short notice)" : ""}.`, "good");
+      say(`Booked — ${d.chargedDays} ${type} day${d.chargedDays === 1 ? "" : "s"}${d.shortNotice && !d.isEmergency ? " (doubled for short notice)" : ""}. You have ${d.remaining} ${type} day${d.remaining === 1 ? "" : "s"} left.`, "good");
     }
   });
 
@@ -215,11 +226,15 @@
     if (e.target.closest("[data-out]")) return clock("out");
     if (e.target.closest("[data-break]")) return clock("break");
     if (e.target.closest("[data-return]")) return clock("return");
-    if (e.target.closest("[data-book-holiday]")) {
+    const bookBtn = e.target.closest("[data-book-holiday]");
+    if (bookBtn) {
+      const type = bookBtn.dataset.bookHoliday;
       const el = root.querySelector("#holiday-form");
       if (!el) return;
-      el.hidden = !el.hidden;
-      if (!el.hidden) el.innerHTML = holidayFormHtml();
+      if (!el.hidden && el.dataset.shownType === type) { el.hidden = true; return; }
+      el.hidden = false;
+      el.dataset.shownType = type;
+      el.innerHTML = holidayFormHtml(type);
       return;
     }
     if (e.target.closest("[data-signout]")) {

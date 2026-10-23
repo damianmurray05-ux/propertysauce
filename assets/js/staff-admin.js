@@ -117,17 +117,20 @@
       <h3 style="margin-top:2rem">Known office addresses</h3>
       ${d.register.length ? `<ul>${d.register.map((r) => `<li><code>${esc(r.ip)}</code>${r.confirmedAt ? " — confirmed" : " — unconfirmed"}</li>`).join("")}</ul>` : `<p class="muted">None recorded yet. The first clean sign-in on the office Wi-Fi will add one.</p>`}
 
-      <h3 style="margin-top:2rem">Holidays this year</h3>
+      <h3 style="margin-top:2rem">Holidays and sick days this year</h3>
       ${d.holidays && d.holidays.length ? `<table style="width:100%;border-collapse:collapse;font-size:var(--fs-1)">
         <thead><tr style="text-align:left;border-bottom:2px solid var(--line-strong)">
-          <th style="padding:.5rem">Who</th><th style="padding:.5rem">Allowed</th><th style="padding:.5rem">Public holidays</th><th style="padding:.5rem">Taken</th><th style="padding:.5rem">Left</th>
+          <th style="padding:.5rem">Who</th><th style="padding:.5rem">Public</th>
+          <th style="padding:.5rem">Holiday taken</th><th style="padding:.5rem">Holiday left</th>
+          <th style="padding:.5rem">Sick taken</th><th style="padding:.5rem">Sick left</th>
         </tr></thead>
         <tbody>${d.holidays.map((h) => `<tr style="border-bottom:1px solid var(--line)">
           <td style="padding:.5rem">${esc(h.name)}</td>
-          <td style="padding:.5rem">${h.allowance}</td>
-          <td style="padding:.5rem">${h.publicHolidaysDeducted}</td>
-          <td style="padding:.5rem">${h.takenDays}</td>
-          <td style="padding:.5rem;${h.remaining < 0 ? "color:var(--danger)" : ""}">${h.remaining}</td>
+          <td style="padding:.5rem">${h.publicHolidays}</td>
+          <td style="padding:.5rem">${h.holidayTakenDays}</td>
+          <td style="padding:.5rem;${h.holidayRemaining < 0 ? "color:var(--danger)" : ""}">${h.holidayRemaining}</td>
+          <td style="padding:.5rem">${h.sickTakenDays}</td>
+          <td style="padding:.5rem;${h.sickRemaining < 0 ? "color:var(--danger)" : ""}">${h.sickRemaining}</td>
         </tr>`).join("")}</tbody>
       </table>` : `<p class="muted">Nothing to show.</p>`}
 

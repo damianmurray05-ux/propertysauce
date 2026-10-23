@@ -2,20 +2,20 @@
 // allowance. Same Zoho Events module as the shift clock, same reasoning —
 // one record per request, searchable by the date it starts.
 //
-// Company protocol, from Damian: four weeks' notice. Less than that costs
-// DOUBLE days, unless it is a medical emergency with proof (a PDF) uploaded
-// at the time of the request, in which case it costs the normal,
-// un-doubled amount. The allowance itself has Pakistan's public holidays
-// for the year already taken off it — see allowanceFor().
+// Company policy, confirmed by Damian 23 Oct 2026: 32 days a year, in three
+// parts —
+//   14 public holidays   fixed, non-negotiable, nothing to book
+//   10 holiday days       booked by the person, 4 weeks' notice required
+//    8 sick days          no notice needed, taken as sick
+// Four weeks' notice on a HOLIDAY day: less than that costs DOUBLE days,
+// unless it is a medical emergency with proof (a PDF) uploaded at the time,
+// which keeps the normal rate. SICK days never carry that penalty — that is
+// the whole point of having them as a separate pool.
 
 import { search, createRecord, uploadAttachment } from "./zoho.mjs";
 
 const NOTICE_DAYS_REQUIRED = 28;
-// Pakistan's Factories Act 1934 / Shops & Establishments Ordinance norm for
-// paid annual leave is 14 days. This is a starting default, not a decision —
-// confirm the real figure with Damian, then set it per person with
-// "holidayAllowance" on their STAFF_DIRECTORY_JSON row.
-const DEFAULT_ALLOWANCE = 14;
+const DEFAULTS = { publicHolidays: 14, holidayAllowance: 10, sickAllowance: 8 };
 
 function zohoDateTime(d) {
   const p = (n) => String(n).padStart(2, "0");
@@ -37,29 +37,25 @@ function workingDaysBetween(start, end) {
   return count;
 }
 
-const holidayTitle = (startDate, slug, id) => `HOLIDAY: ${startDate}: ${slug}: ${id}`;
+const TITLE = { holiday: "HOLIDAY", sick: "SICK" };
+const leaveTitle = (type, startDate, slug, id) => `${TITLE[type]}: ${startDate}: ${slug}: ${id}`;
 
 function loadDirectory() {
   if (!process.env.STAFF_DIRECTORY_JSON) return [];
   try { return JSON.parse(process.env.STAFF_DIRECTORY_JSON); } catch { return []; }
 }
 
-/**
- * The annual allowance for one person, and how many of Pakistan's public
- * holidays come off it this year. PUBLIC_HOLIDAYS_JSON is a plain
- * {"2026": 17} map — one number per year, updated each January once that
- * year's gazetted list is confirmed (the Islamic-calendar ones move).
- */
-export function allowanceFor(name, year = new Date().getFullYear()) {
+/** The three-way annual allowance for one person. Per-person overrides come from their STAFF_DIRECTORY_JSON row. */
+export function allowanceFor(name) {
   const row = loadDirectory().find((r) => (r.name || "").trim().toLowerCase() === String(name || "").trim().toLowerCase());
-  const allowance = Number(row?.holidayAllowance) || DEFAULT_ALLOWANCE;
-  let publicHolidays = {};
-  try { publicHolidays = JSON.parse(process.env.PUBLIC_HOLIDAYS_JSON || "{}"); } catch { /* ignore */ }
-  const deducted = Number(publicHolidays[String(year)]) || 0;
-  return { allowance, publicHolidaysDeducted: deducted, adjustedAllowance: Math.max(0, allowance - deducted) };
+  return {
+    publicHolidays: Number(row?.publicHolidays) || DEFAULTS.publicHolidays,
+    holidayAllowance: Number(row?.holidayAllowance) || DEFAULTS.holidayAllowance,
+    sickAllowance: Number(row?.sickAllowance) || DEFAULTS.sickAllowance,
+  };
 }
 
-export async function requestHoliday({ staff, startDate, endDate, reason, isEmergency, proof }) {
+export async function requestLeave({ type, staff, startDate, endDate, reason, isEmergency, proof }) {
   const start = parseDate(startDate);
   const end = parseDate(endDate || startDate);
   if (!start || !end || end < start) return { ok: false, error: "That date range doesn't look right." };
@@ -68,21 +64,25 @@ export async function requestHoliday({ staff, startDate, endDate, reason, isEmer
   if (days <= 0) return { ok: false, error: "That range doesn't include any working days." };
 
   const now = new Date();
-  const noticeDays = Math.floor((start - now) / 86_400_000);
-  const shortNotice = noticeDays < NOTICE_DAYS_REQUIRED;
-  const emergency = Boolean(isEmergency && proof);
-  const chargedDays = shortNotice && !emergency ? days * 2 : days;
+  let noticeDays = null, shortNotice = false, chargedDays = days;
+  if (type === "holiday") {
+    noticeDays = Math.floor((start - now) / 86_400_000);
+    shortNotice = noticeDays < NOTICE_DAYS_REQUIRED;
+    const emergency = Boolean(isEmergency && proof);
+    chargedDays = shortNotice && !emergency ? days * 2 : days;
+  }
+  // Sick days: no notice calculation, no doubling — that's the point of them.
 
   const id = Math.random().toString(36).slice(2, 8);
   const meta = {
-    staffName: staff.name, slug: staff.slug,
+    type, staffName: staff.name, slug: staff.slug,
     startDate: isoDate(start), endDate: isoDate(end),
     requestedAt: now.toISOString(), noticeDays, shortNotice,
     isEmergency: Boolean(isEmergency), proofUploaded: Boolean(proof),
     days, chargedDays, reason: String(reason || "").slice(0, 300),
   };
   const details = await createRecord("Events", {
-    Event_Title: holidayTitle(meta.startDate, staff.slug, id),
+    Event_Title: leaveTitle(type, meta.startDate, staff.slug, id),
     Start_DateTime: zohoDateTime(start),
     End_DateTime: zohoDateTime(new Date(end.getTime() + 23 * 3_600_000 + 59 * 60_000)),
     Description: JSON.stringify(meta),
@@ -94,30 +94,41 @@ export async function requestHoliday({ staff, startDate, endDate, reason, isEmer
   return { ok: true, ...meta };
 }
 
-/** Every holiday request for one person in a given year, newest first, with the total charged. */
-export async function holidaysForStaff(slug, year = new Date().getFullYear()) {
-  const rows = await search("Events", `(Event_Title:starts_with:HOLIDAY: ${year})`, "id,Event_Title,Description", 500).catch(() => []);
-  const mine = rows
+/** Every holiday + sick request for one person this year, newest first, with both totals. */
+export async function leaveForStaff(slug, year = new Date().getFullYear()) {
+  const [holidayRows, sickRows] = await Promise.all([
+    search("Events", `(Event_Title:starts_with:HOLIDAY: ${year})`, "id,Event_Title,Description", 500).catch(() => []),
+    search("Events", `(Event_Title:starts_with:SICK: ${year})`, "id,Event_Title,Description", 500).catch(() => []),
+  ]);
+  const parse = (rows) => rows
     .map((r) => { let meta = {}; try { meta = JSON.parse(r.Description || "{}"); } catch { /* ignore */ } return meta; })
     .filter((r) => r.slug === slug);
-  const takenDays = mine.reduce((sum, r) => sum + (r.chargedDays || 0), 0);
-  return { requests: mine.sort((a, b) => (b.startDate || "").localeCompare(a.startDate || "")), takenDays };
+  const holidayRequests = parse(holidayRows);
+  const sickRequests = parse(sickRows);
+  const holidayTakenDays = holidayRequests.reduce((sum, r) => sum + (r.chargedDays || 0), 0);
+  const sickTakenDays = sickRequests.reduce((sum, r) => sum + (r.chargedDays || 0), 0);
+  const requests = [...holidayRequests, ...sickRequests].sort((a, b) => (b.startDate || "").localeCompare(a.startDate || ""));
+  return { requests, holidayTakenDays, sickTakenDays };
 }
 
-/** Every holiday request across all staff for a year, grouped by person — for the admin view. */
-export async function holidaysSummary(year = new Date().getFullYear()) {
-  const rows = await search("Events", `(Event_Title:starts_with:HOLIDAY: ${year})`, "id,Event_Title,Description", 500).catch(() => []);
+/** Every holiday + sick request across all staff for a year, grouped by person — for the admin view. */
+export async function leaveSummary(year = new Date().getFullYear()) {
+  const [holidayRows, sickRows] = await Promise.all([
+    search("Events", `(Event_Title:starts_with:HOLIDAY: ${year})`, "id,Event_Title,Description", 500).catch(() => []),
+    search("Events", `(Event_Title:starts_with:SICK: ${year})`, "id,Event_Title,Description", 500).catch(() => []),
+  ]);
   const byStaff = new Map();
-  for (const r of rows) {
+  for (const r of [...holidayRows, ...sickRows]) {
     let meta = {};
     try { meta = JSON.parse(r.Description || "{}"); } catch { /* ignore */ }
     if (!meta.staffName) continue;
-    if (!byStaff.has(meta.staffName)) byStaff.set(meta.staffName, { name: meta.staffName, takenDays: 0, requests: [] });
+    if (!byStaff.has(meta.staffName)) byStaff.set(meta.staffName, { name: meta.staffName, holidayTakenDays: 0, sickTakenDays: 0, requests: [] });
     const s = byStaff.get(meta.staffName);
-    s.takenDays += meta.chargedDays || 0;
+    if (meta.type === "sick") s.sickTakenDays += meta.chargedDays || 0;
+    else s.holidayTakenDays += meta.chargedDays || 0;
     s.requests.push(meta);
   }
   return Array.from(byStaff.values()).sort((a, b) => a.name.localeCompare(b.name));
 }
 
-export const config = { NOTICE_DAYS_REQUIRED, DEFAULT_ALLOWANCE };
+export const config = { NOTICE_DAYS_REQUIRED, DEFAULTS };
